@@ -1,0 +1,59 @@
+package shape;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Polygon;
+
+public class Triangle extends AShape {
+	private int xPoints[];
+	private int yPoints[];
+
+    public Triangle(Color color, Point A, Point B, Point C) {
+    	this.xPoints = new int[]{(int) A.getX(),(int) B.getX(),(int) C.getX()};
+    	this.yPoints = new int[]{(int) A.getY(),(int) B.getY(),(int) C.getY()};
+    	
+        this.color = color;
+        this.location = findLocation();
+        		
+       
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        g.setColor(color);
+        Polygon p = new Polygon(xPoints, yPoints, 3);
+        g.drawPolygon(p);
+        g.fillPolygon(p);
+    }
+    
+    private Point findLocation(){
+    	
+    	int x = xPoints[0] < xPoints[1] ? 
+    			(xPoints[0] < xPoints[2] ? xPoints[0] : xPoints[2]) : 
+    			(xPoints[1] < xPoints[2] ? xPoints[1] : xPoints[2]);
+    	
+    	int y = yPoints[0] > yPoints[1] ? 
+       			(yPoints[0] > yPoints[2] ? yPoints[0] : yPoints[2]) : 
+       			(yPoints[1] > yPoints[2] ? yPoints[1] : yPoints[2]);
+    	
+		return new Point(x,y);
+    }
+    
+    @Override
+    public void setLocation(Point location) {
+    	int xOri = (int) this.location.getX();
+    	int yOri = (int) this.location.getY();
+    	
+    	int xNew = (int) location.getX();
+    	int yNew = (int) location.getY();
+    	
+    	for (int i=0; i <xPoints.length; i++){
+    		xPoints[i] += (xNew - xOri);
+    		yPoints[i] += (yNew - yOri);
+    	}
+    	
+    	this.location = location;
+    }
+    
+}

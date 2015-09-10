@@ -1,0 +1,19 @@
+package model.ball;
+
+import java.awt.Graphics;
+
+public class WanderBall extends ABall {
+
+    @Override
+    protected void move() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void paint(Graphics g) {
+        // TODO Auto-generated method stub
+
+    }
+
+}

@@ -1,0 +1,26 @@
+package model.ball;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Point;
+
+/**
+ * A ball that can go around a circle
+ * @author ls53@rice.edu
+ */
+public class CurveBall extends ABall {
+    
+    private double theta = Math.PI / 15;
+
+    public CurveBall(Point startLoc, int startRadius, Point startVel, Color color, Component canvas) {
+        super(startLoc, startRadius, startVel, color, canvas);
+    }
+
+    @Override
+    protected void updateUniqueProperty() {
+        int oldVx = velocity.x;
+        int oldVy = velocity.y;
+        velocity.x = (int)Math.round((Math.cos(theta) * oldVx - Math.sin(theta) * oldVy));
+        velocity.y = (int)Math.round(Math.cos(theta) * oldVy + Math.sin(theta) * oldVx);
+    }
+}

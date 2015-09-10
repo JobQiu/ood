@@ -1,0 +1,36 @@
+package controller;
+
+import java.awt.EventQueue;
+
+import model.BallWorldModel;
+import view.BallWorldView;
+
+public class BallWorldController {
+    
+    private BallWorldModel model;
+    
+    private BallWorldView view;
+    
+    public BallWorldController() {
+        
+    }
+    
+    public void start() {
+        model.start();
+        view.start();
+    }
+    
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    BallWorldController controller = new BallWorldController();
+                    controller.start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+}

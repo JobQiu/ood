@@ -1,0 +1,69 @@
+package controller;
+
+import java.awt.EventQueue;
+import java.awt.Graphics;
+
+import model.BallWorldModel;
+import model.IViewAdapter;
+import view.BallWorldView;
+import view.IModelCtrlAdapter;
+import view.IModelPaintAdapter;
+
+public class BallWorldController {
+    
+    private BallWorldModel model;
+    
+    private BallWorldView view;
+    
+    public BallWorldController() {
+        model = new BallWorldModel(new IViewAdapter() {
+            
+            @Override
+            public void repaint() {
+                
+                
+            }
+        });
+        
+        view = new BallWorldView(new IModelCtrlAdapter() {
+            
+            @Override
+            public void loadBall(String className) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public void clearBalls() {
+                // TODO Auto-generated method stub
+                
+            }
+        }, new IModelPaintAdapter() {
+            
+            @Override
+            public void paintBalls(Graphics g) {
+                // TODO Auto-generated method stub
+                
+            }
+        });
+    }
+    
+    public void start() {
+        model.start();
+        view.start();
+    }
+    
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    BallWorldController controller = new BallWorldController();
+                    controller.start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+}

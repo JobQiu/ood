@@ -1,0 +1,8 @@
+package view;
+
+import java.awt.Graphics;
+
+public interface IModelPaintAdapter {
+    
+    public void paintBalls(Graphics g);
+}

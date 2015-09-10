@@ -1,0 +1,65 @@
+package model;
+
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.lang.reflect.Constructor;
+
+import javax.swing.Timer;
+
+import model.ball.ABall;
+import util.Dispatcher;
+
+public class BallWorldModel {
+    
+    private IViewAdapter viewAdpt = IViewAdapter.NULL_OBJECT;
+    
+    private Dispatcher dispatcher = new Dispatcher();
+    
+    private int timeSlice = 50;
+    
+    private Timer timer = new Timer(timeSlice, new ActionListener() {
+        
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            viewAdpt.repaint();
+        }
+    });
+    
+    public BallWorldModel(IViewAdapter viewAdpt) {
+        this.viewAdpt = viewAdpt;
+    }
+    
+    public void makeBall(String className) {
+        try {
+            Object[] args = new Object[]{};
+            
+            Constructor<?> cs[] = Class.forName(className).getConstructors();
+            for (Constructor<?> c : cs) {
+                if (args.length == c.getParameterCount()) {
+                    Object obj = c.newInstance(args)
+                    if (obj instanceof ABall) {
+                        ABall ball = (ABall)obj;
+                        dispatcher.addObserver(ball);
+                        break;                        
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Class " + className + " failed to load.\nException =\n" + e);
+            e.printStackTrace();
+        }
+    }
+    
+    public void clearBalls() {
+        
+    }
+    
+    public void start() {
+        timer.start();
+    }
+    
+    public void paint(Graphics g) {
+        dispatcher.notifyAll(g);
+    }
+}

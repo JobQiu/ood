@@ -1,0 +1,177 @@
+package view;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.EventQueue;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+
+import shape.AShape;
+import shape.House;
+import shape.Rectangle;
+import shape.Triangle;
+
+public class ShapeFrame extends JFrame {
+
+    /**
+     * The serial version UID
+     */
+    private static final long serialVersionUID = -4067176727730867507L;
+
+    /**
+     * The container panel for the north panel and center panel
+     */
+    private JPanel contentPane;
+
+    /**
+     * The text field for user to input
+     */
+    private JTextField northTf;
+
+    /**
+     * Launch the application.
+     * @param args arguments for launch the application
+     */
+    
+    private AShape paintingShape = new Rectangle(new Point(100,200), Color.RED, 100, 200);
+
+    
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    ShapeFrame frame = new ShapeFrame();
+                    frame.start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    /**
+     * Create the frame.
+     */
+    public ShapeFrame() {
+        initGUI();
+    }
+
+    /**
+     * Initialize the GUI components but do not start the frame.
+     */
+    private void initGUI() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 450, 300);
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        contentPane.setLayout(new BorderLayout(0, 0));
+        setContentPane(contentPane);
+
+        JPanel centerPnl = new JPanel() {
+            /**
+             * The serial version UID
+             */
+            private static final long serialVersionUID = -7726555411787948554L;
+
+            /**
+             * Overridden paintComponent method to paint a shape in the panel.
+             * @param g The Graphics object to paint on.
+             **/
+            public void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.setColor(Color.RED);
+                g.fillOval(75, 100, 20, 40);
+                
+                paintingShape.paint(g);
+                
+                System.out.println("Painting shape at: " + paintingShape.getLocation());
+                
+            }
+        };
+        centerPnl.setToolTipText("Here will dispaly some fancy paints!");
+
+        centerPnl.setBackground(Color.BLACK);
+        contentPane.add(centerPnl, BorderLayout.CENTER);
+
+        JPanel northPnl = new JPanel();
+        northPnl.setToolTipText("North panel contains a welcome button and a textfield.");
+        northPnl.setBackground(Color.RED);
+        contentPane.add(northPnl, BorderLayout.NORTH);
+
+        JButton northBtn = new JButton("Welcome");
+        northBtn.setToolTipText("This button can set stings get from textfield.");
+        northPnl.add(northBtn);
+
+        northTf = new JTextField();
+        northTf.setToolTipText("You can input whatever you want to display on the label.");
+        northPnl.add(northTf);
+        northTf.setColumns(10);
+
+        JLabel northLbl = new JLabel("");
+        northLbl.setToolTipText("Text will display here.");
+        northPnl.add(northLbl);
+        
+        JPanel westPnl = new JPanel();
+        westPnl.setBackground(Color.GREEN);
+        westPnl.setToolTipText("No idea what's going on here...");
+        contentPane.add(westPnl, BorderLayout.WEST);
+        
+        JButton westBtn = new JButton("WantToTry?");
+        westBtn.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		System.out.println("westBtn has been clicked!!!");
+        		
+                paintingShape = new Triangle(Color.CYAN, new Point(100,150), new Point(150,50), new Point(150,200));
+                
+        		centerPnl.repaint();	
+        	}
+        });
+        westBtn.setToolTipText("Just try it!");
+        westPnl.add(westBtn);
+        
+        JButton westBtnR = new JButton("TryAgain!");
+        westBtnR.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		System.out.println("westBtnR has been clicked!!!");
+        		
+                paintingShape = new House();
+                
+        		centerPnl.repaint();        		
+        	}
+        });
+        westBtnR.setToolTipText("And try this one!");
+        westPnl.add(westBtnR);
+
+        northBtn.addActionListener(new ActionListener() {
+            /**
+             * Click handler for the north button
+             * @param e The click ActionEvent 
+             */
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("northBtn has been clicked!!!");
+                northLbl.setText("Welcome to COMP 504!");
+                String northTfText = northTf.getText();
+                if (!northTfText.equals("")) {
+                    northLbl.setText(northTfText);
+                    System.out.println("input text in northTf has been set!!!");
+                }
+            }
+        });
+    }
+
+    /**
+     * Start the frame
+     */
+    private void start() {
+        setVisible(true);
+    }
+}

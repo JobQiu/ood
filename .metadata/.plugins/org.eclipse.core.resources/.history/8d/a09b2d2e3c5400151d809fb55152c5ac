@@ -1,0 +1,28 @@
+package view;
+
+/**
+ * The interface for view to control model
+ * @author ls53@rice.edu
+ */
+public interface IModelCtrlAdapter {
+    
+    /**
+     * Load a ball
+     * @param className The class name for a ball
+     */
+    public void loadBall(String className);
+    
+    /**
+     * 
+     */
+    public void clearBalls();
+    
+    public static final IModelCtrlAdapter NULL_OBJECT = new IModelCtrlAdapter() {
+        
+        @Override
+        public void loadBall(String className) {}
+        
+        @Override
+        public void clearBalls() {}
+    };
+}

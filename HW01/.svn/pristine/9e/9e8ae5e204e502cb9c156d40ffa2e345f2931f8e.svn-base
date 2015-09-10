@@ -1,0 +1,37 @@
+package shape;
+
+import java.awt.Graphics;
+import java.awt.Point;
+
+public class TwoShapeComposite extends AShape {
+	private AShape shape1;
+	private AShape shape2;
+
+    public TwoShapeComposite(AShape shape1, AShape shape2) {
+    	this.shape1 = shape1;
+    	this.shape2 = shape2;
+    	
+    	int locX = (shape1.getLocation().getX() < shape2.getLocation().getX()) ? (int) shape1.getLocation().getX() : (int) shape2.getLocation().getX() ;
+    	int locY = (shape1.getLocation().getY() < shape2.getLocation().getY()) ? (int) shape1.getLocation().getY() : (int) shape2.getLocation().getY() ;
+    	this.location = (new Point(locX,locY));
+    }
+
+    @Override
+    public void paint(Graphics g) {
+    	this.shape1.paint(g);
+    	this.shape2.paint(g);
+    }
+    
+    @Override
+    public void setLocation(Point location) {
+    	int xMove = (int) location.getX() - (int) this.getLocation().getX();
+    	int yMove = (int) location.getY() - (int) this.getLocation().getY();
+    	
+    	for (AShape i : new AShape[] {shape1 , shape2}){
+    		Point oriLoc = i.getLocation();
+    		Point newLoc = new Point((int) oriLoc.getX() + xMove,(int) oriLoc.getY() + yMove);
+    		i.setLocation(newLoc);
+    	}
+    }
+    
+}

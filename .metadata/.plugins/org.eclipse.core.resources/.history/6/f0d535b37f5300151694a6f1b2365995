@@ -1,0 +1,8 @@
+package model.ball;
+
+public abstract class ABall {
+    
+    public void update() {
+        
+    }
+}

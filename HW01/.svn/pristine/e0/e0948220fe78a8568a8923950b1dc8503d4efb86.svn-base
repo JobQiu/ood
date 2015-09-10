@@ -1,0 +1,56 @@
+package shape;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+
+public abstract class AShape {
+
+    /**
+     * The upper left corner of a shape
+     */
+    protected Point location;
+
+    /**
+     * The color of a shape
+     */
+    protected Color color;
+
+    /**
+     * The abstract paint method for the abstract shape
+     * @param g The Graphics object to paint the abstract shape
+     */
+    public abstract void paint(Graphics g);
+
+    /**
+     * Get the location of the abstract shape
+     * @return The location of the abstract shape
+     */
+    public Point getLocation() {
+        return location;
+    }
+
+    /**
+     * Get the location of the abstract shape
+     * @param location The location of the abstract shape
+     */
+    public void setLocation(Point location) {
+        this.location = location;
+    }
+
+    /**
+     * Get the color for the abstract shape
+     * @return The color for the abstract shape
+     */
+    public Color getColor() {
+        return color;
+    }
+
+    /**
+     * Set the color for the abstract shape
+     * @param color The color for the abstract shape
+     */
+    public void setColor(Color color) {
+        this.color = color;
+    }
+}

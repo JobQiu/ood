@@ -1,0 +1,36 @@
+package shape;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+
+public abstract class AShape {
+
+	/**
+	 * The upper left corner of a shape
+	 */
+	protected Point location;
+
+	/**
+	 * The color of a shape
+	 */
+	protected Color color;
+
+	public abstract void paint(Graphics g);
+
+	public Point getLocation() {
+		return location;
+	}
+
+	public void setLocation(Point location) {
+		this.location = location;
+	}
+
+	public Color getColor() {
+		return color;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
+	}
+}

@@ -1,0 +1,21 @@
+package model;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.Timer;
+
+public class BallWorldModel {
+    
+    private IViewAdapter viewAdpt = IViewAdapter.NULL_OBJECT;
+    
+    private int timeSlice = 50;
+    
+    private Timer timer = new Timer(timeSlice, new ActionListener() {
+        
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            
+        }
+    });
+}

@@ -1,0 +1,14 @@
+package view;
+
+import java.awt.Graphics;
+
+public interface IModelPaintAdapter {
+    
+    public void paintBalls(Graphics g);
+    
+    public static final IModelPaintAdapter NULL_OBJECT = new IModelPaintAdapter() {
+        
+        @Override
+        public void paintBalls(Graphics g) {}
+    };
+}

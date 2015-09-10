@@ -1,0 +1,11 @@
+package model;
+
+public interface IViewAdapter {
+    public void repaint();
+    
+    public static final IViewAdapter NULL_OBJECT = new IViewAdapter() {
+        
+        @Override
+        public void repaint() {}
+    };
+}

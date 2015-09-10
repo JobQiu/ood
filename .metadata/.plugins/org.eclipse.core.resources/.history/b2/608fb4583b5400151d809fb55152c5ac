@@ -1,0 +1,106 @@
+package view;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+
+/**
+ * The view class for ball world
+ * @author ls53@rice.edu
+ */
+public class BallWorldView extends JFrame {
+
+    /**
+     * The serial version UID
+     */
+    private static final long serialVersionUID = 5967465389828290111L;
+    
+    /**
+     * The content Panel
+     */
+    private JPanel contentPane;
+    
+    private IModelCtrlAdapter modelCtrlAdpt = IModelCtrlAdapter.NULL_OBJECT;
+    
+    private IModelPaintAdapter modelPaintAdpt = IModelPaintAdapter.NULL_OBJECT;
+    
+    private final JPanel pnlControl = new JPanel();
+    private final JPanel pnlCanvas = new JPanel() {
+
+        /**
+         * The serial version UID
+         */
+        private static final long serialVersionUID = 3703730653838964038L;
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            modelPaintAdpt.paintBalls(g);
+        }
+    };
+    private final JTextField txtClassName = new JTextField();
+    private final JButton btnMakeBall = new JButton("Make Ball");
+    private final JButton btnClearAll = new JButton("Clear All");
+
+    /**
+     * Create the frame.
+     */
+    public BallWorldView(IModelCtrlAdapter modelCtrlAdpt, IModelPaintAdapter modelPaintAdpt) {
+        txtClassName.setText("model.ball.StraightBall");
+        txtClassName.setColumns(12);
+        initGUI();
+        this.modelCtrlAdpt = modelCtrlAdpt;
+        this.modelPaintAdpt = modelPaintAdpt;
+    }
+    
+    private void initGUI() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 450, 300);
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        contentPane.setLayout(new BorderLayout(0, 0));
+        setContentPane(contentPane);
+        
+        contentPane.add(pnlControl, BorderLayout.NORTH);
+        
+        pnlControl.add(txtClassName);
+        btnMakeBall.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                modelCtrlAdpt.loadBall(txtClassName.getText());
+            }
+        });
+        
+        pnlControl.add(btnMakeBall);
+        btnClearAll.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                modelCtrlAdpt.clearBalls();
+            }
+        });
+        
+        pnlControl.add(btnClearAll);
+        pnlCanvas.setBackground(Color.WHITE);
+        
+        contentPane.add(pnlCanvas, BorderLayout.CENTER);
+    }
+    
+    public void start() {
+        setVisible(true);
+    }
+    
+    public void update() {
+        pnlCanvas.repaint();
+    }
+    
+    public Component getCanvas() {
+        return pnlCanvas;
+    }
+}

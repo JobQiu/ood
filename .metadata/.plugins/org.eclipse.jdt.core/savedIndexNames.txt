@@ -1,0 +1,2 @@
+INDEX VERSION 1.127+/Users/zealot/workspace/eclipse/.metadata/.plugins/org.eclipse.jdt.core
+2775670876.index

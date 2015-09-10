@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename method &apos;model.IViewAdapter.update()&apos; to &apos;repaint&apos;&#x0A;- Original project: &apos;HW02&apos;&#x0A;- Original element: &apos;model.IViewAdapter.update()&apos;&#x0A;- Renamed element: &apos;model.IViewAdapter.repaint()&apos;&#x0A;- Update references to refactored element" delegate="false" deprecate="false" description="Rename method &apos;update&apos;" flags="589830" id="org.eclipse.jdt.ui.rename.method" input="/src&lt;model{IViewAdapter.java[IViewAdapter~update" name="repaint" references="true" stamp="1441427809119" version="1.0"/>
+</session>

@@ -1,0 +1,11 @@
+package model.ball;
+
+public class CurveBall extends ABall {
+
+    @Override
+    protected void updateUniqueProperty() {
+        // TODO Auto-generated method stub
+
+    }
+
+}

@@ -1,0 +1,114 @@
+package view;
+
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+import java.awt.Graphics;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import java.awt.Color;
+
+import javax.swing.JLabel;
+import javax.swing.JButton;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+import javax.swing.JTextField;
+
+public class ShapeFrame extends JFrame {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4067176727730867507L;
+	private JPanel contentPane;
+	private JTextField northTf;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					ShapeFrame frame = new ShapeFrame();
+					frame.start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public ShapeFrame() {
+		initGUI();
+	}
+
+	/**
+	 * Initialize the GUI components but do not start the frame. 
+	 */
+	private void initGUI() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 450, 300);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new BorderLayout(0, 0));
+		setContentPane(contentPane);
+
+		JPanel centerPnl = new JPanel() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -7726555411787948554L;
+
+			/**
+			* Overridden paintComponent method to paint a shape in the panel.
+			* @param g The Graphics object to paint on.
+			**/
+			public void paintComponent(Graphics g) {
+				super.paintComponent(g); // Do everything normally done first, e.g. clear the screen.
+				g.setColor(Color.RED); // Set the color to use when drawing
+				g.fillOval(75, 100, 20, 40); // paint a filled 20x40 red ellipse whose upper left corner is at (75, 100)
+			}
+		};
+
+		centerPnl.setBackground(Color.BLACK);
+		contentPane.add(centerPnl, BorderLayout.CENTER);
+
+		JPanel northPnl = new JPanel();
+		northPnl.setBackground(Color.RED);
+		contentPane.add(northPnl, BorderLayout.NORTH);
+
+		JButton northBtn = new JButton("Welcome");
+		northPnl.add(northBtn);
+
+		northTf = new JTextField();
+		northPnl.add(northTf);
+		northTf.setColumns(10);
+
+		JLabel northLbl = new JLabel("");
+		northPnl.add(northLbl);
+
+		northBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("northBtn has been clicked!!!");
+				northLbl.setText("Welcome to COMP 504!");
+				String northTfText = northTf.getText();
+				if (!northTfText.equals("")) {
+					northLbl.setText(northTfText);
+					System.out.println("input text in northTf has been set!!!");
+				}
+			}
+		});
+	}
+
+	private void start() {
+		setVisible(true);
+	}
+}

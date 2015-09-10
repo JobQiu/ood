@@ -1,0 +1,16 @@
+package model.ball;
+
+import java.awt.Point;
+
+import javax.swing.JPanel;
+
+public abstract class ABall {
+    
+    public ABall(Point startLoc, int startRadius, Point startVel, JPanel canvas) {
+        
+    }
+    
+    public void update() {
+        
+    }
+}

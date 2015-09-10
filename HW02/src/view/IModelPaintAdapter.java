@@ -1,0 +1,25 @@
+package view;
+
+import java.awt.Graphics;
+
+/**
+ * The interface for view to invoke paint method of model
+ * @author ls53@rice.edu
+ */
+public interface IModelPaintAdapter {
+    
+    /**
+     * Paint all balls
+     * @param g
+     */
+    public void paintBalls(Graphics g);
+    
+    /**
+     * The null object as a placeholder
+     */
+    public static final IModelPaintAdapter NULL_OBJECT = new IModelPaintAdapter() {
+        
+        @Override
+        public void paintBalls(Graphics g) {}
+    };
+}

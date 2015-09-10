@@ -1,0 +1,58 @@
+package shape;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+
+/**
+ * @author ls53@rice.edu
+ * The class house composed by a series of different shapes
+ */
+public class House extends AShape {
+
+    /**
+     * Different components of a house
+     */
+    private AShape[] composite;
+
+    /**
+     * The constructor of a house
+     */
+    public House() {
+        this.composite = new AShape[3];
+        composite[0] = new Oval(new Point(150, 150), Color.RED, 50, 50);
+        composite[1] = new Rectangle(new Point(250, 250), Color.DARK_GRAY, 100, 50);
+        composite[2] = new Triangle(Color.CYAN, new Point(0, 0), new Point(200, 0), new Point(100, -50));
+        composite[2].setLocation(new Point(200, 250));
+        this.location = composite[0].getLocation();
+        this.color = Color.WHITE;
+    }
+
+    /**
+     * The painting method for a house
+     * @param g The Graphics object to paint a house
+     */
+    @Override
+    public void paint(Graphics g) {
+        for (AShape i : this.composite) {
+            i.paint(g);
+        }
+    }
+
+    /**
+     * Set the location of a house
+     * @param location The location of a house
+     */
+    @Override
+    public void setLocation(Point location) {
+        int xMove = (int) location.getX() - (int) this.getLocation().getX();
+        int yMove = (int) location.getY() - (int) this.getLocation().getY();
+
+        for (AShape i : this.composite) {
+            Point oriLoc = i.getLocation();
+            Point newLoc = new Point((int) oriLoc.getX() + xMove, (int) oriLoc.getY() + yMove);
+            i.setLocation(newLoc);
+        }
+    }
+
+}
