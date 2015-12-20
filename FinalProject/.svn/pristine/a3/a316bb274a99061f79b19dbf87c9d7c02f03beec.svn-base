@@ -1,0 +1,195 @@
+package ls53_yh36.server.game.gview;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JTextField;
+import javax.swing.JButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.border.TitledBorder;
+
+import gov.nasa.worldwind.geom.Position;
+import gov.nasa.worldwind.layers.Layer;
+import map.MapPanel;
+
+import javax.swing.UIManager;
+import java.awt.Color;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingUtilities;
+import javax.swing.JLabel;
+
+public class RunView extends JFrame {
+
+	private static final long serialVersionUID = 7674830707217974633L;
+	
+	private RunViewAdpt mdlAdpt;
+	private MapPanel map;
+	private int leftTime = 180;
+	
+	
+	private JPanel contentPane;
+	private final JPanel panelCtrl = new JPanel();
+	private final JTextField textLng = new JTextField();
+	private final JButton btnGo = new JButton("Go");
+	private final JTextField textLat = new JTextField();
+	private final JButton btnPlay = new JButton("Play");
+	private final JScrollPane scrollPaneInfo = new JScrollPane();
+	private final JTextArea textGameInfo = new JTextArea();
+	private final JLabel lblTimeLeft = new JLabel("Time Left: 180");
+
+
+
+	/**
+	 * Create the frame.
+	 */
+	public RunView(RunViewAdpt adpt) {
+		mdlAdpt = adpt;
+		textLat.setColumns(10);
+		textLng.setColumns(10);
+		initGUI();
+	}
+	private void initGUI() {
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 780, 533);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		map = new MapPanel();
+		btnPlay.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mdlAdpt.startGame();
+			}
+		});
+		btnGo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+				double lat = Double.parseDouble(textLat.getText());
+				double lng = Double.parseDouble(textLng.getText());
+				postInfo(mdlAdpt.goPlace(lat, lng));
+				textLat.setText("");
+				textLng.setText("");
+				} catch (NumberFormatException e) {
+					postInfo("Illegal inputs.");
+				}				
+			}
+		});
+		scrollPaneInfo.setViewportBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Announcement", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(0, 0, 255)));
+		textGameInfo.setLineWrap(true);
+		textGameInfo.setTabSize(20);
+		
+		scrollPaneInfo.setViewportView(textGameInfo);
+		GroupLayout gl_contentPane = new GroupLayout(contentPane);
+		gl_contentPane.setHorizontalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addGap(7)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addComponent(scrollPaneInfo, GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(map, GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
+							.addContainerGap())
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addComponent(panelCtrl, GroupLayout.DEFAULT_SIZE, 734, Short.MAX_VALUE)
+							.addGap(7))))
+		);
+		gl_contentPane.setVerticalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addGap(7)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addComponent(map, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(scrollPaneInfo, GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panelCtrl, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGap(2))
+		);
+		GroupLayout gl_panelCtrl = new GroupLayout(panelCtrl);
+		gl_panelCtrl.setHorizontalGroup(
+			gl_panelCtrl.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panelCtrl.createSequentialGroup()
+					.addGap(25)
+					.addComponent(lblTimeLeft, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGap(136)
+					.addComponent(btnPlay, GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)
+					.addGap(5)
+					.addComponent(textLat, GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
+					.addGap(5)
+					.addComponent(textLng, GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
+					.addGap(5)
+					.addComponent(btnGo, GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)
+					.addGap(119))
+		);
+		gl_panelCtrl.setVerticalGroup(
+			gl_panelCtrl.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panelCtrl.createSequentialGroup()
+					.addGap(5)
+					.addGroup(gl_panelCtrl.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btnPlay, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(lblTimeLeft, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addGap(5))
+				.addGroup(gl_panelCtrl.createSequentialGroup()
+					.addGap(6)
+					.addComponent(textLat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(5))
+				.addGroup(gl_panelCtrl.createSequentialGroup()
+					.addGap(6)
+					.addComponent(textLng, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(6))
+				.addGroup(gl_panelCtrl.createSequentialGroup()
+					.addGap(5)
+					.addComponent(btnGo))
+		);
+		panelCtrl.setLayout(gl_panelCtrl);
+		contentPane.setLayout(gl_contentPane);
+	}
+	
+	
+	/**
+	 * Start the game view
+	 */
+	public void start() {
+		map.start();
+		setVisible(true);
+	}
+
+	public void addLayer(Layer layer) {
+		map.addLayer(layer);
+	}
+	
+	public void goPlace(Position pos) {
+		map.setPosition(pos, true);
+	}
+	
+	public void postInfo(String info) {
+		textGameInfo.append(info + "\n");
+	}
+	
+	public void postDiag(String info) {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				JOptionPane.showMessageDialog(RunView.this, info);
+			}
+			
+		});
+		
+	}
+	
+	/**
+	 * Update time showed on the game GUI
+	 */
+	public void updateTime() {
+		lblTimeLeft.setText("Seconds: " + leftTime);
+		if (leftTime == 0)
+			mdlAdpt.runOutTime();
+		leftTime--;
+	}
+}

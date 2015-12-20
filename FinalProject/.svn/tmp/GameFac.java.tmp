@@ -1,0 +1,25 @@
+package ls53_yh36.server.game.smodel;
+
+import java.io.Serializable;
+import java.util.UUID;
+
+import common.IChatUser;
+import ls53_yh36.server.game.scontroller.GuessGame;
+
+public class GameFac implements Serializable {
+
+	private static final long serialVersionUID = 2177801969733344056L;
+
+	private UUID gameID;
+	
+	private IChatUser chatStub;
+	
+	public GameFac(UUID gID, IChatUser chatStub) {
+		gameID = gID;
+		this.chatStub = chatStub;
+	}
+
+	public void launchGame() {
+		new GuessGame(gameID, chatStub).launch();
+	}
+}

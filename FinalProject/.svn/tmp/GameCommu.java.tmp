@@ -1,0 +1,8 @@
+package ls53_yh36.server.game.smodel;
+
+import java.rmi.Remote;
+
+public class GameCommu implements Remote {
+
+//	transient private;
+}

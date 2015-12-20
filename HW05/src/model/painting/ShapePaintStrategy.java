@@ -1,0 +1,48 @@
+package model.painting;
+
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+
+import model.Ball;
+
+/**
+ * Concrete class that defines invariant painting behaviors to paint Shape objects for all its subclasses.
+ * @author caojian
+ *
+ */
+public class ShapePaintStrategy extends APaintStrategy{
+
+	/**The Shape to be painted*/
+	private Shape shape;
+	
+	/**
+	 * Constructor that allocates a new AffineTransform for internal use.
+	 * @param shape The shape
+	 */
+	public ShapePaintStrategy(Shape shape) {
+		super(new AffineTransform());
+	}
+
+	/**
+	 * Constructor that uses a supplied AffineTransform for internal use.
+	 * @param at The affine transform object
+	 * @param shape The shape
+	 */
+	public ShapePaintStrategy(AffineTransform at, Shape shape) {
+		super(at);
+		this.shape = shape;
+	}
+
+	@Override
+	/**Paints the shape on the given Graphics context using the supplied AffineTransform.*/
+	public void paintXfrm(Graphics g, Ball host, AffineTransform at) {
+		
+		((Graphics2D) g).fill(at.createTransformedShape(shape));
+		
+	}
+
+	@Override
+	public void init(Ball host) {}
+}

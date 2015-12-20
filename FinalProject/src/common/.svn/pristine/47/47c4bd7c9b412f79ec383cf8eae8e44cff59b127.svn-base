@@ -1,0 +1,48 @@
+/**
+ * This is just a placeholder to enable the provided.datapacket package to compile.
+ * This will change depending on the final public inter-computer API.
+ */
+package common;
+
+import java.awt.Container;
+
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.mixedData.MixedDataDictionary;
+
+public interface ICmd2ModelAdapter {
+	/**
+	 *  Get a container that is on the GUI. This works best if this acts as a factory method
+	 *  that creates a new Container (such as a JPanel), and returns it here and puts it on the GUI
+	 *  Scrollable one works best if a new component is created each time and added to the bottom
+	 *  of a scrollable GUI object
+	 *  @return the Container to modify
+	 *  */
+	public Container scrollable();
+	
+	/**
+	 *  Get a container that is on the GUI. This works best if this acts as a factory method
+	 *  that creates a new Container (such as a JPanel), and returns it here and puts it on the GUI
+	 *  Updateable one works best if an existing component is returned that can be overridden by this command
+	 *  @return the Container to modify
+	 *  */
+	public Container updateable();
+	
+	/**
+	 * This function is probably not needed at all, but is included as a convenience
+	 * Get a reference to an ADataPacketAlgoCmd, most likely one that has some of the application
+	 * in scope. This allows you to interact directly with the application without actually including
+	 * any of your application in scope with a command that gets sent over the network
+	 * @return an ADataPacketAlgoCmd that can perform actions on the local machine. 
+	 */
+	@Deprecated
+	public ADataPacketAlgoCmd<String,?,IUser> other();
+	
+	
+	/**
+	 * This gets the universal MixedDataDictionary that can be used to store and restore arbitrary objects
+	 * This is extremely useful for creating command that need to directly interact with eachoter as well
+	 * as other objects in the model
+	 * @return the local user's MixedDataDictionary
+	 */
+	public MixedDataDictionary dictionary();
+}

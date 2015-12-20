@@ -1,0 +1,126 @@
+package ls53_yh36.server.game.gcontroller;
+
+import java.io.Serializable;
+import java.util.UUID;
+
+import common.IChatUser;
+import gov.nasa.worldwind.geom.Position;
+import gov.nasa.worldwind.layers.Layer;
+import ls53_yh36.server.game.gmodel.Cmd2RunGameAdpt;
+import ls53_yh36.server.game.gmodel.RunModel;
+import ls53_yh36.server.game.gmodel.RunModelAdpt;
+import ls53_yh36.server.game.gview.RunView;
+import ls53_yh36.server.game.gview.RunViewAdpt;
+
+/**
+ * The run controller
+ * @author ls53@rice.edu
+ */
+public class RunController implements Serializable {
+    
+    /**
+     * The generated serial version UID
+     */
+	private static final long serialVersionUID = 3151252791335119492L;
+	
+	/**
+	 * View of RunGame
+	 */
+	private RunView rView;
+	
+	/**
+	 * View of RunView
+	 */
+	private RunModel rModel;
+
+	
+	/**
+	 * Constructor
+	 */
+	public RunController() {
+		
+		rView = new RunView(new RunViewAdpt() {
+
+			private static final long serialVersionUID = 4401713688313054336L;
+
+			@Override
+			public String goPlace(double lat, double lng) {
+				return rModel.goNextPlace(lat, lng);
+			}
+
+			@Override
+			public void startGame() {
+				rModel.startGame();
+			}
+
+			@Override
+			public void runOutTime() {
+				rModel.timeOver();
+			}
+			
+			@Override
+			public void update() {
+				rModel.update();
+			}
+			
+		});
+		
+		rModel = new RunModel(new RunModelAdpt() {
+
+			private static final long serialVersionUID = -8784357586078978740L;
+
+			@Override
+			public void goPlace(Position pos) {
+				rView.goPlace(pos);
+			}
+
+			@Override
+			public void showLayer(Layer layer) {
+				rView.addLayer(layer);
+			}
+
+			@Override
+			public void showInfo(String info) {
+				rView.postInfo(info);
+			}
+
+			@Override
+			public void showRank(String rank) {
+				rView.postDiag(rank);
+			}
+
+			@Override
+			public void updateTime() {
+				rView.updateTime();
+			}
+
+			@Override
+			public void stopBtn() {
+				rView.grayButton();
+			}
+			
+		});
+	}
+	
+	/**
+	 * Assemble the game view and game model
+	 * @param sStub Server IChatUser stub
+	 * @param id Game ID borrowed from chatroom's ID
+	 * @param pStub player's IChatUser stub
+	 */
+	public void start(IChatUser sStub, UUID id, IChatUser pStub) {
+		rModel.setGameID(id);
+		rModel.setSvrStub(sStub);
+		rModel.setPlyStub(pStub);
+		rView.start();
+		rModel.start();
+	}
+	
+	/**
+	 * Get command to game model adapter
+	 * @return Return an adapter to the game model
+	 */
+	public Cmd2RunGameAdpt getCGAdpt() {
+		return rModel.getCGAdpt();
+	}
+}

@@ -1,0 +1,31 @@
+DESCRIPTION
+
+This ball world application can make balls that can change their color, radius, velocity, direction.
+The type of strategies to move balls includes Straight which moves straight but do not change ball state,
+Color which changes the color of balls, Breathing which changes ball radius within a predefined range,
+Curve which changes the direction at which balls move, Wander that changes the velocity of balls randomly,
+and Drunk which update the state of balls randomly by either of the above four types.
+
+
+
+INSTRUCTION
+To add a strategy to the lists, type in one of the five type described as above in the text field and
+press "Add to lists" button to add the type of strategy to both combo boxes in the middle column. If an
+invalid type is typed, an error strategy which beeps every 25 rounds will be added to the combo boxes.
+However, they will still show up with the incorrect name your typed in in the combo boxes.
+
+To combine two strategies, choose two strategies, one from each combo boxes respectively, and press
+"Combine" button, the result of combination, which is a multi strategy will be added to both combo boxes.
+
+To add a ball with selected strategy, choose a strategy from the upper combo box and press "Make Selected
+Ball" to add a ball to the canvas below the control panel. Note that after the ball is created, its update
+strategy cannot be changed thereafter.
+
+To add a ball with switchable strategy (its strategy can be changed after its creation), press "Make Switcher
+Ball". The initial strategy is Straight if the "Switch" button is never clicked.
+
+To change the strategy that updates the states of all switcher balls, choose a strategy from the upper combo
+box and click "Switch", all switcher balls will update there states as the selected strategy in the combo box.
+
+To clear all balls moving on the canvas, click "Clear ALl". This will clear all balls switcher or not from
+the application. You can follow the above steps to add new balls.

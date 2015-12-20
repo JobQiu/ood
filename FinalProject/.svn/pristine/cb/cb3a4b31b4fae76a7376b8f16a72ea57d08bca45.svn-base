@@ -1,0 +1,9 @@
+package ls53_yh36.server.game.sview;
+
+public interface ServerViewAdpt {
+
+	/**
+	 * Stop the server
+	 */
+	public void shutDown();
+}

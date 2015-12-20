@@ -1,0 +1,56 @@
+package model.painting;
+
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.geom.AffineTransform;
+
+import model.Ball;
+import model.IPaintStrategy;
+
+/**
+ * This class provides the basic affine transform services that
+ * its subclasses will use to resize, translate and rotate their prototype images 
+ * into their proper current locations and orientations on the screen.
+ * @author caojian
+ *
+ */
+public abstract class APaintStrategy implements IPaintStrategy{
+	
+	protected AffineTransform at = new AffineTransform();
+	
+	/**
+	 * This method allows the subclass to inject additional processing 
+	 * into the paint method process before the final transformations are performed.    
+	 * @param g
+	 * @param host
+	 */
+	protected void paintCfg(Graphics g, Ball host){
+		
+	}
+	
+	public APaintStrategy(AffineTransform at){
+		this.at = at;
+		
+	}
+
+
+	/**
+	 * A secondary paint operation that uses a supplied affine transform.  
+	 * This allows the same affine transform to be shared amongst paint strategies, 
+	 * reducing the number of times that it has to be calculated.
+	 * @param g
+	 * @param host
+	 * @param at
+	 */
+	public abstract void paintXfrm(Graphics g, Ball host, AffineTransform at);
+	
+	public void paint(Graphics g, Ball host) {
+		Point scale = host.getDimension();
+		at.setToTranslation(host.getLocation().x, host.getLocation().y);
+		at.scale(scale.x, scale.y);
+		at.rotate(Math.atan2(host.getVelocity().y, host.getVelocity().x));
+		g.setColor(host.getColor());    
+		paintCfg(g, host);
+		paintXfrm(g, host, at);
+	}
+}

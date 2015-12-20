@@ -1,0 +1,126 @@
+package common.demo;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.rmi.RemoteException;
+import java.util.HashSet;
+
+import common.IChatroom;
+import common.ICmd2ModelAdapter;
+import common.IConnect;
+import common.IUser;
+import common.messages.RequestForAlgo;
+import provided.datapacket.ADataPacket;
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.datapacket.DataPacket;
+import provided.datapacket.DataPacketAlgo;
+
+public class ConsoleChatApp {
+
+    public static void main(String[] args)
+    {
+        // Initialize the bootstrap object
+        Bootstrap bootstrap = new Bootstrap();
+        
+        
+        // Define the extended visitor with a default command that simply prints the string representation of the object to the console
+        // NOTE: This is where you would handle getting an algorithm for the unknown data type
+        DataPacketAlgo<String,IUser> dataPacketAlgo = new DataPacketAlgo<String,IUser>(null);  
+        
+        // Set the default command to get a new command for processing this Object type
+        dataPacketAlgo.setDefaultCmd(new ADataPacketAlgoCmd<String, Object, IUser>(){
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -4875820883094729419L;
+
+			@Override
+			public String apply(Class<?> index, DataPacket<Object> host, IUser... params) {
+				try {
+					// get the connect object
+					IConnect connect = params[0].getConnect();
+					
+					// get a new data packet algo cmd 
+					ADataPacketAlgoCmd<String,?,IUser> cmd = connect.getNewCommand(new RequestForAlgo(index));
+					
+					// set the new data packet in the extended visitor pattern, indexed by the class type "index"
+					dataPacketAlgo.setCmd(index, cmd);
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				// Once we have an algorithm, execute. 
+				// NOTE THAT THIS THREAD WILL BE BLOCKED UNTIL GETNEWCOMMAND ABOVE IS RETURNED
+				return host.execute(dataPacketAlgo);
+			}
+
+			@Override
+			public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {
+				
+			}
+        	
+        });
+        
+                
+        // Initialize the system with your username "b", and define the Connect object's connection to your application.
+        String myName = "me";
+        User me = bootstrap.init(myName, new IConnect(){
+
+        	// Get the user associated with this connect object
+            @Override
+            public IUser getUser(IConnect stub) throws RemoteException {
+                try {
+                    return new User(stub, myName, InetAddress.getLocalHost() );
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                    return new User(stub, myName, null );
+                }
+            }
+
+            @Override
+            public HashSet<IChatroom> getChatrooms() throws RemoteException {
+                // TODO Auto-generated method stub
+                return null;
+            }
+            
+            // This is a getNewCommand implmementation that only returns an algorithm for strings because that
+            // is the only think this app knows how to process
+			@Override
+			public ADataPacketAlgoCmd<String, ?, IUser> getNewCommand(RequestForAlgo request) throws RemoteException {
+				ADataPacketAlgoCmd<String,?,IUser> cmd = null;
+				
+				// Instead of an if statement, it would be better practice to use a Map to find the algorithm corresponding
+				// to this datatype.
+				if(request.unknownType().equals(String.class)){
+					// Please see the StringConsoleDataPacketAlgoCmd file for how this is implmemented
+					// NOTE it is very important to not use an anonymous inner class for this because then the entire app will
+					// be serialized with the algocmd when it is sent over the network when getNewCommand is called
+					cmd = new StringConsoleDataPacketAlgoCmd();
+				}
+				
+				return cmd;
+			}
+
+			// When a datapacket comes in, execute the visitor pattern. 
+			// At first it does not know how to handle any type of data packet
+			// but it gains the "String" algorithm through the unknown dataPacket handling
+			@Override
+			public void sendReceive(IUser sender, ADataPacket data) throws RemoteException {
+				data.execute(dataPacketAlgo, sender);
+			}
+            
+        });
+        
+        // Get the user associated with a well-known IP address. In this case, this app
+        User friend = bootstrap.connectToUser("127.0.0.1");
+        
+        // create a new chatroom object and add the other user to it
+        Chatroom room = new Chatroom();
+        room.addUser(friend);
+        
+        // send a packet of type String
+        room.send(me, new DataPacket<String>(String.class,"Hello world"));
+    
+    }
+
+}

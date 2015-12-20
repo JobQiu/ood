@@ -1,0 +1,261 @@
+package ls53_yh36.server.game.gview;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JTextField;
+import javax.swing.JButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.border.TitledBorder;
+
+import gov.nasa.worldwind.event.SelectEvent;
+import gov.nasa.worldwind.event.SelectListener;
+import gov.nasa.worldwind.geom.Position;
+import gov.nasa.worldwind.layers.Layer;
+import gov.nasa.worldwind.util.BasicDragger;
+
+import javax.swing.UIManager;
+import java.awt.Color;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingUtilities;
+import javax.swing.JLabel;
+
+public class RunView extends JFrame {
+
+	private static final long serialVersionUID = 7674830707217974633L;
+	
+	/**
+	 * Game view to game model adapter
+	 */
+	private RunViewAdpt mdlAdpt;
+	
+	/**
+	 * WWD map object
+	 */
+	private NewMap map;
+	
+	/**
+	 * Left clicks for the game	
+	 */
+	private int leftTime = 1350;
+	
+	/**
+	 * Position of the current search area
+	 */
+	private Position curPos;
+	
+	
+	private JPanel contentPane;
+	private final JPanel panelCtrl = new JPanel();
+	private final JTextField textLon = new JTextField();
+	private final JButton btnGo = new JButton("Go");
+	private final JTextField textLat = new JTextField();
+	private final JButton btnPlay = new JButton("Play");
+	private final JScrollPane scrollPaneInfo = new JScrollPane();
+	private final JTextArea textGameInfo = new JTextArea();
+	private final JLabel lblTimeLeft = new JLabel("Time Left: 2250");
+	private final JLabel lblLat = new JLabel("Lat:");
+	private final JLabel lblLon = new JLabel("Lon:");
+	private final JButton btnRelocate = new JButton("Relocate");
+
+
+
+	/**
+	 * Create the frame.
+	 */
+	public RunView(RunViewAdpt adpt) {
+		btnRelocate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				goPlace(curPos);
+			}
+		});
+		mdlAdpt = adpt;
+		textLat.setColumns(10);
+		textLon.setColumns(10);
+		
+		initGUI();
+		
+		map.getWWD().addSelectListener(new SelectListener() {
+			
+			private BasicDragger dragger = new BasicDragger(map.getWWD());
+			
+			public void selected(SelectEvent event) {
+				this.dragger.selected(event);
+			}
+		});
+	}
+	private void initGUI() {
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 809, 533);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		map = new NewMap();
+		btnPlay.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mdlAdpt.startGame();
+			}
+		});
+		btnGo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+				double lat = Double.parseDouble(textLat.getText());
+				double lng = Double.parseDouble(textLon.getText());
+				postInfo(mdlAdpt.goPlace(lat, lng));
+				textLat.setText("");
+				textLon.setText("");
+				} catch (NumberFormatException e) {
+					postInfo("Illegal inputs.");
+				}				
+			}
+		});
+		scrollPaneInfo.setViewportBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Announcement", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(0, 0, 255)));
+		textGameInfo.setLineWrap(true);
+		textGameInfo.setTabSize(20);
+		
+		scrollPaneInfo.setViewportView(textGameInfo);
+		GroupLayout gl_contentPane = new GroupLayout(contentPane);
+		gl_contentPane.setHorizontalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addGap(7)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addComponent(scrollPaneInfo, GroupLayout.PREFERRED_SIZE, 212, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(map, GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE)
+							.addContainerGap())
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addComponent(panelCtrl, GroupLayout.DEFAULT_SIZE, 734, Short.MAX_VALUE)
+							.addGap(7))))
+		);
+		gl_contentPane.setVerticalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addGap(7)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addComponent(scrollPaneInfo, GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE)
+						.addComponent(map, GroupLayout.DEFAULT_SIZE, 410, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panelCtrl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(2))
+		);
+		GroupLayout gl_panelCtrl = new GroupLayout(panelCtrl);
+		gl_panelCtrl.setHorizontalGroup(
+			gl_panelCtrl.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panelCtrl.createSequentialGroup()
+					.addGap(25)
+					.addComponent(lblTimeLeft, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+					.addGap(70)
+					.addComponent(btnPlay, GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE)
+					.addGap(18)
+					.addComponent(lblLat)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(textLat, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(lblLon)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(textLon, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnGo, GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnRelocate)
+					.addGap(24))
+		);
+		gl_panelCtrl.setVerticalGroup(
+			gl_panelCtrl.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panelCtrl.createSequentialGroup()
+					.addGap(5)
+					.addGroup(gl_panelCtrl.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblTimeLeft, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(btnPlay, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(lblLat)
+						.addComponent(textLat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblLon)
+						.addComponent(textLon, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnGo)
+						.addComponent(btnRelocate))
+					.addGap(5))
+		);
+		panelCtrl.setLayout(gl_panelCtrl);
+		contentPane.setLayout(gl_contentPane);
+	}
+	
+	
+	/**
+	 * Start the game view
+	 */
+	public void start() {
+		map.start();
+		setVisible(true);
+	}
+
+	/**
+	 * Add layers to the map panel
+	 * @param layer Layer to be added
+	 */
+	public void addLayer(Layer layer) {
+		map.addLayer(layer);
+	}
+	
+	/**
+	 * Go to the given position
+	 * @param pos Position of the target place
+	 */
+	public void goPlace(Position pos) {
+		curPos = pos;
+		map.setPosition(pos, true);
+	}
+	
+	/**
+	 * Display the string to the info JList
+	 * @param info String to be shown
+	 */
+	public void postInfo(String info) {
+		textGameInfo.append(info + "\n");
+	}
+	
+	/**
+	 * Pop up a dialog to shown the given message
+	 * @param info Information to be shown on the dialog
+	 */
+	public void postDiag(String info) {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				JOptionPane.showMessageDialog(RunView.this, info);
+			}
+			
+		});
+		
+	}
+	
+	/**
+	 * Stimulated by the timer event
+	 */
+	public void updateTime() {
+		lblTimeLeft.setText("Ticks: " + leftTime);
+		mdlAdpt.update();
+		if (leftTime == 0) {
+			mdlAdpt.runOutTime();
+			postInfo("Time out!\nYou can continue your game, even if your result has been submitted.");
+		}
+		leftTime--;
+	}
+	
+	/**
+	 * Disable the buttons
+	 */
+	public void grayButton() {
+		btnPlay.setEnabled(false);
+		btnGo.setEnabled(false);
+		btnRelocate.setEnabled(false);
+	}
+}

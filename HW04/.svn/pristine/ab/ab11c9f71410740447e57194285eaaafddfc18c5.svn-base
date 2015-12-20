@@ -1,0 +1,224 @@
+package model;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.JComponent;
+
+import strategy.IUpdateStrategy;
+
+/**
+ * A class that represents all balls that are filled with a certain color 
+ * and moves at a certain velocity on a canvas.
+ *
+ */
+public class ABall implements Observer {
+	
+	/**
+	 * The center location of the ball.
+	 */
+	private Point location;
+	/**
+	 * The radius of the ball.
+	 */
+	private int radius;
+	/**
+	 * The velocity at which the ball moves.
+	 */
+	private Point velocity;
+	/**
+	 * The color of the ball.
+	 */
+	private Color color;
+	/**
+	 * The canvas within which the ball moves.
+	 */
+	private JComponent canvas;
+	/**
+	 * The update strategy of the state of the ball.
+	 */
+	private IUpdateStrategy udpateStrategy;
+	
+	/**
+	 * Construct a ball.
+	 * @param location the center location of the ball
+	 * @param radius the radius (int) of the ball
+	 * @param velocity the velocity vector of the ball
+	 * @param color the RGB color of the ball
+	 * @param canvas the canvas within with the ball moves
+	 * @param strategy the update strategy to use
+	 */
+	public ABall(Point location, int radius, Point velocity, Color color, JComponent canvas, IUpdateStrategy strategy) {
+		this.location = location;
+		this.radius = radius;
+		this.velocity = velocity;
+		this.color = color;
+		this.canvas = canvas;
+		this.udpateStrategy = strategy;
+	}
+	
+	
+	/**
+	 * Get the center location of the ball.
+	 * @return the center location
+	 */
+	public Point getLocation() {
+		return this.location;
+	}
+
+	/**
+	 * Set the center location of the ball.
+	 * @param loc the new location of the ball
+	 */
+	public void setLocation(Point loc) {
+		this.location = loc;
+	}
+	
+	
+	/**
+	 * Get the radius of the ball.
+	 * @return the radius
+	 */
+	public int getRadius() {
+		return this.radius;
+	}
+	
+	/**
+	 * Set the radius of the ball.
+	 * @param r the new radius
+	 */
+	public void setRadius(int r) {
+		if(r <= 0) {
+			throw new IllegalArgumentException("Radisu should be positive");
+		}
+		
+		this.radius = r;
+	}
+	
+	/**
+	 * Get the color of the ball.
+	 * @return the color of the ball
+	 */
+	public Color getColor() {
+		return this.color;
+	}
+	
+	/**
+	 * Set the color of a ball to a new ball.
+	 * @param color the new color of the ball
+	 */
+	public void setColor(Color color) {
+		this.color = color;
+	}
+	
+	/**
+	 * Get the velocity of the ball.
+	 * @return the velocity of the ball
+	 */
+	public Point getVelocity() {
+		return this.velocity;
+	}
+	
+	/**
+	 * Set the velocity of the ball.
+	 * @param v the new velocity of the ball
+	 */
+	public void setVelocity(Point v) {
+		this.velocity = v;
+	}
+	
+	/**
+	 * Update the ball in response to dispatcher command.
+	 */
+	public void update(Observable o, Object arg) {
+		move();
+		bounce();
+		paint((Graphics)arg);
+		updateState();
+	}
+	
+	/**
+	 * Move the ball to the new location determined by current velocity.
+	 */
+	private void move() {
+		location.x = location.x + velocity.x;
+		location.y = location.y + velocity.y;
+	}
+	
+	/**
+	 * Bounce the ball when it moves outside the boundary of the canvas.
+	 */
+	private void bounce() {
+		Point l = new Point(location);
+		while(outOfVerticalBoundary(l)!=0 || outOfHorizontalBoundary(l)!=0) {
+			if (outOfVerticalBoundary(l) < 0) {
+				l.x = 2*radius - l.x;
+				velocity.x = -velocity.x;
+			} else if (outOfVerticalBoundary(l) > 0) {
+				l.x = 2*(canvas.getWidth() - radius) - l.x;
+				velocity.x = -velocity.x;
+			}
+			if (outOfHorizontalBoundary(l) < 0) {
+				l.y = 2*radius - l.y;
+				velocity.y = -velocity.y;
+			} else if (outOfHorizontalBoundary(l) > 0) {
+				l.y = 2 * (canvas.getHeight() - radius) - l.y;
+				velocity.y = -velocity.y;
+			}
+		}
+		location = l;
+	}
+	
+	
+	/**
+	 * Paint the ball on the canvas.
+	 * @param g the graphics object to paint on.
+	 */
+	private void paint(Graphics g) {
+		g.setColor(color);
+		g.fillOval(location.x - radius, location.y - radius, 2*radius, 2*radius);
+	}
+	
+	
+	/**
+	 * Update the state of the ball.
+	 */
+	private void updateState() {
+		udpateStrategy.updateState(this);
+	}
+
+	/**
+	 * Check if a ball centered at a given location hits the left or right boundary of the canvas.
+	 * @param p the center location of a ball
+	 * @return -1: hit the left boundary; 
+	 *         0: hit neither of the left and right boundaries;
+	 *         1: hit the right boundary;
+	 */
+	private int outOfVerticalBoundary(Point p) {
+		if (p.x < 0 + radius)
+			return -1;
+		else if (p.x > canvas.getWidth() - radius)
+			return 1;
+		else 
+			return 0;
+	}
+	
+	/**
+	 * Check if a ball centered at a given location hits the upper or lower boundary of the canvas.
+	 * @param p the center location of a ball
+	 * @return -1: hit the upper boundary; 
+	 *         0: hit neither of the upper and lower boundaries;
+	 *         1: hit the lower boundary;
+	 */
+	private int outOfHorizontalBoundary(Point p) {
+		if (p.y < 0 + radius)
+			return -1;
+		else if (p.y > canvas.getHeight() - radius)
+			return 1;
+		else 
+			return 0;
+	}
+}

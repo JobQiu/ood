@@ -1,0 +1,111 @@
+package controller;
+
+import java.awt.EventQueue;
+import java.awt.Graphics;
+
+import javax.swing.JComponent;
+
+import model.BallWorldModel;
+import model.IModelControlAdapter;
+import model.IModelUpdateAdapter;
+import strategy.IStrategyFac;
+import view.BallWorldView;
+import view.IViewUpdateAdapter;
+
+/**
+ * The Controller in the ball world application.
+ */
+public class Controller {
+
+	/**
+	 * The model in ball world application.
+	 */
+	private BallWorldModel model;
+	/**
+	 * The view in ball world application.
+	 */
+	private BallWorldView<IStrategyFac> view;
+	
+	/**
+	 * Construct a controller.
+	 */
+	public Controller() {
+	
+		view = new BallWorldView<IStrategyFac>(
+		    // Initialize a model update adapter
+			new IModelUpdateAdapter() {
+				@Override
+				public void update(Graphics g) {
+					model.update(g);
+				}
+			},
+		    // Initialize a model control adapter
+			new IModelControlAdapter<IStrategyFac>() {
+
+				@Override
+				public void makeBall(IStrategyFac selectedItem, JComponent canvas) {
+					model.addBall(selectedItem.make(), canvas);
+				}
+
+				@Override
+				public void makeSwitcherBall(JComponent canvas) {
+					model.addSwitcherBall(canvas);
+				}
+
+				@Override
+				public void clearBalls() {
+					model.clearBalls();
+				}
+
+				@Override
+				public IStrategyFac addStrategy(String strategyName) {
+					return model.makeStrategyFac(strategyName);
+				}
+
+				@Override
+				public IStrategyFac combineStrategies(IStrategyFac selectedItem1, IStrategyFac selectedItem2) {
+					return model.combineStrategyFacs(selectedItem1, selectedItem2);
+				}
+
+				@Override
+				public void switchStrategy(IStrategyFac selectedItem) {
+					model.setSwitcherStrategy(selectedItem.make());
+				}
+		}); 	
+		
+		model = new BallWorldModel(
+		    // Initialize a view update adapter
+			new IViewUpdateAdapter() {
+				@Override
+				public void update() {
+					view.update();
+				}
+		}) ;
+		
+	}
+	
+	/**
+	 * Start the controller.
+	 */
+	public void start() {
+		model.start();  
+		view.start();	
+	}
+		
+	/**
+	 * Main function to start the ball world application.
+	 * @param args	command line arguments
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Controller c = new Controller();
+					c.start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+}

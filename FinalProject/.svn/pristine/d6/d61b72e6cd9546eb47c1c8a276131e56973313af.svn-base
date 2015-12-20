@@ -1,0 +1,410 @@
+package ls53_yh36.client.app.model;
+
+import java.rmi.RemoteException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.Map.Entry;
+
+import common.IChatUser;
+import common.IChatroom;
+import common.ICmd2ModelAdapter;
+import common.IInitUser;
+import common.demo.message.chat.AddMe;
+import common.demo.message.init.ChatroomListRequest;
+import common.demo.message.init.ChatroomListResponse;
+import common.demo.message.init.InitUserInfoRequest;
+import common.demo.message.init.InitUserInfoResponse;
+import common.demo.message.init.Invitation2Chatroom;
+import common.message.init.AChatroomListRequest;
+import common.message.init.AChatroomListResponse;
+import common.message.init.AInitUserInfoRequest;
+import common.message.init.AInitUserInfoResponse;
+import common.message.init.AInvitation2Chatroom;
+import ls53_yh36.client.chat.model.ChatModel;
+import ls53_yh36.user.InitUser;
+import ls53_yh36.util.Bootstrap;
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.datapacket.DataPacket;
+import provided.datapacket.DataPacketAlgo;
+import provided.util.IVoidLambda;
+
+/**
+ * The app model
+ * @author ls53@rice.edu
+ */
+public class AppModel {
+    
+    /**
+     * The host's IP
+     */
+    private String ip;
+
+    /**
+     * The user name
+     */
+    private String username;
+    
+    /**
+     * The current user
+     * Can not remove it because IConnect needs to be
+     * referenced by me
+     */
+    private IInitUser me;
+    
+    private IInitUser meStub;
+    
+    /**
+     * All the connected users
+     */
+    private Map<String, IInitUser> friends = new HashMap<>();
+    
+    /**
+     * All init users
+     */
+    private Map<IInitUser, InitUser> initUsers = new HashMap<>();
+    
+    /**
+     * The connected chatrooms
+     */
+    private Set<ChatModel> chatrooms = new HashSet<>();
+    
+    /**
+     * The model to view adapter
+     */
+    private IAppViewAdapter viewAdapter;
+    
+    /**
+     * The data packet algorithm
+     */
+    private DataPacketAlgo<String, IInitUser> dataPacketAlgo = new DataPacketAlgo<>(null);
+    
+    /**
+     * The bootstrap for starting RMI
+     */
+    private Bootstrap bootstrap;
+    
+    /**
+     * The constructor for chat app model
+     * @param viewAdapter The model to view adapter
+     */
+    public AppModel(IAppViewAdapter viewAdapter) {
+        this.viewAdapter = viewAdapter;
+        bootstrap = new Bootstrap(new IVoidLambda<String>() {
+            
+            @Override
+            public void apply(String... params) {
+                for (String s : params) {
+                    viewAdapter.append(String.format("%s\n", s));
+                }
+            }
+        });
+        
+        initDataPacketAlgo();
+    }
+    
+    /**
+     * Initialize data packet algorithm
+     */
+    public void initDataPacketAlgo() {
+        dataPacketAlgo.setDefaultCmd(new ADataPacketAlgoCmd<String, Object, IInitUser>() {
+
+            /**
+             * The generated serial version UID
+             */
+            private static final long serialVersionUID = -2832682237052228492L;
+
+            @Override
+            public String apply(Class<?> index, DataPacket<Object> host, IInitUser... params) {
+                viewAdapter.append(String.format("Received Unknown data packet from %s.\n",
+                                                 params[0].toString()));
+                viewAdapter.warn("The InitUserStub only handles the messages belonging to common.message.init!");
+                return null;
+            }
+
+            @Override
+            public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {}
+        });
+        
+        dataPacketAlgo.setCmd(AInitUserInfoRequest.class, new ADataPacketAlgoCmd<String, AInitUserInfoRequest, IInitUser>() {
+
+            /**
+             * The generated serial version UID
+             */
+            private static final long serialVersionUID = -1642077281933635963L;
+
+            @Override
+            public String apply(Class<?> index, DataPacket<AInitUserInfoRequest> host, IInitUser... params) {
+                try {
+                    params[0].receive(meStub, new InitUserInfoResponse(host.getData(), username, ip).getDataPacket());
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                
+                return null;
+            }
+
+            @Override
+            public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {}
+        });
+        
+        dataPacketAlgo.setCmd(AInitUserInfoResponse.class, new ADataPacketAlgoCmd<String, AInitUserInfoResponse, IInitUser>() {
+
+            /**
+             * The generated serial version UID
+             */
+            private static final long serialVersionUID = 6842281532097303458L;
+
+            @Override
+            public String apply(Class<?> index, DataPacket<AInitUserInfoResponse> host, IInitUser... params) {
+                AInitUserInfoResponse response = host.getData();
+                initUsers.put(params[0], new InitUser(response.getName(), response.getIP(), null));
+                return null;
+            }
+
+            @Override
+            public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {}
+        });
+        
+        dataPacketAlgo.setCmd(AInvitation2Chatroom.class, new ADataPacketAlgoCmd<String, AInvitation2Chatroom, IInitUser>() {
+            
+            /**
+             * The generated serial version UID
+             */
+            private static final long serialVersionUID = -2750033857606213270L;
+
+            @Override
+            public String apply(Class<?> index, DataPacket<AInvitation2Chatroom> host, IInitUser... params) {
+                IInitUser user = params[0];
+                viewAdapter.append("Received an InviteToChatroom data packet\n");
+                
+                IChatroom remoteChatroom = host.getData().getChatroom();
+                String chatroomName = remoteChatroom.getName();
+                if (chatroomName == null) {
+                    viewAdapter.append("Illegal chatroom name!\n");
+                    viewAdapter.append("Assign a default chatroom: default chatroom name\n");
+                    chatroomName = "default chatroom name";
+                }
+                
+                if (chatrooms.contains(remoteChatroom)) {
+                    return null;
+                }
+                
+                if (viewAdapter.willJoinChatroom(user.toString(), chatroomName) || host.getData().mustAccept()) {
+                    joinChatroom(remoteChatroom, chatroomName);
+                }
+                
+                return null;
+            }
+
+            @Override
+            public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {}
+        });
+
+        dataPacketAlgo.setCmd(AChatroomListRequest.class, new ADataPacketAlgoCmd<String, AChatroomListRequest, IInitUser>() {
+
+            /**
+             * The generated serial version UID
+             */
+            private static final long serialVersionUID = -1051843247525083187L;
+
+            @Override
+            public String apply(Class<?> index, DataPacket<AChatroomListRequest> host, IInitUser... params) {
+                IInitUser user = params[0];
+                Set<IChatroom> chatroomList = new HashSet<>();
+                for (IChatroom chatroom : chatrooms) {
+                    chatroomList.add(chatroom);
+                }
+                
+                try {
+                    user.receive(meStub, new ChatroomListResponse(host.getData(), chatroomList).getDataPacket());
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                
+                return null;
+            }
+
+            @Override
+            public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {}
+        });
+        
+        dataPacketAlgo.setCmd(AChatroomListResponse.class, new ADataPacketAlgoCmd<String, AChatroomListResponse, IInitUser>() {
+
+            /**
+             * The generated serial version UID
+             */
+            private static final long serialVersionUID = 4103819982135023367L;
+
+            @Override
+            public String apply(Class<?> index, DataPacket<AChatroomListResponse> host, IInitUser... params) {
+                Set<IChatroom> chatroomList = host.getData().getChatrooms();
+                viewAdapter.chooseChatroom(initUsers.get(params[0]), chatroomList);
+                return null;
+            }
+
+            @Override
+            public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {}
+        });
+    }
+    
+    /**
+     * Start chat app model
+     */
+    public void start() {
+        me = new InitUser(username, ip, dataPacketAlgo);        
+        meStub = bootstrap.register(me);
+        ip = bootstrap.getIP();
+        viewAdapter.setTitle(String.format("%s: %s", username, ip));
+    }
+
+    /**
+     * Set user name
+     * @param username The user name
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    
+    /**
+     * Connect to an IP address
+     * @param ip The IP address
+     */
+    public void connectTo(String ip) {
+        if (friends.containsKey(ip)) {
+            viewAdapter.append(String.format("Already connected to this user %s!\n", ip));
+            return;
+        }
+        
+        IInitUser friend = bootstrap.connectToUser(ip);
+        
+        try {
+            friend.receive(meStub, new InitUserInfoRequest().getDataPacket());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        
+        viewAdapter.addUser(initUsers.get(friend));
+        viewAdapter.append(String.format("Successfully connected to the user %s!\n", friend));
+    }
+    
+    /**
+     * Create new chat room
+     * @param chatroomId The chat room ID
+     * @param name The user name
+     * @return The chat room model
+     */
+    public ChatModel createNewChatroom(UUID chatroomId, String name) {
+        ChatModel chatroomModel = new ChatModel(chatroomId, name, username, ip, meStub);
+        chatroomModel.setViewAdapter(viewAdapter.makeChatroomViewAdapter(chatroomModel));
+        viewAdapter.addChatroom(chatroomModel);
+        chatroomModel.start();
+        
+        return chatroomModel;
+    }
+    
+    /**
+     * Invite a user to a chat room
+     * @param user The user
+     * @param chatroom The chat room
+     */
+    public void inviteUserToChatroom(InitUser user, ChatModel chatroom) {
+        if (user.getIp().equals(ip)) {
+            viewAdapter.append("Will not invite myself\n");
+            return;
+        }
+        
+        IInitUser userStub = getUserStub(user);
+        if (chatroom.getUsers().contains(userStub)) {
+            return;
+        }
+        
+        (new Thread() {
+            
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    userStub.receive(meStub, new Invitation2Chatroom(chatroom, false).getDataPacket());
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        
+        viewAdapter.append(String.format("Successfully sent a InviteToChatroom to %s at IP: %s\n", 
+                                         user.getName(), 
+                                         user.getIp()));
+    }
+    
+    /**
+     * Join a server's chat room
+     * @param user The user who owns the server
+     */
+    public void joinGameServer(InitUser user) {
+        if (user.getIp().equals(ip)) {
+            viewAdapter.append("Will not invite myself\n");
+            return;
+        }
+        
+        IInitUser userStub = getUserStub(user);
+        (new Thread() {
+
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    userStub.receive(meStub, new ChatroomListRequest().getDataPacket());
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+    
+    /**
+     * Join a chat room
+     * @param remoteChatroom The chat room to join
+     */
+    public void joinChatroom(IChatroom remoteChatroom, String chatroomName) {
+        ChatModel chatroom = createNewChatroom(remoteChatroom.getID(), chatroomName);
+        chatrooms.add(chatroom);
+        for (IChatUser otherUser : remoteChatroom.getUsers()) {
+            chatroom.addUser(otherUser);
+        }
+        
+        chatroom.send(chatroom.getMe(), new AddMe(chatroom.getMe()));
+        chatroom.addUser(chatroom.getMe());
+    }
+    
+    /**
+     * Quit a chat room
+     * @param chatroom The chat room
+     */
+    public void quitChatroom(ChatModel chatroom) {
+        chatroom.removeUser(chatroom.getMe());
+        viewAdapter.removeChatroom(chatroom);
+        chatrooms.remove(chatroom);
+    }
+    
+    /**
+     * Quite all chat rooms
+     */
+    public void quitAllChatrooms() {
+        for (ChatModel chatroom : chatrooms) {
+            chatroom.removeUser(chatroom.getMe());
+        }
+    }
+    
+    private IInitUser getUserStub(InitUser user) {
+        for (Entry<IInitUser, InitUser> entry : initUsers.entrySet()) {
+            if (entry.getValue().equals(user)) {
+                return entry.getKey();
+            }
+        }
+        
+        throw new IllegalStateException();
+    }
+}

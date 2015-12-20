@@ -1,0 +1,12 @@
+package strategies;
+
+import model.Ball;
+
+public class StraightStrategy implements IUpdateStrategy {
+	/**
+	 * No-op for StraightStrategy
+	 */
+	public void updateState(Ball _ball) {
+		// Does what by default
+	}
+}

@@ -1,0 +1,239 @@
+package ls53_yh36.server.game.gmodel;
+
+import java.io.Serializable;
+import java.rmi.RemoteException;
+import java.util.Stack;
+import java.util.UUID;
+
+import javax.swing.Timer;
+
+import common.IChatUser;
+import gov.nasa.worldwind.geom.Position;
+import ls53_yh36.server.game.gmodel.message.ReportServer;
+import map.MapLayer;
+
+public class RunModel implements Serializable {
+
+	private static final long serialVersionUID = 8788613805162366689L;
+
+	/**
+	 * RunModel to RunView Adapter
+	 */
+	private RunModelAdpt rmAdpt;
+	
+	/**
+	 * Command to RunGame adapter
+	 */
+	private Cmd2RunGameAdpt cgAdpt;
+	
+	/**
+	 * 
+	 */
+	private int tickLen = 100;
+	private Timer timer = new Timer(tickLen, (e) -> rmAdpt.updateTime());
+	
+	/**
+	 * Server stub used by game to send data back
+	 */
+	private IChatUser svrStub;
+	
+	/**
+	 * ID used to identify the game
+	 */
+	private UUID gameID; 
+	
+	/**
+	 * Player stub used for identification
+	 */
+	private IChatUser plyStub;
+	
+	/**
+	 * Annotation layer for the map
+	 */
+	private MapLayer annoLayer = new MapLayer();
+	
+	/**
+	 * Start time of the game
+	 */
+	private long startT;
+	
+	/**
+	 * End time of the game
+	 */
+	private long endT;
+	
+	/**
+	 * Record the place information of the game
+	 */
+	private Stack<AnnoTag> plcs = new Stack<>();
+	
+	
+	private boolean played;
+	
+	/**
+	 * Constructor of the game
+	 * @param stub Server's stub
+	 * @param id Chatroom's UUID
+	 */
+	public RunModel(RunModelAdpt adpt) {
+		rmAdpt = adpt;
+		cgAdpt = new Cmd2RunGameAdpt() {
+
+			private static final long serialVersionUID = -7823106041975338787L;
+
+			@Override
+			public void post(String msg) {
+				RunModel.this.rmAdpt.showRank(msg);
+			}
+			
+		};
+		played = false;
+	}	
+	
+	/**
+	 * Setter of the server stub
+	 * @param stub Server's stub
+	 */
+	public void setSvrStub(IChatUser stub) {
+		svrStub = stub;
+	}
+	
+	public void setPlyStub(IChatUser stub) {
+		plyStub = stub;
+	}
+	
+	/**
+	 * Setter of game ID
+	 * @param id ID of team
+	 */
+	public void setGameID(UUID id) {
+		gameID = id;
+	}
+	
+	/**
+	 * Initialize the game model and load game data
+	 */
+	public void start() {
+		load();
+		rmAdpt.showLayer(annoLayer);
+	}
+	
+	private void load() {
+//		plcs.add(new AnnoTag(Position.fromDegrees(51.477222, 0.0, 3000), "End!", "Congrulations!"));
+//		plcs.add(new AnnoTag(Position.fromDegrees(46.191401, -122.195551, 3000), 
+//				"St. Helens", "Next position:\nlatitude: 51.477222\nlongitude: 0.0"));		
+		plcs.add(new AnnoTag(Position.fromDegrees(29.721321, -95.393896, 1000), 
+				"Leebron's House", "Next position:\nlatitude: 46.191401\nlongitude: -122.195551"));
+		plcs.add(new AnnoTag(Position.fromDegrees(30.187870, 118.144226, 1500), 
+				"Huangshan", "Next position:\nlatitude: 29.721321\nlongitude: -95.393896"));
+	}
+	
+	/**
+	 * Start the game
+	 */
+	public void startGame() {
+		if (played) return;
+		played = true;
+		timer.start();
+		startT = System.currentTimeMillis();
+		AnnoTag tmp = plcs.pop();
+		rmAdpt.goPlace(tmp.pos);
+		annoLayer.addToggleAnnotation(tmp.crntPlc, tmp.nxtPlc, tmp.pos/*, 1000, 4000*/);
+	}
+	
+	/**
+	 * Check the input and move to the next position
+	 * @param lat latitude
+	 * @param lng longitude
+	 * @return Return the status information
+	 */
+	public String goNextPlace(double lat, double lng) {
+		if (!played)
+			return "Please click \"Play\" button to start the game.\n";
+		else if (plcs.isEmpty())
+			return "You have finished your game.\n";
+		else {
+			AnnoTag tmp = plcs.peek();
+			endT = System.currentTimeMillis();
+			long min = (endT - startT) / 60000;
+			long sec = (endT - startT - min * 60000) / 1000;
+			if (tmp.pos.latitude.degrees != lat || tmp.pos.longitude.degrees != lng)
+				return "Wrong input!--" + min + " min " + sec + " sec has passed.";
+			else {
+				annoLayer.removeAllAnnotations();
+				tmp = plcs.pop();
+				annoLayer.addToggleAnnotation(tmp.crntPlc, tmp.nxtPlc, tmp.pos, 700, 800);
+				rmAdpt.goPlace(tmp.pos);
+				if (plcs.isEmpty()) {
+					rmAdpt.goPlace(Position.fromDegrees(51.477222, 0.0, 3000));
+					try {
+//						svrStub.receive(null, new GameOver(gameID.toString() + "*" + (endT - startT) + "*" + plyStub).getDataPacket());
+						svrStub.receive(plyStub, new ReportServer(gameID, endT - startT, plyStub).getDataPacket());
+					} catch (RemoteException e) {
+						System.err.println("Exception happened when sending back final result to the server.\n");
+						e.printStackTrace();
+					}
+					return "Game is done. You used " + min + " min " + sec + " sec in this game.";
+				}
+				return min + " min " + sec + " sec has passed.";
+			}
+		}
+	}
+	
+	public void timeOver() {
+		timer.stop();
+		try {
+			svrStub.receive(plyStub, new ReportServer(gameID, 3*60000, plyStub).getDataPacket());
+		} catch (RemoteException e) {
+			System.err.println("Exception happened when throwing timeOut report: " + e);
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Post information on the infoPanel
+	 * @param info
+	 */
+	public void Show(String info) {
+		rmAdpt.showInfo(info);
+	}
+	
+	/**
+	 * Get the adapter to the game model
+	 * @return Return the Command to Game Model Adapter
+	 */
+	public Cmd2RunGameAdpt getCGAdpt() {
+		return cgAdpt;
+	}
+	
+	/**
+	 * Helper inner class
+	 * @author Yi
+	 *
+	 */
+	private class AnnoTag implements Serializable {
+		
+		private static final long serialVersionUID = -6866030515236049645L;
+
+		/**
+		 * Position of the current place
+		 */
+		public Position pos;
+		
+		/**
+		 * Description of the current place
+		 */
+		public String crntPlc;
+		
+		/**
+		 * Information of next place
+		 */
+		public String nxtPlc;
+		
+		public AnnoTag(Position p, String cp, String np) {
+			pos = p;
+			crntPlc = cp;
+			nxtPlc = np;
+		}
+	}
+}

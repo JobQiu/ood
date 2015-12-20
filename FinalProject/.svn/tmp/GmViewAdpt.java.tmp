@@ -1,0 +1,22 @@
+package ls53_yh36.server.game.sview;
+
+import java.io.Serializable;
+
+public interface GmViewAdpt extends Serializable {
+
+	/**
+	 * Start the game
+	 */
+	public void startGame();
+	
+	/**
+	 * Send back the answer
+	 * @param ans
+	 */
+	public void backAns(String ans);
+	
+	/**
+	 * Close the game
+	 */
+	public void close();
+}

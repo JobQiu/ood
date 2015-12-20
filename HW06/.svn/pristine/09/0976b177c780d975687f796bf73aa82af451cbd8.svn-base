@@ -1,0 +1,72 @@
+package controller;
+
+import java.awt.EventQueue;
+import java.util.Arrays;
+
+import model.PlayerModel;
+import provided.abcParser.ABCParser;
+import provided.music.IPhrase;
+import provided.music.NESeqList;
+import provided.music.Note;
+import provided.player.ISequencePlayerStatus;
+import provided.player.SequencePlayer;
+import provided.player.SequencePlayer2;
+import provided.player.SequencePlayer2.IPlayable;
+import provided.util.ABCUtil;
+import view.PlayerGui;
+import visitor.PlayMusicAlgo;
+import visitor.ToStringAlgo;
+
+public class PlayerApp {
+    
+    private PlayerModel model;
+    
+    private PlayerGui view;
+    
+    public PlayerApp() {
+        model = new PlayerModel();
+        
+        view = new PlayerGui();
+    }
+    
+    /**
+     * Launch the player app.
+     */
+    public void start() {
+        view.start();
+    }
+    
+    /**
+     * The main method of the player app.
+     * @param args Useless arguments.
+     */
+    public static void main(String[] args) {
+        SequencePlayer sp = new SequencePlayer(16, 0);  // 16 = ticks per QUARTER note
+        sp.setTicksPerDefaultNote(16);  // 16 = ticks per DEFAULT note
+        sp.setTempo(140);   // 140 quarter notes (beats) per minute
+        Note g = new Note('G', 0, 0, 1.0, false);
+        sp.addNote(g, 10);   // 10 = start tick of note.  Tick of next note is returned.
+        //sp.play(ISequencePlayerStatus.NULL);   // No-op end-of-song cmd supplied.
+        System.out.println(ABCUtil.Singleton.getFileContents("/songs/scale.abc"));
+        ABCParser parser = new ABCParser("/songs/joy_to_the_world.abc");
+        IPhrase phrase = parser.parse();
+        NESeqList.setToStringAlgo(new ToStringAlgo());
+        System.out.println(phrase);
+        System.out.println(Arrays.toString(ABCUtil.Singleton.getInstruments()));
+        SequencePlayer2 player = new SequencePlayer2(16, 0);
+        phrase.execute(new PlayMusicAlgo(), player, 0);
+        
+        IPlayable music = player.makePlayable(ISequencePlayerStatus.NULL);
+        music.start();
+        //music.stop();
+        
+//        EventQueue.invokeLater(() -> {
+//            try {
+//                PlayerApp app = new PlayerApp();
+//                app.start();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        });
+    }
+}

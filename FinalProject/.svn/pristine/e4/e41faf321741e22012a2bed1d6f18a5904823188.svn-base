@@ -1,0 +1,82 @@
+package ls53_yh36.server.game.sview;
+
+import java.awt.BorderLayout;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JScrollPane;
+import javax.swing.border.TitledBorder;
+import java.awt.Color;
+import java.awt.Component;
+
+import javax.swing.UIManager;
+import javax.swing.JSplitPane;
+import javax.swing.JList;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.border.LineBorder;
+import java.awt.SystemColor;
+
+public class ServerView<R> extends JFrame {
+
+	private static final long serialVersionUID = -791543489664001952L;
+	
+	
+	private ServerViewAdpt sModelAdpt;
+	private final DefaultListModel<R> model = new DefaultListModel<>();
+	
+	private JPanel contentPane;
+	private final JScrollPane scrollPane = new JScrollPane();
+	private final JButton btnClose = new JButton("Close");
+	private final JList<R> listBoard = new JList<>(model);
+	
+
+
+
+	/**
+	 * Create the frame.
+	 */
+	public ServerView(ServerViewAdpt v2mAdpt) {
+		sModelAdpt = v2mAdpt;
+		
+		initGUI();
+	}
+	private void initGUI() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 656, 375);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new BorderLayout(0, 0));
+		setContentPane(contentPane);
+		scrollPane.setViewportBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Team Ladder", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(0, 0, 255)));
+		
+		contentPane.add(scrollPane, BorderLayout.CENTER);
+		listBoard.setBackground(new Color(250, 235, 215));
+		listBoard.setBorder(new LineBorder(new Color(0, 0, 0)));
+		
+		scrollPane.setViewportView(listBoard);
+		btnClose.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				sModelAdpt.shutDown();
+			}
+		});
+		
+		contentPane.add(btnClose, BorderLayout.SOUTH);
+	}
+
+	
+	/**
+	 * Start the server view
+	 */
+	public void start() {
+		this.setVisible(true);
+	}
+	
+	public void addEntry(R res) {
+		model.add(0, res);
+	}
+	
+}

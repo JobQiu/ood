@@ -1,0 +1,15 @@
+package common.message;
+
+/**
+ * A message only sent inside chatroom. 
+ * 
+ * Well-known chat messages are: 
+ * TextMessage, 
+ * AddMe, RemoveMe, 
+ * CommandRequest, CommandResponse, 
+ * InitUserRequest, InitUserResponse, 
+ * ChatUserInfoRequest, ChatUserInfoResponse. 
+ */
+public interface IChatMessage extends IMessage {
+
+}

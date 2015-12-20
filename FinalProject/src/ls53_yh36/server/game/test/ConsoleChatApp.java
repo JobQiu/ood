@@ -1,0 +1,189 @@
+package ls53_yh36.server.game.test;
+
+import java.awt.Component;
+import java.rmi.RemoteException;
+import java.util.function.Supplier;
+
+import javax.swing.JFrame;
+
+import common.IChatUser;
+import common.ICmd2ModelAdapter;
+import common.IInitUser;
+import common.demo.Chatroom;
+import common.demo.command.AddMeCmd;
+import common.demo.command.Invitation2ChatroomCmd;
+import common.demo.command.TextMessageCmd;
+import common.demo.message.chat.CommandRequest;
+import common.demo.message.init.Invitation2Chatroom;
+import common.message.IChatMessage;
+import common.message.IInitMessage;
+import common.message.chat.AAddMe;
+import common.message.chat.ACommandResponse;
+import common.message.chat.ATextMessage;
+import common.message.init.AInvitation2Chatroom;
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.datapacket.DataPacket;
+import provided.datapacket.DataPacketAlgo;
+import provided.mixedData.MixedDataDictionary;
+import provided.mixedData.MixedDataKey;
+
+/**
+ * A console chat app only prints string in console. 
+ */
+public class ConsoleChatApp {
+
+    /**
+     * The cache
+     */
+	private static DataPacket<IChatMessage> cache; 
+	
+	/**
+	 * The adapter
+	 */
+	private static ICmd2ModelAdapter adapter = new ICmd2ModelAdapter() {
+	
+		private transient MixedDataDictionary dict = new MixedDataDictionary();
+        
+        @Override
+        public void updateUpdatable(Supplier<Component> componentFac) {}
+        
+        @Override
+        public <T> void setMixedDataDictEntry(MixedDataKey<T> key, T value) {
+            dict.put(key, value);
+        }
+        
+        @Override
+        public void sendToChatroom(IChatMessage message) {}
+        
+        @Override
+        public String getUserName() {
+        	return null;
+        }
+        
+        @Override
+        public <T> T getMixedDataDictEntry(MixedDataKey<T> key) {
+            return dict.get(key);
+        }
+        
+        @Override
+        public void createNewWindow(Supplier<JFrame> frameFac) {}
+        
+        @Override
+        public void addToScrollable(Supplier<Component> componentFac) {}
+
+        @Override
+        public void sendMsgTo(IChatMessage msg, IChatUser chatUser) {}
+	};
+	
+	/**
+	 * Run the demo. 
+	 * @param args - console arguments. 
+	 */
+	public static void main(String[] args) {
+
+		// initialize bootstrap. 
+		Bootstrap bootstrap = new Bootstrap();
+
+		// initialize initAlgo with null as its default command. 
+		DataPacketAlgo<String, IInitUser> initAlgo = new DataPacketAlgo<String, IInitUser>(null);
+
+		// initialize chatAlgo with null as its default command. 
+		DataPacketAlgo<String, IChatUser> chatAlgo = new DataPacketAlgo<String, IChatUser>(null);
+
+		// create a remote to local adapter.  
+		IInitUser initMe = new IInitUser() {
+			@Override
+			public void receive(IInitUser sender, DataPacket<? extends IInitMessage> dp) throws RemoteException {
+				dp.execute(initAlgo, sender);
+			}
+		};
+
+		// create a remote to chatroom adapter. 
+		IChatUser chatMe = new IChatUser() {
+			@Override
+			public void receive(IChatUser sender, DataPacket<? extends IChatMessage> dp) throws RemoteException {
+				dp.execute(chatAlgo, sender);
+			}
+		};
+
+		// get the stub of initial adapter. 
+		IInitUser initMeStub = bootstrap.register(initMe);
+
+		// get the stub of chatroom adapter. 
+		IChatUser chatMeStub = bootstrap.register(chatMe);
+
+		// create a new chatroom. 
+		Chatroom room = new Chatroom();
+		room.addUser(chatMeStub);
+
+		// add commands to initAlgo. 
+		initAlgo.setCmd(AInvitation2Chatroom.class, new Invitation2ChatroomCmd(chatMeStub));
+
+		// add commands to chatAlgo. 
+//		chatAlgo.setDefaultCmd(new UnknownMessageCmd(chatMeStub));
+		chatAlgo.setDefaultCmd(new ADataPacketAlgoCmd<String, IChatMessage, IChatUser>() {
+			/**
+			 * Auto-generated UID. 
+			 */
+			private static final long serialVersionUID = -2693800186204923931L;
+
+			{
+				me = chatMeStub;
+			}
+			
+			/**
+			 * Receiver of this unknown message.
+			 */
+			private IChatUser me;
+
+			@Override
+			public String apply(Class<?> index, DataPacket<IChatMessage> host, IChatUser... params) {
+				IChatMessage msg = host.getData();
+				IChatUser sender = params[0];
+				CommandRequest request = new CommandRequest(msg.getClass());
+				// unknowns.put(request.getID(), msg); // cache this unknown message until its command returns
+				cache = host;
+				try {
+					sender.receive(me, request.getDataPacket());
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+				return "Received unknown-type data. ";
+			}
+
+			@Override
+			public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {
+			}
+		});
+		chatAlgo.setCmd(AAddMe.class, new AddMeCmd(room));
+		chatAlgo.setCmd(ATextMessage.class, new TextMessageCmd());
+		chatAlgo.setCmd(ACommandResponse.class, new ADataPacketAlgoCmd<String, ACommandResponse, IChatUser>() {
+
+			private static final long serialVersionUID = -3548526218871651031L;
+			
+			@Override
+			public String apply(Class<?> index, DataPacket<ACommandResponse> host, IChatUser... params) {
+				Class<?> tmp = host.getData().getUnknownType();
+				ADataPacketAlgoCmd<String, ?, IChatUser> cmd = host.getData().getCommand();
+				cmd.setCmd2ModelAdpt(adapter);
+				cmd.apply(tmp, cache, params[0]);
+				return null;
+			}
+
+			@Override
+			public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {	}
+			
+		});
+
+		// get the initial stub from friend's IP address. 
+		IInitUser friend = bootstrap.connectToUser("10.121.78.216");
+
+		// ask friend to join your chatroom. 
+		try {
+			friend.receive(initMeStub, new Invitation2Chatroom(room, true).getDataPacket());
+		} catch (RemoteException e) {
+			System.out.println("Can't find friend. ");
+			e.printStackTrace();
+		}
+	}
+}

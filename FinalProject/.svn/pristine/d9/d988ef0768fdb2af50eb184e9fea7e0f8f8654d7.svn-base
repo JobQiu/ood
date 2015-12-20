@@ -1,0 +1,71 @@
+package ls53_yh36.client.chat.model;
+
+import java.util.Set;
+import java.util.UUID;
+
+import common.IChatUser;
+import common.IChatroom;
+import common.message.IChatMessage;
+import gov.nasa.worldwind.formats.tiff.GeotiffMetaData;
+
+public class ChatModel implements IChatroom {
+    
+    /**
+     * The generated serial version UID
+     */
+    private static final long serialVersionUID = 3642862362618211070L;
+
+    public ChatModel() {
+        
+    }
+    
+    public void sendMessage(String message) {
+        
+    }
+    
+    public ChatUser getMe() {
+        return null;
+    }
+
+    @Override
+    public UUID getID() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setName(String name) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public Set<IChatUser> getUsers() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean addUser(IChatUser user) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean removeUser(IChatUser user) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void send(IChatUser sender, IChatMessage message) {
+        // TODO Auto-generated method stub
+        
+    }
+}

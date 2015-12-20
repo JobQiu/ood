@@ -1,0 +1,42 @@
+package common;
+
+import java.rmi.RemoteException;
+import java.util.Collection;
+
+import common.messages.RequestForAlgo;
+import provided.datapacket.DataPacket;
+import provided.datapacket.ADataPacketAlgoCmd;
+
+public class Connect implements IConnect {
+	
+  public transient IConnectToWorldAdapter _IConnectToWorldAdapter;
+  
+  /*Constructor takes IUser object and the adapter to access methods in model*/
+  public Connect(IConnectToWorldAdapter adapter){
+    _IConnectToWorldAdapter = adapter;
+  }
+  
+  /*get the IUser object of this connection*/
+  @Override
+  public IUser getUser(IConnect stub) throws RemoteException {
+	  return _IConnectToWorldAdapter.getUser(stub);
+  }
+
+  /*get a list of chatrooms from this IUser*/
+  @Override
+  public Collection<IChatroom> getChatrooms() throws RemoteException{
+    return _IConnectToWorldAdapter.getChatrooms();
+  }
+
+  /*pass the data needed to be sent through the adapter*/
+  @Override
+  public <T> void sendReceive(int roomID, IUser me, DataPacket<T> data) throws RemoteException{
+    _IConnectToWorldAdapter.receive(roomID,me,data);
+  }
+  
+  /*Get a command to handle a packet we've never seen before */
+  @Override
+  public <T> ADataPacketAlgoCmd<?,T,?> getNewCommand(RequestForAlgo<T> request) throws RemoteException {
+	  return _IConnectToWorldAdapter.getCommand(request);
+  }
+}

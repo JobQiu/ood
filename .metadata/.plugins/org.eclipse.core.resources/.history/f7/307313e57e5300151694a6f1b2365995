@@ -1,5 +1,0 @@
-package model.ball;
-
-public abstract class ABall {
-
-}

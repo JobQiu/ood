@@ -1,0 +1,303 @@
+package ls53_yh36.server.game.smodel;
+
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import common.IChatUser;
+import common.ICmd2ModelAdapter;
+import common.IInitUser;
+import common.message.IChatMessage;
+import common.message.IInitMessage;
+import common.message.chat.ACommandRequest;
+import common.message.init.AInvitation2Chatroom;
+import ls53_yh36.server.game.gmodel.message.ReportServer;
+import ls53_yh36.server.game.scontroller.RunGameFac;
+import ls53_yh36.server.game.smodel.message.StartGame;
+import ls53_yh36.server.game.smodel.message.StartGameResponse;
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.datapacket.DataPacket;
+import provided.datapacket.DataPacketAlgo;
+import provided.rmiUtils.IRMIUtils;
+import provided.rmiUtils.IRMI_Defs;
+import provided.rmiUtils.RMIUtils;
+import provided.util.IVoidLambda;
+
+public class ServerModel {
+
+	/**
+	 * Server model to view adapter
+	 */
+	private ServerModelAdpt sViewAdpt;
+	
+	/**
+	 * RMI Utility
+	 */
+	private IRMIUtils rmiUtils;	
+	
+	/**
+	 * Registry object of the game server
+	 */
+	private Registry registry;
+	
+	/**
+	 * InitUser for the game server
+	 */
+	private IInitUser initServer;
+	private IInitUser initStub;
+	
+	/**
+	 * ChatUser sent to ChatClient
+	 */
+	private IChatUser chatServer;
+	private IChatUser chatStub;
+	
+	/**
+	 * Algorithm dealing with requests from IInitUser clients
+	 */
+	private DataPacketAlgo<String, IInitUser/*sender type*/> initAlgo;
+	
+	/**
+	 * Algorithm dealing with requests from IChatUser clients
+	 */
+	private DataPacketAlgo<String, IChatUser> chatAlgo;
+	
+	/**
+	 * Contain the states of all teams
+	 */
+	private Map<UUID, TeamRecord> teams = new HashMap<>();
+	
+	/**
+	 * Keep the records of previous teams
+	 */
+	private List<Long> records = new ArrayList<>();
+	
+	
+//	private GuessGame gg;
+	
+	
+	public ServerModel(ServerModelAdpt ViewAdpt) {
+		sViewAdpt = ViewAdpt;
+		
+		rmiUtils = new RMIUtils(new IVoidLambda<String>() {
+
+			@Override
+			public void apply(String... params) {
+			}
+			
+		});
+		
+		initServer = new IInitUser() {
+
+			@Override
+			public void receive(IInitUser sender, DataPacket<? extends IInitMessage> dp) throws RemoteException {
+				dp.execute(initAlgo, sender);
+			}
+			
+		};
+		
+		initAlgo = new DataPacketAlgo<String, IInitUser>(null); // don't need defaultAlgo
+		initAlgo.setCmd(AInvitation2Chatroom.class, new ADataPacketAlgoCmd<String, AInvitation2Chatroom, IInitUser>(){
+			// When server receives an invitation from an IInitUser, it will send the whole game to the team
+			private static final long serialVersionUID = -461623071457187081L;
+			
+			@Override
+			public String apply(Class<?> index, DataPacket<AInvitation2Chatroom> host, IInitUser... params) {
+				UUID gID = host.getData().getChatroom().getID();
+//				RunGameFac gFac = new RunGameFac(chatStub, gID);
+				if (teams.containsKey(gID)) 
+					return "Game has already been sent.\n";
+				teams.put(gID, new TeamRecord(host.getData().getChatroom().getUsers(), System.currentTimeMillis()));
+				
+				for (IChatUser player : host.getData().getChatroom().getUsers()) {
+					try {
+						player.receive(chatStub, new StartGame(new RunGameFac(chatStub, gID, player)).getDataPacket());
+					} catch (RemoteException e) {
+						System.err.println("Exception when sending game to clients: " + e + "\n");
+						e.printStackTrace();
+					}
+				}
+				return "New game has been forward to team \"" + host.getData().getChatroom().getName() + "\"\n";
+			}
+
+			@Override
+			public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {
+			}
+			
+		});
+		
+//		gg = new GuessGame(UUID.randomUUID());
+		
+		chatServer = new IChatUser() {
+
+			@Override
+			public void receive(IChatUser sender, DataPacket<? extends IChatMessage> dp) throws RemoteException {
+				dp.execute(chatAlgo, sender);
+			}
+			
+		};
+		
+		chatAlgo = new DataPacketAlgo<String, IChatUser>(null);
+		chatAlgo.setCmd(ACommandRequest.class, new ADataPacketAlgoCmd<String, ACommandRequest, IChatUser>() {
+			// This command will send StartGameCmd to requested clients
+			private static final long serialVersionUID = 828558989096978029L;
+
+			@Override
+			public String apply(Class<?> index, DataPacket<ACommandRequest> host, IChatUser... params) {
+				IChatUser sender = params[0];
+				try {
+					sender.receive(chatStub, new StartGameResponse(host.getData(), host.getData().getUnknownType()).getDataPacket());
+				} catch (RemoteException e) {
+					System.err.println("Cannot not handle the ACommandRequest. Exception: " + e + "\n");
+					e.printStackTrace();
+				}
+				return "Receive a StartGameRequest from client \"" + sender + "\"\n";
+			}
+
+			@Override
+			public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {
+			}
+			
+		});	
+		chatAlgo.setCmd(ReportServer.class, new ADataPacketAlgoCmd<String, ReportServer, IChatUser>() {
+
+			private static final long serialVersionUID = -7124216027600452850L;
+
+			@Override
+			public String apply(Class<?> index, DataPacket<ReportServer> host, IChatUser... params) {
+				UUID teamID = host.getData().gameID;
+				IChatUser player = host.getData().player;
+				long usedTime = host.getData().time;
+				
+				if (teams.containsKey(teamID) && !teams.get(teamID).replyed.contains(player)) {
+					TeamRecord entry = teams.get(teamID);  
+					entry.bestResult = Math.min(entry.bestResult, usedTime);
+					entry.replyed.add(player);
+					if (entry.replyed.size() == entry.players.size()) {
+						records.add(entry.bestResult);
+						Collections.sort(records);
+						sViewAdpt.updateScore((records.indexOf(entry.bestResult) + 1) + "");
+					}
+				}
+				return "Receive a feedback a player.";
+			}
+
+			@Override
+			public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {
+			}
+			
+		});
+//		chatAlgo.setCmd(ATextMessage.class, new ADataPacketAlgoCmd<String, ATextMessage, IChatUser>() {
+//			// Receive a reply from a player
+//			private static final long serialVersionUID = 8195572056197598138L;
+//			
+//			@Override
+//			public String apply(Class<?> index, DataPacket<ATextMessage> host, IChatUser... params) {
+//				String result = host.getData().getText();
+//				sViewAdpt.updateScore(result);
+////				String[] parts = result.split("*");
+////				UUID gameID = UUID.fromString(parts[0]);
+////				long playTime = Long.parseLong(parts[1]);
+////				if (teams.containsKey(gameID) && teams.get(gameID).replyed.contains(o)) {
+////					teams.get(gameID).bestResult = Math.min(teams.get(gameID).bestResult, playTime);
+////				}
+//				return null;
+//			}
+//
+//			@Override
+//			public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {
+//			}
+//			
+//		});				
+		
+	}
+	
+	
+	/**
+	 * Launch the server
+	 */
+	public void start() {
+		register();
+		
+//		gg.launch();
+	}
+	
+	/**
+	 * Put the game server's IInitUser stub into the registry
+	 */
+	private void register() {
+		try {
+			initStub = (IInitUser) UnicastRemoteObject.exportObject(initServer, IInitUser.BOUND_PORT_SERVER);
+			chatStub = (IChatUser) UnicastRemoteObject.exportObject(chatServer, IChatUser.BOUND_PORT_SERVER);
+			rmiUtils.startRMI(IRMI_Defs.CLASS_SERVER_PORT_SERVER);
+			registry = rmiUtils.getLocalRegistry();
+			registry.rebind(IInitUser.BOUND_NAME, initStub);
+			System.out.println("Created remote me.");
+		} catch (RemoteException e) {
+			System.err.println("Connect exception:" + e + "\n");
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		
+	}
+	
+	/**
+	 * Shut down the server
+	 */
+	public void close() {
+		try {
+			registry.unbind(IInitUser.BOUND_NAME);
+			System.out.println("Server's stub has been unbounded.");
+			rmiUtils.stopRMI();
+			System.exit(0);
+		} catch (RemoteException | NotBoundException e) {
+			System.err.println("Error unbounding.");
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		
+	}
+	
+	private class TeamRecord {
+		/**
+		 * ID used to indentify the team
+		 */
+//		public UUID teamID;
+		
+		/**
+		 * Team corresponding to the ID
+		 */
+		public Set<IChatUser> players;
+		
+		/**
+		 * Game start time (ms)
+		 */
+		public long startTime;
+		
+		/**
+		 * Number of replyed players
+		 */
+		public Set<IChatUser> replyed;
+		
+		/**
+		 * Fastest time acheived by the team, default value is 4 min
+		 */
+		public long bestResult = 4 * 60000;
+		
+		public TeamRecord(Set<IChatUser> team, long startT) {
+			players = team;
+			replyed = new HashSet<>();
+			startTime = startT;
+		}
+		
+	}
+}

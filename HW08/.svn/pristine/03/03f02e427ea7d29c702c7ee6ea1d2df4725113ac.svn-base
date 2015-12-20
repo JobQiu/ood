@@ -1,0 +1,60 @@
+package chatapp.controller;
+
+import java.awt.EventQueue;
+
+import chatapp.model.ChatAppModel;
+import chatapp.model.IChatAppViewAdapter;
+import chatapp.view.ChatAppView;
+import chatapp.view.IChatAppModelAdapter;
+import common.IUser;
+
+public class ChatAppController {
+    
+    private ChatAppModel model;
+    
+    private ChatAppView view;
+    
+    public ChatAppController() {
+        model = new ChatAppModel(new IChatAppViewAdapter() {
+            
+            @Override
+            public void appendMessage(String message) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public void addUser(IUser user) {
+                // TODO Auto-generated method stub
+                
+            }
+        });
+        view = new ChatAppView(new IChatAppModelAdapter() {
+            
+            @Override
+            public void initUsername(String username) {
+                model.setUsername(username);
+            }
+        });
+    }
+    
+    public void start() {
+        view.start();
+        model.start();
+    }
+    
+    /**
+     * Launch the application.
+     * @param args no use
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                ChatAppController controller = new ChatAppController();
+                controller.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+}

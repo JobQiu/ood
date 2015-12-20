@@ -1,0 +1,12 @@
+package ls53_yh36.server.game.gmodel;
+
+import java.io.Serializable;
+
+public interface Cmd2RunGameAdpt extends Serializable {
+
+	/**
+	 * Post the information onto game view
+	 * @param msg
+	 */
+	public void post(String msg);
+}

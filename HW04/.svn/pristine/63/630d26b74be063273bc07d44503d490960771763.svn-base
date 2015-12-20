@@ -1,0 +1,206 @@
+package view;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import model.IModelControlAdapter;
+import model.IModelUpdateAdapter;
+
+import javax.swing.JButton;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+
+import javax.swing.JTextField;
+import javax.swing.JComboBox;
+
+import java.awt.GridLayout;
+import javax.swing.border.EtchedBorder;
+
+/**
+ * The view class in ball world application that displays all controls and added balls.
+ */
+public class BallWorldView<DropListItem> extends JFrame {
+	
+	/**
+	 * Serial Version ID automatically generated.
+	 */
+	private static final long serialVersionUID = 4665628271829011924L;
+
+
+	/**
+	 * The model adapter that this view communicates with.
+	 */
+	private final IModelControlAdapter<DropListItem> modelCtrAdapter;
+
+	private final IModelUpdateAdapter modelUpdateAdapter;
+	
+	/**
+	 * Main content pane
+	 */
+	private JPanel contentPane;
+	
+	/**
+	 * Center panel
+	 */
+	private JPanel cpanel = new JPanel() {
+		/**
+		 * Serial Version ID automatically generated.
+		 */
+		private static final long serialVersionUID = -708326350965762632L;
+
+		/**
+		 * Overridden paintComponent method to paint a shape in the panel.
+		 * @param g The Graphics object to paint on.
+		 **/
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g); // Do everything normally done first, e.g. clear the screen.
+			modelUpdateAdapter.update(g);
+		}
+	};
+	/**
+	 *  North Panel
+	 */
+	private final JPanel npanel = new JPanel();
+	private final JComboBox<DropListItem> comboxBall = new JComboBox<DropListItem>();
+	private final JButton btnMakeBall = new JButton("Make Selected Ball");
+	private final JButton btnAddtoList = new JButton("Add to lists");
+	private final JTextField txtBallName = new JTextField();
+	private final JComboBox<DropListItem> comboxCombine = new JComboBox<DropListItem>();
+	private final JButton btnCombine = new JButton("Combine");
+	private final JButton btnMakeSwitherBall = new JButton("Make Swither Ball");
+	private final JButton btnSwitchStrat = new JButton("Switch");
+	private final JButton btnClearAll = new JButton("Clear All");
+
+	/**
+	 * Start view.
+	 */
+	public void start() {
+		setVisible(true);
+	}
+
+	/**
+	 * GUI initialization function
+	 */
+	public void initGUI() {
+		setTitle("Ball World");
+
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 450, 300);
+		contentPane = new JPanel();
+		contentPane.setToolTipText("Main ContentPane");
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new BorderLayout(0, 0));
+		setContentPane(contentPane);
+		cpanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		cpanel.setPreferredSize(new Dimension(100, 100));
+		cpanel.setBackground(Color.WHITE);
+		cpanel.setToolTipText("The canvas panel which balls move within");
+		cpanel.setMinimumSize(new Dimension(50, 50));
+
+		contentPane.add(cpanel, BorderLayout.CENTER);
+		cpanel.setLayout(new GridLayout(1, 0, 1, 0));
+		npanel.setBackground(Color.WHITE);
+		contentPane.add(npanel, BorderLayout.NORTH);
+		npanel.setToolTipText("The control panel");
+		npanel.setLayout(new GridLayout(0, 3, 0, 0));
+		txtBallName.setToolTipText("type in the abbreviated name of the strategy to add without strategy suffix");
+		
+		npanel.add(txtBallName);
+		
+		npanel.add(comboxBall);
+		btnAddtoList.setToolTipText("add a new type of strategy to the lists");
+		btnAddtoList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(txtBallName.getText() != null) {
+					DropListItem strategyFac = modelCtrAdapter.addStrategy(txtBallName.getText());
+					comboxBall.addItem(strategyFac);
+					comboxCombine.addItem(strategyFac);
+				}
+			}
+		});
+		btnMakeBall.setToolTipText("add a ball with the selected update strategy which cannot be changed thereafter");
+		btnMakeBall.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				modelCtrAdapter.makeBall(comboxBall.getItemAt(comboxBall.getSelectedIndex()), cpanel);
+			}
+		});
+		
+		npanel.add(btnMakeBall);
+		
+		npanel.add(btnAddtoList);
+		
+		npanel.add(comboxCombine);
+		btnClearAll.setToolTipText("Clear all balls");
+		btnClearAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				modelCtrAdapter.clearBalls();
+			}
+		});
+		btnMakeSwitherBall.setToolTipText("make a ball with current switcher strategy which can be changed thereafter");
+		btnMakeSwitherBall.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				modelCtrAdapter.makeSwitcherBall(cpanel);
+			}
+		});
+		
+		npanel.add(btnMakeSwitherBall);
+		
+		npanel.add(btnClearAll);
+		btnSwitchStrat.setToolTipText("Swith update strategy of all switcher balls to the selected strategy");
+		btnSwitchStrat.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int selectedIndex = comboxBall.getSelectedIndex();
+				if(selectedIndex >= 0) {
+					modelCtrAdapter.switchStrategy(comboxBall.getItemAt(selectedIndex));
+				}
+			}
+		});
+		btnCombine.setToolTipText("comine two selected strategies and add it to lists");
+		btnCombine.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				DropListItem item = modelCtrAdapter.combineStrategies(comboxBall.getItemAt(comboxBall.getSelectedIndex()), comboxCombine.getItemAt(comboxCombine.getSelectedIndex()));
+				comboxBall.addItem(item);
+				comboxCombine.addItem(item);
+			}
+		});
+		
+		npanel.add(btnCombine);
+		npanel.add(btnSwitchStrat);
+		
+		cpanel.addComponentListener(new ComponentListener(){
+
+			public void componentResized(ComponentEvent e) {
+			}
+			public void componentMoved(ComponentEvent e) {}
+			public void componentShown(ComponentEvent e) {}
+			public void componentHidden(ComponentEvent e) {}
+			
+		});
+		
+		setMinimumSize(new Dimension(100, 250));
+	}
+
+	/**
+	 * Update view.
+	 */
+	public void update() {
+		cpanel.repaint();
+	}
+	
+	public BallWorldView(IModelUpdateAdapter vupdateAdapter, IModelControlAdapter<DropListItem> vcontrolAdapter) {
+		txtBallName.setColumns(10);
+		this.modelCtrAdapter = vcontrolAdapter;
+		this.modelUpdateAdapter = vupdateAdapter;
+		initGUI();
+	}
+
+
+}

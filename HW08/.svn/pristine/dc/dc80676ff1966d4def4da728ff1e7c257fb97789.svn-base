@@ -1,0 +1,200 @@
+package chatapp.controller;
+
+import java.awt.Container;
+import java.awt.EventQueue;
+import java.awt.Image;
+import java.util.UUID;
+
+import chatapp.model.ChatAppModel;
+import chatapp.model.IChatAppViewAdapter;
+import chatapp.view.ChatAppView;
+import chatapp.view.IChatAppModelAdapter;
+import chatroom.model.ChatroomModel;
+import chatroom.model.IChatroomViewAdapter;
+import chatroom.view.ChatroomView;
+import chatroom.view.IChatroomModelAdapter;
+import chatroom.view.ImageView;
+import common.IUser;
+
+/**
+ * The controller for chat app
+ * @author ls53@rice.edu
+ */
+public class ChatAppController {
+    
+    /**
+     * The chat app model
+     */
+    private ChatAppModel model;
+    
+    /**
+     * The chat app view
+     */
+    private ChatAppView<IUser, ChatroomModel> view;
+    
+    /**
+     * The constructor for chat app
+     */
+    public ChatAppController() {
+        view = new ChatAppView<>(new IChatAppModelAdapter<IUser, ChatroomModel>() {
+            
+            @Override
+            public void initUsername(String username) {
+                model.setUsername(username);
+            }
+
+            @Override
+            public void connectTo(String ip) {
+                model.connectTo(ip);
+            }
+
+            @Override
+            public void createNewChatroom() {
+                String chatroomName = view.getNewChatroomName();
+                if (chatroomName != null) {
+                    ChatroomModel chatroom = model.createNewChatroom(UUID.randomUUID(), chatroomName);
+                    chatroom.addUser(chatroom.getMe());
+                }
+            }
+
+            @Override
+            public void inviteUserToChatroom(IUser user, ChatroomModel chatroom) {
+                model.inviteUserToChatroom(user, chatroom);
+            }
+        });
+        
+        model = new ChatAppModel(new IChatAppViewAdapter() {
+            
+            @Override
+            public void append(String message) {
+                view.append(message);
+            }
+            
+            @Override
+            public void addUser(IUser user) {
+                view.addUser(user);
+            }
+
+            @Override
+            public String getNewChatroomName() {
+                return view.getNewChatroomName();
+            }
+            
+            @Override
+            public IChatroomViewAdapter makeChatroomViewAdapter(ChatroomModel chatroomModel) {
+                IChatroomModelAdapter chatroomModelAdapter = new IChatroomModelAdapter() {
+                    
+                    @Override
+                    public void sendMessage(String message) {
+                        chatroomModel.sendMessage(message);
+                    }
+                    
+                    @Override
+                    public void sendImage(Image image) {
+                        chatroomModel.sendImage(image);
+                    }
+
+                    @Override
+                    public void quiteChatroom() {
+                        model.quitChatroom(chatroomModel);
+                    }
+                };
+                
+                ChatroomView<IUser> chatroomView = view.makeChatroomView(chatroomModelAdapter);
+                
+                return new IChatroomViewAdapter() {
+                    
+                    @Override
+                    public void start() {
+                        chatroomView.start();
+                    }
+                    
+                    @Override
+                    public void append(IUser user, String message) {
+                        chatroomView.append(String.format("%s: %s\n", user.getName(), message));
+                    }
+
+                    @Override
+                    public void addUser(IUser user) {
+                        chatroomView.addUser(user);
+                    }
+                    
+                    @Override
+                    public void removeUser(IUser user) {
+                        chatroomView.removeUser(user);
+                    }
+
+                    @Override
+                    public void warn(String message) {
+                        chatroomView.warn(message);
+                    }
+
+                    @Override
+                    public void setTitle(String title) {
+                        chatroomView.setTitle(title);
+                    }
+
+                    @Override
+                    public Container createImageView() {
+                        ImageView imageView = new ImageView();
+                        imageView.start();
+                        return imageView.getContentPane();
+                    }
+
+                    @Override
+                    public void showImage(Container container, Image image) {
+                        chatroomView.showImage(container, image);
+                    }
+                };
+            }
+
+            @Override
+            public boolean willJoinChatroom(String username, String chatroom) {
+                return view.willJoinChatroom(username, chatroom);
+            }
+
+            @Override
+            public void setTitle(String title) {
+                view.setTitle(title);
+            }
+
+            @Override
+            public void addChatroom(ChatroomModel chatroom) {
+                view.addChatroom(chatroom);
+            }
+
+            @Override
+            public void removeChatroom(ChatroomModel chatroom) {
+                view.removeChatroom(chatroom);
+            }
+
+            @Override
+            public void warn(String message) {
+                view.warn(message);
+            }
+        });
+    }
+    
+    /**
+     * Start the controller
+     */
+    public void start() {
+        view.start();
+        model.start();
+    }
+    
+    /**
+     * Launch the application.
+     * @param args no use
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                ChatAppController controller = new ChatAppController();
+                controller.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+}

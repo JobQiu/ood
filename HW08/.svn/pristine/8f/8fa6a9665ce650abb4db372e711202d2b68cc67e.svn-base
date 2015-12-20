@@ -1,0 +1,7 @@
+package chatapp.view;
+
+public interface IChatAppModelAdapter {
+    public void initUsername(String username);
+    
+    public void connectTo(String ip);
+}

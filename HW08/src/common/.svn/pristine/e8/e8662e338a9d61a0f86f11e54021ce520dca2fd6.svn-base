@@ -1,0 +1,34 @@
+package common.messages;
+
+import java.io.Serializable;
+import java.util.UUID;
+
+import common.IUser;
+
+/**
+ * Remove me from a chat room, sent by DataPacket
+ */
+public class RemoveMe implements Serializable{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6772035205940259261L;
+
+	public RemoveMe(IUser me, UUID chatroomID)
+	{
+		this.me = me;
+		this.chatroomID = chatroomID;
+	}
+	
+	/**
+	 * The user self
+	 */
+	public IUser me;
+	
+	/**
+	 * Target chat room ID
+	 */
+	public UUID chatroomID;
+
+}

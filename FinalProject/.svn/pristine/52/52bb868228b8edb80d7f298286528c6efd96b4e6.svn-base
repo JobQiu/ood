@@ -1,0 +1,64 @@
+package ls53_yh36.server.game.smodel.command;
+
+import java.util.UUID;
+
+import common.IChatUser;
+import common.ICmd2ModelAdapter;
+import ls53_yh36.server.game.gmodel.Cmd2RunGameAdpt;
+import ls53_yh36.server.game.smodel.message.ReplyRank;
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.datapacket.DataPacket;
+import provided.mixedData.MixedDataKey;
+
+/**
+ * Replay rand command
+ * @author ls53@rice.edu
+ */
+public class ReplyRankCmd extends ADataPacketAlgoCmd<String, ReplyRank, IChatUser> {
+
+    /**
+     * The generated serial version UID
+     */
+	private static final long serialVersionUID = -8107870629912883491L;
+
+	/**
+	 * The command to model adapter
+	 */
+	transient private ICmd2ModelAdapter adpt;
+	
+	/**
+	 * UUID used to get the Cmd2RunGameAdpt from the mixedDictionary
+	 */
+	private UUID id;
+	
+	/**
+	 * Constructor
+	 * @param id UUID
+	 */
+	public ReplyRankCmd(UUID id) {
+		this.id = id;
+	}
+	
+	/**
+	 * The apply method
+	 * @param index The index
+	 * @param host The data packet
+	 * @param params The sender
+	 */
+	@Override
+	public String apply(Class<?> index, DataPacket<ReplyRank> host, IChatUser... params) {
+		Cmd2RunGameAdpt cgAdpt = adpt.getMixedDataDictEntry(new MixedDataKey<Cmd2RunGameAdpt>(id, "Cmd2RunGameAdpt", Cmd2RunGameAdpt.class));
+		cgAdpt.post(host.getData().rank());
+		return null;
+	}
+
+	/**
+	 * Set command to model adapter
+	 * @param cmd2ModelAdpt The command to model adapter to set
+	 */
+	@Override
+	public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {
+		adpt = cmd2ModelAdpt;		
+	}
+
+}

@@ -1,0 +1,17 @@
+package common.messages;
+
+import java.io.Serializable;
+
+public class RequestForAlgo<T> implements Serializable{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3165014455787956557L;
+	
+	/**
+	 * The class type you need an algorithm for
+	 */
+	public Class<T> unknownType;
+	
+}

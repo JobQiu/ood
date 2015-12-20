@@ -1,0 +1,34 @@
+package common.messages;
+
+import java.io.Serializable;
+import java.util.UUID;
+
+import common.IUser;
+
+/**
+ * Add me to a chat room, sent by DataPacket
+ */
+public class AddMe implements Serializable {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7738562854732574759L;
+
+	public AddMe(IUser me,UUID chatroomID)
+	{
+		this.me = me;
+		this.chatroomID = chatroomID;
+	}
+	
+	/**
+	 * The user self
+	 */
+	public IUser me;
+	
+	/**
+	 * Target chat room ID
+	 */
+	public UUID chatroomID;
+
+}

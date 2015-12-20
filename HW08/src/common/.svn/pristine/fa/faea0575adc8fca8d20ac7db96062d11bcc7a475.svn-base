@@ -1,0 +1,63 @@
+package common;
+
+import java.rmi.RemoteException;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+
+import provided.datapacket.DataPacket;
+
+/**
+ * Reference implementation of a chatroom.
+ */
+public class Chatroom implements IChatroom {
+	
+	private int id;
+	private Set<IUser> users;
+	private static Random rand = new Random();
+
+	public Chatroom() {
+		id = rand.nextInt();
+		users = new HashSet<IUser>();
+	}
+
+	public Chatroom(int id) {
+		this.id = id;
+		users = new HashSet<IUser>();
+	}
+
+	@Override
+	public int id() {
+		return id;
+	}
+
+	@Override
+	public Set<IUser> getUsers() {
+		return users;
+	}
+
+	@Override
+	public boolean addUser(IUser user) {
+		return users.add(user);
+	}
+
+	@Override
+	public boolean removeUser(IUser user) {
+		return users.remove(user);
+	}
+
+	@Override
+	public <T> void send(IUser me, DataPacket<T> message) {
+		users.iterator().forEachRemaining(
+					(user) ->{ 
+						try{
+							user.getConnect().sendReceive(((Integer)id).toString(), me, message);
+						}
+						catch(RemoteException e)
+						{
+							e.printStackTrace();
+						}
+					});
+	}
+
+}

@@ -1,0 +1,41 @@
+package chatroom.model;
+
+import java.awt.Container;
+import java.awt.Graphics;
+import java.awt.Image;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import chatroom.view.ImagePanel;
+import chatroom.view.ImageView;
+import common.ICmd2ModelAdapter;
+import common.IUser;
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.datapacket.DataPacket;
+
+public class ImageDataPacketAlgoCmd extends ADataPacketAlgoCmd<String, ImageIcon, IUser> {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7098826673563143364L;
+    
+    private transient ICmd2ModelAdapter cmd2ModelAdapter;
+
+    @Override
+    public String apply(Class<?> index, DataPacket<ImageIcon> host, IUser... params) {
+        Container container = cmd2ModelAdapter.updateable();
+        ImageView view = new ImageView();
+        ImageIcon imageIcon = host.getData();
+        ImagePanel panel = new ImagePanel(imageIcon.getImage(), container);
+        view.getContentPane().add(panel);
+        view.setVisible(true);
+        return null;
+    }
+
+    @Override
+    public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {
+        this.cmd2ModelAdapter = cmd2ModelAdpt;
+    }
+}

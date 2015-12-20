@@ -1,0 +1,271 @@
+package model;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.util.Observable;
+import java.util.Observer;
+
+import model.strategy.IUpdateStrategy;
+
+/**
+ * Concrete class for a ball
+ * Defines a ball's reasonable field and some common methods
+ * @author JacobChen, Li Shen
+ *
+ */
+public class Ball implements Observer {
+
+	/** radius of the ball */
+	private int radius;
+
+	/** color of the ball */
+	private Color color;
+
+	/**
+	 * velocity of the ball,
+	 * including velocity.x and velocity.y
+	 */
+	private Point velocity;
+
+	/**
+	 * location of the ball,
+	 * including location.x and location.y
+	 */
+	private Point location;
+
+	/** On which component does the ball exist */
+	private Component canvas;
+
+	/** the strategy the ball performs */
+	private IUpdateStrategy strategy;
+
+	/**
+	 * the constructor for ABall
+	 * @param radius radius of the ball
+	 * @param color color of the ball
+	 * @param velocity velocity of the ball
+	 * @param location location of the ball
+	 * @param canvas on which canvas does the ball exist
+	 * @param strategy state strategy for each ball
+	 */
+	public Ball(int radius, Color color, Point velocity, Point location, Component canvas, IUpdateStrategy strategy) {
+		this.radius = radius;
+		this.color = color;
+		this.velocity = velocity;
+		this.location = location;
+		this.canvas = canvas;
+		this.strategy = strategy;
+	}
+
+	/**
+	 * Gets the radius of the ball
+	 * @return the radius
+	 */
+	public int getRadius() {
+		return radius;
+	}
+
+	/**
+	 * Sets the radius of the ball
+	 * @param radius the radius to set
+	 */
+	public void setRadius(int radius) {
+		this.radius = radius;
+	}
+
+	/**
+	 * Gets the color of the ball
+	 * @return the color 
+	 */
+	public Color getColor() {
+		return color;
+	}
+
+	/**
+	 * Sets the color of the ball
+	 * @param color the color to set
+	 */
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
+	/**
+	 * Gets the velocity of the ball
+	 * @return the velocity
+	 */
+	public Point getVelocity() {
+		return velocity;
+	}
+
+	/**
+	 * Sets the velocity of the ball
+	 * @param velocity the velocity to set
+	 */
+	public void setVelocity(Point velocity) {
+		this.velocity = velocity;
+	}
+
+	/**
+	 * Gets the velocity x of the ball
+	 * @return the x velocity
+	 */
+	public int getVelX() {
+		return velocity.x;
+	}
+
+	/**
+	 * Sets the velocity x of the ball
+	 * @param vx the velocity x to set
+	 */
+	public void setVelX(int vx) {
+		this.velocity.x = vx;
+	}
+
+	/**
+	 * Gets the velocity y of the ball
+	 * @return the y velocity
+	 */
+	public int getVelY() {
+		return velocity.y;
+	}
+
+	/**
+	 * Sets the velocity y of the ball
+	 * @param vy the velocity y to set
+	 */
+	public void setVelY(int vy) {
+		this.velocity.y = vy;
+	}
+
+	/**
+	 * Gets the location of the ball
+	 * @return the location
+	 */
+	public Point getLoc() {
+		return location;
+	}
+
+	/**
+	 * Sets the location of the ball
+	 * @param location the location to set
+	 */
+	public void setLoc(Point location) {
+		this.location = location;
+	}
+
+	/**
+	 * Gets the canvas of the ball painted on
+	 * @return the canvas of the ball painted on
+	 */
+	public Component getCanvas() {
+		return canvas;
+	}
+
+	/**
+	 * Get the strategy of the ball.
+	 * @return Strategy of the ball
+	 */
+	public IUpdateStrategy getStrategy() {
+		return strategy;
+	}
+
+	public void setStrategy(IUpdateStrategy strategy) {
+		this.strategy = strategy;
+	}
+
+	/**
+	 * Paints the ball 
+	 * @param g the Graphics object to paint the ball onto.
+	 */
+	public void paint(Graphics g) {
+		/** set the color to paint with */
+		g.setColor(color);
+		/** paint a circle onto the graphics object centered on location and with radius */
+		g.fillOval(location.x - radius, location.y - radius, 2 * radius, 2 * radius);
+	}
+
+	/**
+	 * Bounce the ball off the wall
+	 * If it hits the left or right wall, set the x-component of the velocity to 
+	 * the negative of the x-component of the velocity.   
+	 * Likewise, if it hits the top or bottom wall, set the y-component of the velocity to 
+	 * the negative of itself.
+	 */
+	public void bounce() {
+		/** get the bounds of the component in the form of a Rectangle object */
+		Rectangle bounds = canvas.getBounds();
+
+		/**
+		 * the ball hits the top of the wall
+		 */
+		if (location.y - radius + velocity.y <= 0) {
+			int diff = -(location.y - radius + velocity.y);
+			location.y = diff + radius;
+			velocity.y = -velocity.y;
+		}
+
+		/**
+		 * the ball hits the bottom of the wall
+		 */
+		if (location.y + radius + velocity.y >= bounds.height) {
+			int diff = location.y + radius + velocity.y - (int) Math.floor(bounds.height);
+			location.y = bounds.height - diff - radius;
+			velocity.y = -velocity.y;
+		}
+
+		/** 
+		 * the ball hits the left of the wall 
+		 */
+		if (location.x - radius + velocity.x <= 0) {
+			int diff = -(location.x - radius + velocity.x);
+			location.x = diff + radius;
+			velocity.x = -velocity.x;
+		}
+
+		/**
+		 * the ball hits the right of the wall
+		 */
+		if (location.x + radius + velocity.x >= bounds.width) {
+			int diff = location.x + radius + velocity.x - (int) Math.floor(bounds.width);
+			location.x = bounds.width - diff - radius;
+			velocity.x = -velocity.x;
+		}
+	}
+
+	/**
+	 * Define the default movement of ABall
+	 */
+	public void move() {
+		location.x = location.x + velocity.x;
+		location.y = location.y + velocity.y;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+	 * Update things such as changing the position, creating animated motion or 
+	 * strategies the ball uses.
+	 * @param o observable
+	 * @param g the Graphics object to paint the ball onto
+	 */
+	public void update(Observable o, Object g) {
+
+		if (g instanceof Graphics) {
+
+			/** update balls' state */
+			this.strategy.updateState(this);
+
+			/** detects bouncing events */
+			bounce();
+
+			/** moves like a default ball */
+			move();
+
+			/** Repaints the ball on this Graphics object */
+			paint((Graphics) g);
+		}
+	}
+
+}

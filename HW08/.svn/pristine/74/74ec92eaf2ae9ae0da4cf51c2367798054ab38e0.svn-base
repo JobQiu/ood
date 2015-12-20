@@ -1,0 +1,10 @@
+package chatapp.model;
+
+import common.IUser;
+
+public interface IChatAppViewAdapter {
+    
+    public void appendMessage(String message);
+    
+    public void addUser(IUser user);
+}

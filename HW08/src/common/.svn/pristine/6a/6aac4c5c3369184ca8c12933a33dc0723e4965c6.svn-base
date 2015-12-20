@@ -1,0 +1,38 @@
+package common;
+
+import java.rmi.Remote;
+
+import java.rmi.RemoteException;
+import java.util.Collection;
+
+import common.messages.IRequestForAlgo;
+import provided.datapacket.ADataPacket;
+import provided.datapacket.ADataPacketAlgoCmd;
+
+public interface IConnect extends Remote {
+  /* private transient ConnectToWorldAdapter _adapter */
+	
+  /**
+   * The name the ICompute object will be bound to in the RMI Registry
+   */
+  public static final String BOUND_NAME = "Connect";
+  
+  /**
+   * The port that the client will use to communicate with the ICompute object
+   * Note that this port must be opened of inbound traffic on the server machine
+   */
+  public static final int BOUND_PORT = 2100;
+  
+  /*get the IUser object of this connection*/
+  public IUser getUser(IConnect stub) throws RemoteException;
+  
+  /*get a list of chatrooms from this IUser*/
+  public Collection<IChatroom> getChatrooms() throws RemoteException;
+
+  /*process the data send by the remote application*/
+  public void sendReceive(IUser me, ADataPacket data) throws RemoteException;
+  
+  /*Get a command to handle a packet we've never seen before */
+  public ADataPacketAlgoCmd<String,?,IUser> getNewCommand(IRequestForAlgo request) throws RemoteException;
+}
+

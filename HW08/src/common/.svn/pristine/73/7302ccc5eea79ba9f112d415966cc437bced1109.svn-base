@@ -1,0 +1,12 @@
+/**
+ * This is just a placeholder to enable the provided.datapacket package to compile.
+ * This will change depending on the final public inter-computer API.
+ */
+package common;
+
+import java.awt.Component;
+
+public interface ICmd2ModelAdapter {
+	/* Get a reference to the container on the GUI that is used to display unknown types */
+	public Component modelPanel();
+}

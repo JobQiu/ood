@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring accessors="true" comment="Delete 4 elements from project &apos;HW07&apos;&#x0A;- Original project: &apos;HW07&apos;&#x0A;- Original elements:&#x0A;     HW07/src/client.controller&#x0A;     HW07/src/client.model&#x0A;     HW07/src/client.model.task&#x0A;     HW07/src/client.view&#x0A;- Delete subpackages" description="Delete elements" element1="/src&lt;client.view" element2="/src&lt;client" element3="/src&lt;client.model.task" element4="/src&lt;client.model" element5="/src&lt;client" element6="/src&lt;client.controller" element7="/src&lt;client" elements="7" flags="589830" id="org.eclipse.jdt.ui.delete" resources="0" stamp="1445378919695" subPackages="true" version="1.0"/>
+</session>

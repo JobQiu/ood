@@ -1,0 +1,111 @@
+package chatapp.controller;
+
+import java.awt.EventQueue;
+
+import javax.swing.ImageIcon;
+
+import chatapp.model.ChatAppModel;
+import chatapp.model.IChatAppViewAdapter;
+import chatapp.view.ChatAppView;
+import chatapp.view.IChatAppModelAdapter;
+import chatroom.model.ChatroomModel;
+import chatroom.model.IChatroomViewAdapter;
+import chatroom.view.ChatroomView;
+import chatroom.view.IChatroomModelAdapter;
+import common.IUser;
+
+public class ChatAppController {
+    
+    private ChatAppModel model;
+    
+    private ChatAppView<IUser> view;
+    
+    public ChatAppController() {
+        model = new ChatAppModel(new IChatAppViewAdapter() {
+            
+            @Override
+            public void append(String message) {
+                view.append(message);
+            }
+            
+            @Override
+            public void addUser(IUser user) {
+                // TODO Auto-generated method stub
+                
+            }
+
+            @Override
+            public String getNewChatroomName() {
+                return view.getNewChatroomName();
+            }
+            
+            @Override
+            public IChatroomViewAdapter makeChatroomViewAdapter(ChatroomModel model) {
+                IChatroomModelAdapter chatroomModelAdapter = new IChatroomModelAdapter() {
+                    
+                    @Override
+                    public void sendMessage(String message) {
+                        // TODO Auto-generated method stub
+                        
+                    }
+                    
+                    @Override
+                    public void sendImage(ImageIcon image) {
+                        // TODO Auto-generated method stub
+                        
+                    }
+                };
+                
+                ChatroomView<IUser> chatroomView = view.makeChatroomView(chatroomModelAdapter);
+                
+                return new IChatroomViewAdapter() {
+                    
+                    @Override
+                    public void start() {
+                        chatroomView.start();
+                    }
+                    
+                    @Override
+                    public void append(IUser user, String message) {
+                        chatroomView.append(String.format("%s: %s", user.getName(), message));
+                    }
+                };
+                
+            }
+
+        });
+        
+        view = new ChatAppView<>(new IChatAppModelAdapter() {
+            
+            @Override
+            public void initUsername(String username) {
+                model.setUsername(username);
+            }
+
+            @Override
+            public void connectTo(String ip) {
+                model.connectTo(ip);
+            }
+        });
+    }
+    
+    public void start() {
+        view.start();
+        model.start();
+    }
+    
+    /**
+     * Launch the application.
+     * @param args no use
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                ChatAppController controller = new ChatAppController();
+                controller.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+}

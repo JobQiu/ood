@@ -1,0 +1,140 @@
+package ls53_yh36.server.game.gview;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JTextField;
+import javax.swing.JButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.border.TitledBorder;
+
+import gov.nasa.worldwind.geom.Position;
+import gov.nasa.worldwind.globes.Earth;
+import gov.nasa.worldwind.layers.Layer;
+import map.MapPanel;
+
+import javax.swing.UIManager;
+import java.awt.Color;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.FlowLayout;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+
+public class RunView extends JFrame {
+
+	private static final long serialVersionUID = 7674830707217974633L;
+	
+	private RunViewAdpt mdlAdpt;
+	private MapPanel map;
+	
+	
+	private JPanel contentPane;
+	private final JPanel panelCtrl = new JPanel();
+	private final JTextField textLng = new JTextField();
+	private final JButton btnGo = new JButton("Go");
+	private final JTextField textLat = new JTextField();
+	private final JButton btnPlay = new JButton("Play");
+	private final JButton btnClose = new JButton("Close");
+	private final JScrollPane scrollPaneInfo = new JScrollPane();
+	private final JTextArea textGameInfo = new JTextArea();
+
+
+
+	/**
+	 * Create the frame.
+	 */
+	public RunView(RunViewAdpt adpt) {
+		mdlAdpt = adpt;
+		textLat.setColumns(10);
+		textLng.setColumns(10);
+		initGUI();
+	}
+	private void initGUI() {
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 780, 533);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		map = new MapPanel(Earth.class);
+		btnPlay.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mdlAdpt.startGame();
+			}
+		});
+		btnClose.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mdlAdpt.closeGame();
+			}
+		});
+		btnGo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+				double lat = Double.parseDouble(textLat.getText());
+				double lng = Double.parseDouble(textLng.getText());
+				postInfo(mdlAdpt.goPlace(lat, lng));
+				textLat.setText("");
+				textLng.setText("");
+				} catch (NumberFormatException e) {
+					postInfo("Illegal inputs.");
+				}				
+			}
+		});
+		panelCtrl.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		panelCtrl.add(btnClose);
+		panelCtrl.add(btnPlay);
+		panelCtrl.add(textLat);
+		panelCtrl.add(textLng);
+		panelCtrl.add(btnGo);
+		scrollPaneInfo.setViewportBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Announcement", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(0, 0, 255)));
+		textGameInfo.setLineWrap(true);
+		textGameInfo.setTabSize(20);
+		
+		scrollPaneInfo.setViewportView(textGameInfo);
+		GroupLayout gl_contentPane = new GroupLayout(contentPane);
+		gl_contentPane.setHorizontalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addGap(7)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addComponent(scrollPaneInfo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addGap(4)
+							.addComponent(map, GroupLayout.PREFERRED_SIZE, 480, GroupLayout.PREFERRED_SIZE))
+						.addComponent(panelCtrl, GroupLayout.PREFERRED_SIZE, 734, GroupLayout.PREFERRED_SIZE)))
+		);
+		gl_contentPane.setVerticalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addGap(7)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addComponent(scrollPaneInfo, GroupLayout.PREFERRED_SIZE, 410, GroupLayout.PREFERRED_SIZE)
+						.addComponent(map, GroupLayout.PREFERRED_SIZE, 410, GroupLayout.PREFERRED_SIZE))
+					.addGap(4)
+					.addComponent(panelCtrl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		);
+		contentPane.setLayout(gl_contentPane);
+	}
+	
+	
+	/**
+	 * Start the game view
+	 */
+	public void start() {
+		map.start();
+		setVisible(true);
+	}
+
+	public void addLayer(Layer layer) {
+		map.addLayer(layer);
+	}
+	
+	public void goPlace(Position pos) {
+		map.setPosition(pos, true);
+	}
+	
+	public void postInfo(String info) {
+		textGameInfo.append(info + "\n");
+	}
+}

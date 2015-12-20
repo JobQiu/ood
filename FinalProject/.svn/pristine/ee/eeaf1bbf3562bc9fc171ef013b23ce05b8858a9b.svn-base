@@ -1,0 +1,26 @@
+package ls53_yh36.client.app.model;
+
+import java.io.Serializable;
+
+import gov.nasa.worldwind.globes.Earth;
+import map.MapPanel;
+
+/**
+ * The Map factory
+ * @author ls53@rice.edu
+ */
+public class MapFac implements Serializable {
+    
+    /**
+     * The generated serial version UID
+     */
+	private static final long serialVersionUID = 5972240845864653631L;
+	
+	/**
+	 * Make a map panel
+	 * @return The map panel
+	 */
+	public MapPanel GeoMapFac() {
+		return new MapPanel(Earth.class);
+	}
+}

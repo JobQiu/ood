@@ -1,0 +1,10 @@
+package model.paint.strategy;
+
+import model.paint.UprightImagePaintStratergy;
+
+public class BirdSheepImagePaintStrategy extends UprightImagePaintStratergy {
+
+    public BirdSheepImagePaintStrategy() {
+        super(Math.random() < 0.5 ? "images/sheep_animate.gif" : "images/humbird_animate.gif", 0.5);
+    }
+}

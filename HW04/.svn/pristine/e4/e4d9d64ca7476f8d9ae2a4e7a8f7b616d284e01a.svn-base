@@ -1,0 +1,14 @@
+package strategy;
+
+import model.ABall;
+
+/**
+ * Define an interface to update the state of balls.
+ */
+public interface IUpdateStrategy {
+	/**
+	 * Update the state of a given ball.
+	 * @param context the ball to update
+	 */
+	void updateState(ABall context);
+}

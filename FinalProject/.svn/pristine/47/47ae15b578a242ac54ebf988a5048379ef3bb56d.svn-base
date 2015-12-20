@@ -1,0 +1,31 @@
+package ls53_yh36.server.game.smodel.command;
+
+import java.util.UUID;
+
+import common.IChatUser;
+import common.ICmd2ModelAdapter;
+import ls53_yh36.server.game.gmodel.Cmd2RunGameAdpt;
+import ls53_yh36.server.game.smodel.message.ReplyRank;
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.datapacket.DataPacket;
+import provided.mixedData.MixedDataKey;
+
+public class ReplyRankCmd extends ADataPacketAlgoCmd<String, ReplyRank, IChatUser> {
+
+	private static final long serialVersionUID = -8107870629912883491L;
+
+	transient private ICmd2ModelAdapter adpt;
+	
+	@Override
+	public String apply(Class<?> index, DataPacket<ReplyRank> host, IChatUser... params) {
+		Cmd2RunGameAdpt cgAdpt = adpt.getMixedDataDictEntry(new MixedDataKey<Cmd2RunGameAdpt>(UUID.fromString("38400000-8cf0-11bd-b23e-10b96e4ef00d"), "Cmd2RunGameAdpt", Cmd2RunGameAdpt.class));
+		cgAdpt.post(host.getData().rank());
+		return null;
+	}
+
+	@Override
+	public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {
+		adpt = cmd2ModelAdpt;		
+	}
+
+}

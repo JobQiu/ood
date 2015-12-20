@@ -1,0 +1,101 @@
+package chatapp.model;
+
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import chatroom.model.ChatroomModel;
+import common.IChatroom;
+import common.IConnect;
+import common.IUser;
+import common.demo.Bootstrap;
+import common.demo.Chatroom;
+import common.demo.User;
+import common.messages.IRequestForAlgo;
+import provided.datapacket.ADataPacket;
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.datapacket.DataPacket;
+
+public class ChatAppModel {
+    
+    private String username;
+    
+    private IUser me;
+    
+    private Set<IUser> friends = new HashSet<>();
+    
+    private Set<Chatroom> chatrooms = new HashSet<>();
+    
+    private IChatAppViewAdapter viewAdapter;
+    
+    private Bootstrap bootstrap = new Bootstrap();
+    
+    public ChatAppModel(IChatAppViewAdapter viewAdapter) {
+        this.viewAdapter = viewAdapter;
+    }
+    
+    public void start() {
+        me = bootstrap.init(username, new IConnect() {
+            
+            @Override
+            public void sendReceive(IUser me, ADataPacket data) throws RemoteException {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public IUser getUser(IConnect stub) throws RemoteException {
+                // TODO Auto-generated method stub
+                return null;
+            }
+            
+            @Override
+            public ADataPacketAlgoCmd<String, ?, IUser> getNewCommand(IRequestForAlgo request) throws RemoteException {
+                // TODO Auto-generated method stub
+                return null;
+            }
+            
+            @Override
+            public Collection<IChatroom> getChatrooms() throws RemoteException {
+                // TODO Auto-generated method stub
+                return null;
+            }
+        });
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    
+    public void connectTo(String ip) {
+        User friend = bootstrap.connectToUser(ip);
+        if (friends.contains(friend)) {
+            viewAdapter.append(String.format("Already connected to this user %s !\n", ip));
+            return;
+        }
+        
+        Chatroom chatroom = new Chatroom();
+        if (createNewChatroom(chatroom)) {
+            friends.add(friend);
+            chatroom.addUser(friend);                
+        }
+    }
+    
+    public boolean createNewChatroom(Chatroom chatroom) {
+        String name = viewAdapter.getNewChatroomName();
+        if (name == null) {
+            return false;
+        }
+        
+        chatroom.setName(name);
+        chatrooms.add(chatroom);
+        
+        ChatroomModel chatroomModel = new ChatroomModel(me, chatroom);
+        chatroomModel.setViewAdapter(viewAdapter.makeChatroomViewAdapter(chatroomModel));
+        chatroomModel.start();
+        
+        return true;
+    }
+}

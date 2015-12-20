@@ -1,0 +1,111 @@
+package controller;
+
+import java.awt.Component;
+import java.awt.EventQueue;
+import java.awt.Graphics;
+
+import model.BallWorldModel;
+import model.IViewUpdateAdapter;
+import model.paint.strategy.IPaintStrategyFac;
+import model.strategy.IUpdateStrategyFac;
+import view.BallWorldView;
+import view.IModelControlAdapter;
+import view.IModelUpdateAdapter;
+
+/**
+ * The Controller in the ball world application.
+ */
+public class Controller {
+
+	/**
+	 * The model in ball world application.
+	 */
+	private BallWorldModel model;
+	/**
+	 * The view in ball world application.
+	 */
+	private BallWorldView<IUpdateStrategyFac, IPaintStrategyFac> view;
+	
+	/**
+	 * Construct a controller.
+	 */
+	public Controller() {
+	
+		view = new BallWorldView<IUpdateStrategyFac, IPaintStrategyFac>(
+		    // Initialize a model update adapter
+			new IModelUpdateAdapter() {
+				@Override
+				public void update(Graphics g) {
+					model.update(g);
+				}
+			},
+		    // Initialize a model control adapter
+			new IModelControlAdapter<IUpdateStrategyFac, IPaintStrategyFac>() {
+
+				@Override
+				public void makeBall(IUpdateStrategyFac selectedItem1, IPaintStrategyFac selectedItem2, Component canvas) {
+					model.addBall(selectedItem1.make(), canvas);
+				}
+
+				@Override
+				public void makeSwitcherBall(Component canvas) {
+					model.addSwitcherBall(canvas);
+				}
+
+				@Override
+				public void clearBalls() {
+					model.clearBalls();
+				}
+
+				@Override
+				public IUpdateStrategyFac addStrategy(String strategyName) {
+					return model.makeStrategyFac(strategyName);
+				}
+
+				@Override
+				public IUpdateStrategyFac combineStrategies(IUpdateStrategyFac selectedItem1, IUpdateStrategyFac selectedItem2) {
+					return model.combineStrategyFacs(selectedItem1, selectedItem2);
+				}
+
+				@Override
+				public void switchStrategy(IUpdateStrategyFac selectedItem) {
+					model.setSwitcherStrategy(selectedItem.make());
+				}
+		}); 	
+		
+		model = new BallWorldModel(
+		    // Initialize a view update adapter
+			new IViewUpdateAdapter() {
+				@Override
+				public void update() {
+					view.update();
+				}
+		}) ;
+		
+	}
+	
+	/**
+	 * Start the controller.
+	 */
+	public void start() {
+		model.start();  
+		view.start();	
+	}
+		
+	/**
+	 * Main function to start the ball world application.
+	 * @param args	command line arguments
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Controller c = new Controller();
+					c.start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+}

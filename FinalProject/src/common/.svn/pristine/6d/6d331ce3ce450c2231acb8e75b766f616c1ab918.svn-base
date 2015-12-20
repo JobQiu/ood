@@ -1,0 +1,58 @@
+package common.message.chat;
+
+import java.util.UUID;
+
+import common.IChatUser;
+import common.message.IChatMessage;
+import provided.datapacket.ADataPacket;
+import provided.datapacket.DataPacket;
+
+/**
+ * A message asking a chat user to remove a specified user. 
+ */
+public class RemoveMe implements IChatMessage {
+
+	/**
+	 * Auto-generated UID. 
+	 */
+	private static final long serialVersionUID = -43476278183651200L;
+
+	/**
+	 * User to be removed. 
+	 */
+	private final IChatUser user;
+
+	/**
+	 * ID of this message. 
+	 */
+	private final UUID msgID;
+
+	/**
+	 * Constructs a new message containing the specified user to be removed. 
+	 * UUID for the message is auto-generated.
+	 * @param user - user to be removed
+	 */
+	public RemoveMe(IChatUser user) {
+		this.msgID = UUID.randomUUID();
+		this.user = user;
+	}
+
+	/**
+	 * Returns the user to be removed. 
+	 * @return the user to be removed
+	 */
+	public IChatUser getChatConnect() {
+		return user;
+	}
+
+	@Override
+	public UUID getID() {
+		return msgID;
+	}
+
+	@Override
+	public ADataPacket getDataPacket() {
+		return new DataPacket<RemoveMe>(RemoveMe.class, this);
+	}
+
+}

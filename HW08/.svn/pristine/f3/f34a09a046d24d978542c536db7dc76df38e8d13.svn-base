@@ -1,0 +1,11 @@
+package chatroom.view;
+
+import java.awt.Image;
+
+public interface IChatroomModelAdapter {
+    public void sendMessage(String message);
+    
+    public void sendImage(Image image);
+    
+    public void quiteChatroom();
+}

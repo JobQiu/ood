@@ -1,0 +1,27 @@
+/**
+ * This is just a placeholder to enable the provided.datapacket package to compile.
+ * This will change depending on the final public inter-computer API.
+ */
+package common;
+
+import java.awt.Component;
+
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.mixedData.MixedDataDictionary;
+
+public interface ICmd2ModelAdapter {
+	/* Get a reference to the container on the GUI that is used to display unknown types */
+	public Component scrollable();
+	
+	public Component updateable();
+	
+	/**
+	 * Get a reference to an ADataPacketAlgoCmd, most likely one that has some of the application
+	 * in scope. This allows you to interact directly with the application without actually including
+	 * any of your application in scope with a command that gets sent over the network
+	 * @return
+	 */
+	public ADataPacketAlgoCmd<String,?,IUser> other();
+	
+	public MixedDataDictionary dictionary();
+}

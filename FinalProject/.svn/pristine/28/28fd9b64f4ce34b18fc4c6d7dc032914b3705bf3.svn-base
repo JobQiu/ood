@@ -1,0 +1,222 @@
+package ls53_yh36.client.app.controller;
+
+import java.awt.Component;
+import java.awt.EventQueue;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import common.IChatroom;
+import ls53_yh36.client.app.model.AppModel;
+import ls53_yh36.client.app.model.IAppViewAdapter;
+import ls53_yh36.client.app.view.AppView;
+import ls53_yh36.client.app.view.IAppModelAdapter;
+import ls53_yh36.client.chat.model.ChatModel;
+import ls53_yh36.client.chat.model.IChatViewAdapter;
+import ls53_yh36.client.chat.view.ChatView;
+import ls53_yh36.client.chat.view.IChatModelAdapter;
+import ls53_yh36.client.chat.view.ScrollView;
+import ls53_yh36.user.ChatUser;
+import ls53_yh36.user.InitUser;
+
+/**
+ * The app controller
+ * @author ls53@rice.edu
+ */
+public class AppController {
+    
+    /**
+     * The app View
+     */
+    private AppView<InitUser, ChatUser, ChatModel> view;
+    
+    /**
+     * The app model
+     */
+    private AppModel model;
+    
+    /**
+     * The constructor for App Controller
+     */
+    public AppController() {
+        view = new AppView<>(new IAppModelAdapter<InitUser, ChatModel>() {
+
+            @Override
+            public void setUsername(String username) {
+                model.setUsername(username);
+            }
+
+            @Override
+            public void connectTo(String ip) {
+                model.connectTo(ip);
+            }
+
+            @Override
+            public void createNewChatroom() {
+                String chatroomName = view.getNewChatroomName();
+                if (chatroomName != null) {
+                    ChatModel chatroom = model.createNewChatroom(UUID.randomUUID(), chatroomName);
+                    chatroom.addUser(chatroom.getMe());
+                }
+            }
+
+            @Override
+            public void inviteUserToChatroom(InitUser user, ChatModel chatroom) {
+                model.inviteUserToChatroom(user, chatroom);
+            }
+
+            @Override
+            public void quitAllChatrooms() {
+                model.quitAllChatrooms();
+            }
+
+            @Override
+            public void join(InitUser user) {
+                model.joinGameServer(user);
+            }
+        });
+        
+        model = new AppModel(new IAppViewAdapter() {
+            
+            @Override
+            public boolean willJoinChatroom(String username, String chatroom) {
+                return view.willJoinChatroom(username, chatroom);
+            }
+            
+            @Override
+            public void warn(String message) {
+                view.warn(message);
+            }
+            
+            @Override
+            public void setTitle(String title) {
+                view.setTitle(title);
+            }
+            
+            @Override
+            public void removeChatroom(ChatModel chatroom) {
+                view.removeChatroom(chatroom);
+            }
+            
+            @Override
+            public IChatViewAdapter makeChatroomViewAdapter(ChatModel chatModel) {
+                IChatModelAdapter chatModelAdapter = new IChatModelAdapter() {
+                    
+                    @Override
+                    public void sendMessage(String message) {
+                        chatModel.sendMessage(message);
+                    }
+                    
+                    @Override
+                    public void quiteChatroom() {
+                        model.quitChatroom(chatModel);
+                    }
+                };
+                
+                ChatView<ChatUser> chatView = view.makeChatView(chatModelAdapter);
+                
+                return new IChatViewAdapter() {
+                    
+                    @Override
+                    public void warn(String message) {
+                        chatView.warn(message);
+                    }
+                    
+                    @Override
+                    public void start() {
+                        chatView.start();
+                    }
+                    
+                    @Override
+                    public void setTitle(String title) {
+                        chatView.setTitle(title);
+                    }
+                    
+                    @Override
+                    public void removeUser(ChatUser user) {
+                        chatView.removeUser(user);
+                    }
+                    
+                    @Override
+                    public void append(ChatUser user, String message) {
+                        chatView.append(String.format("%s: %s\n", user, message));
+                    }
+                    
+                    @Override
+                    public void addUser(ChatUser user) {
+                        chatView.addUser(user);
+                    }
+
+                    @Override
+                    public void addToPane(Component component) {
+                        ScrollView view = new ScrollView();
+                        view.start();
+                        view.getScrollPane().setViewportView(component);
+                    }
+                };
+            }
+            
+            @Override
+            public String getNewChatroomName() {
+                return view.getNewChatroomName();
+            }
+            
+            @Override
+            public void append(String message) {
+                view.append(message);
+            }
+            
+            @Override
+            public void addUser(InitUser user) {
+                view.addUser(user);
+            }
+            
+            @Override
+            public void addChatroom(ChatModel chatroom) {
+                view.addChatroom(chatroom);
+            }
+
+            @Override
+            public void chooseChatroom(InitUser user, Set<IChatroom> chatroomList) {
+                String[] chatroomNames = new String[chatroomList.size()];
+                Map<String, IChatroom> chatroomMap = new HashMap<>();
+                int i = 0;
+                for (IChatroom chatroom : chatroomList) {
+                    chatroomNames[i++] = chatroom.getName();
+                    chatroomMap.put(chatroom.getName(), chatroom);
+                }
+                
+                String chatroomName = view.chooseChatroom(user.getName(), chatroomNames);
+                if (chatroomName == null) {
+                    return;
+                }
+                
+                model.joinChatroom(chatroomMap.get(chatroomName), chatroomName);
+            }
+        });
+    }
+    
+    /**
+     * Start the App
+     */
+    public void start() {
+        view.start();
+        model.start();
+    }
+    
+    /**
+     * Launch the whole application
+     * @param args
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                AppController controller = new AppController();
+                controller.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+}

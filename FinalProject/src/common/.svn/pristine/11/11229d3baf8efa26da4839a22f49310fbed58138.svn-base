@@ -1,0 +1,65 @@
+package common.message.chat;
+
+import java.util.UUID;
+
+import common.IInitUser;
+import common.message.IChatMessage;
+import provided.datapacket.ADataPacket;
+import provided.datapacket.DataPacket;
+
+/**
+ * A message containing a chat user's initial user. 
+ */
+public class InitUserResponse implements IChatMessage {
+
+	/**
+	 * Auto-generated UID. 
+	 */
+	private static final long serialVersionUID = 6657217558010931971L;
+
+	/**
+	 * User to be added. 
+	 */
+	private final IInitUser user;
+
+	/**
+	 * ID of this message. 
+	 */
+	private final UUID msgID;
+
+	/**
+	 * Constructs a new message containing chat user's initial user. 
+	 * UUID for the message is auto-generated.
+	 */
+	public InitUserResponse(IInitUser user) {
+		this(UUID.randomUUID(),user);
+	}
+	
+	/**
+	 * Constructs a new message containing chat user's initial user. 
+	 * UUID for the message is auto-generated.
+	 */
+	public InitUserResponse(UUID msgID, IInitUser user) {
+		this.msgID = msgID;
+		this.user = user;
+	}
+	
+	/**
+	 * Returns the initial user of this chat user.
+	 * @return the initial user of this chat user
+	 */
+	public IInitUser getUser() {
+		return user;
+	}
+
+	@Override
+	public UUID getID() {
+		return msgID;
+	}
+
+	@Override
+	public ADataPacket getDataPacket() {
+		return new DataPacket<InitUserResponse>(InitUserResponse.class, this);
+	}
+
+}

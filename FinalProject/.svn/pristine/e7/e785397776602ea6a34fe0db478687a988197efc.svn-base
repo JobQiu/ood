@@ -1,0 +1,37 @@
+package ls53_yh36.server.game.smodel.message;
+
+import java.util.UUID;
+
+import common.message.IChatMessage;
+import provided.datapacket.DataPacket;
+
+public class ReplyRank implements IChatMessage {
+
+	private static final long serialVersionUID = 5820001539650160343L;
+
+	private String rank;
+	
+	public ReplyRank(String res) {
+		rank = res;
+	}
+	
+	@Override
+	public UUID getID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DataPacket<? extends IChatMessage> getDataPacket() {
+		return new DataPacket<ReplyRank>(ReplyRank.class, this);
+	}
+	
+	/**
+	 * String shows the rank of the team
+	 * @return Return the team's rank in string
+	 */
+	public String rank() {
+		return rank;
+	}
+
+}

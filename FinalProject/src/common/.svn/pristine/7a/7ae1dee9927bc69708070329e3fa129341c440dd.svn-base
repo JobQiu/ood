@@ -1,0 +1,37 @@
+package common;
+
+import java.awt.Container;
+import java.util.function.Supplier;
+
+import provided.mixedData.MixedDataKey;
+
+/**
+ * Command to model adapter that enables command to talk to model. 
+ */
+public interface ICmd2ModelAdapter {
+
+	/**
+	 * Provide a container factory to the local system, which will later
+	 * be used by the GUI thread to add and display a container to the GUI.
+	 * 
+	 * Typical implementation will make use of SwingUtilities.invokeLater()
+	 */
+	public void provideContainer(Supplier<Container> containerSupplier);
+
+	/**
+	 * Returns entry from MixedDataDictionary by specified key. 
+	 * @param <T> - type of key
+	 * @param key - a MixedDataKey
+	 * @return entry from MixedDataDictionary by specified key
+	 */
+	public <T> T getMixedDataDictEntry(MixedDataKey<T> key);
+
+	/**
+	 * Set entry to MixedDataDictionary by specified key. 
+	 * @param <T> - type of key
+	 * @param key - a MixedDataKey
+	 * @param value - data associated with this key
+	 */
+	public <T> void setMixedDataDictEntry(MixedDataKey<T> key, T value);
+
+}

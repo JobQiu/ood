@@ -1,0 +1,42 @@
+package common.message.init;
+
+import java.util.UUID;
+
+import common.message.IInitMessage;
+import provided.datapacket.ADataPacket;
+import provided.datapacket.DataPacket;
+
+/**
+ * A message asking for initial user's chatroom list. 
+ */
+public class ChatroomListRequest implements IInitMessage {
+
+	/**
+	 * Auto-generated UID. 
+	 */
+	private static final long serialVersionUID = -8543337463182982639L;
+
+	/**
+	 * ID of this message. 
+	 */
+	private final UUID msgID;
+
+	/**
+	 * Constructs a new message to request user's chatroom list. 
+	 * UUID for the message is auto-generated.
+	 */
+	public ChatroomListRequest() {
+		this.msgID = UUID.randomUUID();
+	}
+
+	@Override
+	public UUID getID() {
+		return msgID;
+	}
+
+	@Override
+	public ADataPacket getDataPacket() {
+		return new DataPacket<ChatroomListRequest>(ChatroomListRequest.class, this);
+	}
+
+}

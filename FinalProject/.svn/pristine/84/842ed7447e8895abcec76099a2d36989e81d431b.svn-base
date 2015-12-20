@@ -1,0 +1,49 @@
+package ls53_yh36.user;
+
+import java.rmi.RemoteException;
+
+import common.IChatUser;
+import common.message.IChatMessage;
+import provided.datapacket.DataPacket;
+import provided.datapacket.DataPacketAlgo;
+
+public class ChatUser implements IChatUser {
+    
+    private String name;
+    
+    private String ip;
+    
+    private DataPacketAlgo<String, IChatUser> dataPacketAlgo;
+    
+    public ChatUser(String name, String ip, DataPacketAlgo<String, IChatUser> dataPacketAlgo) {
+        this.name = name;
+        this.ip = ip;
+        this.dataPacketAlgo = dataPacketAlgo;
+    }
+
+    @Override
+    public void receive(IChatUser sender, DataPacket<? extends IChatMessage> dp) throws RemoteException {
+        dp.execute(dataPacketAlgo, sender);
+    }
+    
+    public String getName() {
+        return name;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+}

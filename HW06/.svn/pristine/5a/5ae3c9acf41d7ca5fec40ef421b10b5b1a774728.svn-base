@@ -1,0 +1,70 @@
+package model;
+
+import provided.abcParser.ABCParser;
+import provided.music.IPhrase;
+import provided.music.NESeqList;
+import provided.player.ISequencePlayerStatus;
+import provided.player.SequencePlayer2;
+import provided.player.SequencePlayer2.IPlayable;
+import provided.util.ABCInstrument;
+import provided.util.ABCUtil;
+import visitor.PlayMusicAlgo;
+import visitor.ToStringAlgo;
+
+/**
+ * Construct a player model which contains business logic
+ * 
+ * @author Li Shen, Ning Zhu
+ *
+ */
+public class PlayerModel {
+	/**
+	 * Adapter for controlling the view (print to the view)
+	 */
+    private IViewUpdateAdapter viewUpdateAdapter = IViewUpdateAdapter.NULL_OBJECT;
+
+	private ABCParser parser;
+	
+	private IPhrase phrase;
+	
+	private SequencePlayer2 player;
+	
+	private IPlayable music;
+
+	public PlayerModel(IViewUpdateAdapter viewUpdateAdapter) {
+		this.viewUpdateAdapter = viewUpdateAdapter;
+		NESeqList.setToStringAlgo(new ToStringAlgo());
+		
+	}
+	
+	public String loadFile(String fileName) {
+	    fileName = "/songs/" + fileName + ".abc";
+	    parser = new ABCParser(fileName);
+	    return ABCUtil.Singleton.getFileContents(fileName);
+	}
+	
+	public String parseFile() {
+	    phrase = parser.parse();
+	    return phrase.toString();
+	}
+	
+	public void playMusic(ABCInstrument instrument) {
+	    player = new SequencePlayer2(16, instrument.getValue());
+	    player.setTicksPerDefaultNote(16);
+        player.setTempo(140);
+        phrase.execute(new PlayMusicAlgo(), player, 0);
+        music = player.makePlayable(ISequencePlayerStatus.NULL);
+		music.start();
+	}
+	
+	public void stopMusic() {
+	    music.stop();
+	}
+	
+	public void start() {
+	    ABCInstrument[] instruments = ABCUtil.Singleton.getInstruments();
+	    for (ABCInstrument instrument : instruments) {
+	        viewUpdateAdapter.addInstrument(instrument);
+	    }
+	}
+}

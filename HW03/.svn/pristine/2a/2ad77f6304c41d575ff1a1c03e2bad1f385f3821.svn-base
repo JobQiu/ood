@@ -1,0 +1,18 @@
+package strategies;
+
+import model.Ball;
+import util.Randomizer;
+
+public class ColorChangingStrategy implements IUpdateStrategy {
+	
+	/* (non-Javadoc)
+	 * @see strategies.IUpdateStrategy#updateState(model.Ball)
+	 * this updateState strategy is used to randomly change
+	 * the ball's color
+	 */
+	@Override
+	public void updateState(Ball _ball) {
+		/** set color randomly */
+		_ball.setColor(Randomizer.Singleton.randomColor());
+	}
+}

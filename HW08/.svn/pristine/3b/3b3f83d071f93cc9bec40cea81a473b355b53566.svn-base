@@ -1,0 +1,11 @@
+package chatroom.view;
+
+import javax.swing.ImageIcon;
+
+public interface IChatroomModelAdapter {
+    public void sendMessage(String message);
+    
+    public void sendImage(ImageIcon image);
+    
+    public void quiteChatroom();
+}

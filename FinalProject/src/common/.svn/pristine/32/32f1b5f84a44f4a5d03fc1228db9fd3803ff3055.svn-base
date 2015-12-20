@@ -1,0 +1,41 @@
+package common;
+
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+import common.message.IChatMessage;
+
+/**
+ * Was IConnect in HW08. 
+ * 
+ * A chatroom remote user, its stub is put in RMI registry. 
+ * Only receives chat messages from another chatroom remote user. 
+ * 
+ * Well-known chat messages are: 
+ * TextMessage, 
+ * AddMe, RemoveMe, 
+ * CommandRequest, CommandResponse, 
+ * InitUserRequest, InitUserResponse, 
+ * ChatUserInfoRequest, ChatUserInfoResponse. 
+ */
+public interface IChatUser extends Remote {
+	/**
+	* The name the ICompute object will be bound to in the RMI Registry
+	*/
+	public static final String BOUND_NAME = "ChatUser";
+	  
+	/**
+	* The port that the client will use to communicate with the ICompute object
+	* Note that this port must be opened of inbound traffic on the server machine
+	*/
+	public static final int BOUND_PORT = 2100;
+	
+	/**
+	 * Handles the chat message sent by another remote user. 
+	 * @param sender - user who sent this message
+	 * @param message - message being sent
+	 * @throws RemoteException - if this remote user could not be found
+	 */
+	public void receive(IChatUser sender, IChatMessage message) throws RemoteException;
+
+}

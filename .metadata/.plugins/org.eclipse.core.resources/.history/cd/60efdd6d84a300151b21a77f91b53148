@@ -1,0 +1,75 @@
+package ls53_yh36.user;
+
+import java.io.Serializable;
+import java.rmi.RemoteException;
+
+import common.IChatUser;
+import common.message.IChatMessage;
+import provided.datapacket.DataPacket;
+import provided.datapacket.DataPacketAlgo;
+
+/**
+ * The chat user implementation
+ * @author ls53@rice.edu
+ *
+ */
+public class ChatUser implements IChatUser, Serializable {
+    
+    /**
+     * The generated serial version UID
+     */
+    private static final long serialVersionUID = 6409238694307962072L;
+
+    /**
+     * The name
+     */
+    private String name;
+    
+    /**
+     * The ip
+     */
+    private String ip;
+    
+    /**
+     * The data packet algorithm
+     */
+    private DataPacketAlgo<String, IChatUser> dataPacketAlgo;
+    
+    /**
+     * Constructor
+     * @param name The name
+     * @param ip The IP
+     * @param dataPacketAlgo The data packet algorithm
+     */
+    public ChatUser(String name, String ip, DataPacketAlgo<String, IChatUser> dataPacketAlgo) {
+        this.name = name;
+        this.ip = ip;
+        this.dataPacketAlgo = dataPacketAlgo;
+    }
+
+    @Override
+    public void receive(IChatUser sender, DataPacket<? extends IChatMessage> dp) throws RemoteException {
+        dp.execute(dataPacketAlgo, sender);
+    }
+    
+    public String getName() {
+        return name;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+}

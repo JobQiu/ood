@@ -1,0 +1,38 @@
+package ls53_yh36.server.game.smodel.command;
+
+import java.rmi.RemoteException;
+
+import common.IChatUser;
+import common.ICmd2ModelAdapter;
+import common.message.chat.ACommandRequest;
+import ls53_yh36.server.game.smodel.message.StartGameResponse;
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.datapacket.DataPacket;
+import provided.mixedData.MixedDataKey;
+
+public class CommandRequestCmd extends ADataPacketAlgoCmd<String, ACommandRequest, IChatUser> {
+
+	private static final long serialVersionUID = -7654749456596632060L;
+
+
+	private ICmd2ModelAdapter c2mAdpt;
+	
+	@Override
+	public String apply(Class<?> index, DataPacket<ACommandRequest> host, IChatUser... params) {
+		IChatUser sender = params[0];
+		IChatUser chatStub = c2mAdpt.getMixedDataDictEntry(new MixedDataKey<IChatUser>(null, "GameServerStub", IChatUser.class));
+		try {
+			sender.receive(chatStub, new StartGameResponse(host.getData(), host.getData().getUnknownType()).getDataPacket());
+		} catch (RemoteException e) {
+			System.err.println("Cannot not handle the ACommandRequest. Exception: " + e + "\n");
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {
+		c2mAdpt = cmd2ModelAdpt;
+	}
+
+}

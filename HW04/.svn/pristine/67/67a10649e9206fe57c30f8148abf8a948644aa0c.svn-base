@@ -1,0 +1,18 @@
+package model.paint.strategy;
+
+import java.awt.geom.AffineTransform;
+
+import model.paint.ShapePaintStrategy;
+import model.paint.shape.RectangleShapeFactory;
+
+public class RectanglePaintStrategy extends ShapePaintStrategy {
+
+	//Shape rect=
+	public RectanglePaintStrategy()
+	{
+		this(new AffineTransform(), 0, 0, 5, 2);
+	}
+	public RectanglePaintStrategy(AffineTransform at, double x, double y, double width, double height) {
+		super(at, RectangleShapeFactory.Singleton.makeShape(x, y, width, height));
+	}
+}

@@ -1,0 +1,80 @@
+package chatapp.controller;
+
+import java.awt.EventQueue;
+
+import chatapp.model.ChatAppModel;
+import chatapp.model.IChatAppViewAdapter;
+import chatapp.view.ChatAppView;
+import chatapp.view.IChatAppModelAdapter;
+import chatroom.model.ChatroomModel;
+import chatroom.model.IChatroomViewAdapter;
+import common.User;
+
+public class ChatAppController {
+    
+    private ChatAppModel model;
+    
+    private ChatAppView view;
+    
+    public ChatAppController() {
+        model = new ChatAppModel(new IChatAppViewAdapter() {
+            
+            @Override
+            public void appendMessage(String message) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public void addUser(User user) {
+                // TODO Auto-generated method stub
+                
+            }
+
+            @Override
+            public String getNewChatroomName() {
+                // TODO Auto-generated method stub
+                return null;
+            }
+            
+            @Override
+            public IChatroomViewAdapter makeChatroomViewAdapter(ChatroomModel model) {
+                // TODO Auto-generated method stub
+                return null;
+            }
+
+        });
+        view = new ChatAppView(new IChatAppModelAdapter() {
+            
+            @Override
+            public void initUsername(String username) {
+                model.setUsername(username);
+            }
+
+            @Override
+            public void connectTo(String ip) {
+                model.connectTo(ip);
+            }
+        });
+    }
+    
+    public void start() {
+        view.start();
+        model.start();
+    }
+    
+    /**
+     * Launch the application.
+     * @param args no use
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                ChatAppController controller = new ChatAppController();
+                controller.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+}

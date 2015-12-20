@@ -1,0 +1,31 @@
+package view;
+
+import java.awt.Graphics;
+
+/**
+ * adapter for model update tasks
+ *
+ */
+public interface IModelUpdateAdapter {
+	
+	
+	public void updatePaint(Graphics g);
+	
+	public void updateState();
+	
+	public static final IModelUpdateAdapter NULL_OBJECT = new IModelUpdateAdapter() {
+		
+		public void updatePaint(Graphics g) {
+
+		}
+
+		@Override
+		public void updateState() {
+			// TODO Auto-generated method stub
+			
+		}
+	};
+
+	
+
+}

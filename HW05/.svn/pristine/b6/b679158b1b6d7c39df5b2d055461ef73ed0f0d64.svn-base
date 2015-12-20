@@ -1,0 +1,27 @@
+package model.strategy;
+
+import model.Ball;
+import model.IBallCmd;
+import model.IUpdateStrategy;
+import util.IDispatcher;
+import util.Randomizer;
+
+public class FlashStrategy implements IUpdateStrategy<IBallCmd> {
+    
+    public static int effectDist = 100;
+    
+    @Override
+    public void init(Ball context) {}
+
+    @Override
+    public void updateState(Ball context, IDispatcher<IBallCmd> dispatcher) {
+        context.setColor(Randomizer.Singleton.randomColor());
+        dispatcher.dispatch((other,disp) -> {
+            if (context != other) {
+                if (context.getLocation().distance(other.getLocation()) < effectDist) {
+                    other.setColor(Randomizer.Singleton.randomColor());
+                }
+            }
+        });
+    }
+}

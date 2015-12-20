@@ -1,30 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
-	<item value="367" key="RevertDialog.size.y"/>
-	<item value="525" key="RevertDialog.size.x"/>
-	<item value="564" key="passwordStores.size.y"/>
-	<item value="927" key="passwordStores.size.x"/>
-	<item value="4" key="ResolveConflictDialog.lastChoice"/>
-	<item value="76" key="HistoryTableProvider.SVNHistoryPage.Revision"/>
-	<item value="376" key="HistoryTableProvider.SVNHistoryPage.Comment"/>
+	<item value="92" key="HistoryTableProvider.HistoryDialog.Date"/>
+	<item value="425" key="ResolveTreeConflict.size.y"/>
+	<item value="23" key="UpdateDialogWithConflictHandling.location.y"/>
+	<item value="625" key="ResolveTreeConflict.size.x"/>
+	<item value="795" key="TreeConflictsView.col.Description"/>
+	<item value="250" key="HistoryTableProvider.revisionsBlock.Date"/>
+	<item value="/Users/zealot/workspace/eclipse/FinalProject" key="TreeConflictsView.resource"/>
+	<item value="592" key="SwitchDialogWithConflictHandling.size.x"/>
+	<item value="23" key="SwitchDialogWithConflictHandling2.location.y"/>
+	<item value="773" key="SwitchDialogWithConflictHandling.size.y"/>
+	<item value="344" key="SwitchDialogWithConflictHandling2.location.x"/>
+	<item value="501" key="HistoryTableProvider.MergeWizardUnblockRevisionsPage.Comment"/>
 	<item value="23" key="passwordStores.location.y"/>
-	<item value="207" key="CommitDialog.location.y"/>
+	<item value="183" key="CommitDialog.location.y"/>
 	<item value="177" key="passwordStores.location.x"/>
-	<item value="133" key="CommitDialog.location.x"/>
-	<item value="500" key="CommitDialog.weights.0"/>
+	<item value="78" key="CommitDialog.location.x"/>
 	<item value="378" key="RevertDialog.location.x"/>
 	<item value="156" key="MarkResolvedDialog.location.y"/>
-	<item value="500" key="CommitDialog.weights.1"/>
 	<item value="375" key="MarkResolvedDialog.location.x"/>
 	<item value="530" key="MarkResolvedDialog.size.x"/>
 	<item value="165" key="RevertDialog.location.y"/>
 	<item value="380" key="MarkResolvedDialog.size.y"/>
-	<item value="" key="DirectorySelectionPage.lastParent_https://svn.rice.edu/r/comp504/turnin/F15/ls53"/>
-	<item value="533" key="CommitDialog.size.y"/>
-	<item value="1130" key="CommitDialog.size.x"/>
+	<item value="525" key="SetSvnPropertyDialog.size.x"/>
+	<item value="228" key="TreeConflictsView.col.Resource"/>
+	<item value="464" key="SetSvnPropertyDialog.size.y"/>
+	<item value="328" key="ResolveTreeConflict.location.x"/>
+	<item value="126" key="ResolveTreeConflict.location.y"/>
 	<item value="188" key="HistoryTableProvider.SVNHistoryPage.Date"/>
 	<item value="150" key="HistoryTableProvider.SVNHistoryPage.Author"/>
+	<item value="250" key="HistoryTableProvider.revisions.Date"/>
+	<item value="500" key="HistoryTableProvider.revisionsBlock.Comment"/>
+	<item value="true" key="TreeConflictsView.container"/>
+	<item value="https://svn.rice.edu/r/comp504/turnin/F15/ls53/FinalProject" key="UrlCombo.FinalProject.0"/>
+	<item value="101" key="HistoryTableProvider.MergeWizardUnblockRevisionsPage.Revision"/>
+	<item value="101" key="HistoryTableProvider.revisions.Revision"/>
+	<item value="440" key="HistoryDialog.location.x"/>
+	<item value="143" key="HistoryDialog.location.y"/>
+	<item value="367" key="RevertDialog.size.y"/>
+	<item value="525" key="RevertDialog.size.x"/>
+	<item value="564" key="passwordStores.size.y"/>
+	<item value="500" key="HistoryTableProvider.revisions.Comment"/>
+	<item value="927" key="passwordStores.size.x"/>
+	<item value="3" key="ResolveConflictDialog.lastChoice"/>
+	<item value="76" key="HistoryTableProvider.SVNHistoryPage.Revision"/>
+	<item value="100" key="SetSvnPropertyDialog.location.y"/>
+	<item value="378" key="SetSvnPropertyDialog.location.x"/>
+	<item value="376" key="HistoryTableProvider.SVNHistoryPage.Comment"/>
+	<item value="101" key="HistoryTableProvider.revisionsBlock.Revision"/>
+	<item value="200" key="HistoryDialog.weights.0"/>
+	<item value="74" key="HistoryTableProvider.HistoryDialog.Author"/>
+	<item value="251" key="HistoryTableProvider.MergeWizardUnblockRevisionsPage.Date"/>
+	<item value="200" key="HistoryDialog.weights.2"/>
+	<item value="200" key="HistoryDialog.weights.1"/>
+	<item value="500" key="CommitDialog.weights.0"/>
+	<item value="500" key="CommitDialog.weights.1"/>
+	<item value="773" key="UpdateDialogWithConflictHandling.size.y"/>
+	<item value="37" key="HistoryTableProvider.HistoryDialog.Revision"/>
+	<item value="200" key="HistoryTableProvider.MergeWizardUnblockRevisionsPage.Author"/>
+	<item value="" key="DirectorySelectionPage.lastParent_https://svn.rice.edu/r/comp504/turnin/F15/ls53"/>
+	<item value="533" key="CommitDialog.size.y"/>
+	<item value="525" key="UpdateDialogWithConflictHandling.size.x"/>
+	<item value="1130" key="CommitDialog.size.x"/>
+	<item value="773" key="SwitchDialogWithConflictHandling2.size.y"/>
+	<item value="592" key="SwitchDialogWithConflictHandling2.size.x"/>
+	<item value="378" key="UpdateDialogWithConflictHandling.location.x"/>
+	<item value="200" key="HistoryTableProvider.revisions.Author"/>
+	<item value="200" key="HistoryTableProvider.revisionsBlock.Author"/>
 	<item value="https://svn.rice.edu/r/comp504/turnin/F15/ls53" key="RepositorySelectionPage.lastRepository"/>
+	<item value="400" key="HistoryDialog.size.x"/>
+	<item value="23" key="SwitchDialogWithConflictHandling.location.y"/>
+	<item value="400" key="HistoryDialog.size.y"/>
+	<item value="183" key="HistoryTableProvider.HistoryDialog.Comment"/>
+	<item value="344" key="SwitchDialogWithConflictHandling.location.x"/>
 	<section name="CommitWizard">
 		<item value="500" key="VWeight2"/>
 		<item value="500" key="VWeight1"/>
@@ -32,8 +80,11 @@
 	</section>
 	<section name="NewLocationWizard">
 		<list key="ConfigurationWizardMainPage.STORE_URL_ID">
+			<item value="https://svn.rice.edu/r/comp310/course/VisitorDemos/VisitorDemo/"/>
+			<item value="https://svn.rice.edu/r/comp310/course/HW06/songs"/>
+			<item value="https://svn.rice.edu/r/comp504/turnin/F15/jc92/HW05"/>
+			<item value="https://svn.rice.edu/r/comp504/turnin/F15/kp21/HW04"/>
 			<item value="https://svn.rice.edu/r/comp504/turnin/F15/xw40/HW02"/>
-			<item value="https://svn.rice.edu/r/comp504/turnin/F15/ls53/"/>
 		</list>
 	</section>
 </section>

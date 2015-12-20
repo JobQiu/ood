@@ -1,0 +1,59 @@
+package common.message.init;
+
+import java.util.Set;
+import java.util.UUID;
+
+import common.IChatroom;
+import common.message.IInitMessage;
+import provided.datapacket.ADataPacket;
+import provided.datapacket.DataPacket;
+
+/**
+ * A message containing initial user's chatroom list. 
+ */
+public class ChatroomListResponse implements IInitMessage {
+
+	/**
+	 * Auto-generated UID. 
+	 */
+	private static final long serialVersionUID = 6222263246432828497L;
+
+	/**
+	 * User's chatroom list. 
+	 */
+	private final Set<IChatroom> chatrooms;
+
+	/**
+	 * ID of this message. 
+	 */
+	private final UUID msgID;
+
+	/**
+	 * Constructs a new message containing user's chatroom list. 
+	 * UUID for the message is auto-generated.
+	 * @param chatrooms - user's chatroom list
+	 */
+	public ChatroomListResponse(Set<IChatroom> chatrooms) {
+		this.msgID = UUID.randomUUID();
+		this.chatrooms = chatrooms;
+	}
+
+	/**
+	 * Returns user's chatroom list. 
+	 * @return user's chatroom list
+	 */
+	public Set<IChatroom> getChatrooms() {
+		return chatrooms;
+	}
+
+	@Override
+	public UUID getID() {
+		return msgID;
+	}
+
+	@Override
+	public ADataPacket getDataPacket() {
+		return new DataPacket<ChatroomListResponse>(ChatroomListResponse.class, this);
+	}
+
+}

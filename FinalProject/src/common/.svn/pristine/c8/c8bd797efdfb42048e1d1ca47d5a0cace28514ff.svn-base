@@ -1,0 +1,43 @@
+package common.message.chat;
+
+import common.message.ARequest;
+import common.message.IChatMessage;
+import provided.datapacket.DataPacket;
+
+/**
+ * A message containing a text string. 
+ */
+public class TextMessage extends ARequest implements IChatMessage {
+
+	/**
+	 * Auto-generated UID. 
+	 */
+	private static final long serialVersionUID = -9032536444654285428L;
+
+	/**
+	 * The text string. 
+	 */
+	private String text;
+
+	/**
+	 * Constructs a new message containing a text string. 
+	 * @param text - a text string. 
+	 */
+	public TextMessage(String text) {
+		this.text = text;
+	}
+
+	/**
+	 * Returns the text string. 
+	 * @return the text string. 
+	 */
+	public String getText() {
+		return text;
+	}
+
+	@Override
+	public DataPacket<? extends IChatMessage> getDataPacket() {
+		return new DataPacket<TextMessage>(TextMessage.class, this);
+	}
+
+}

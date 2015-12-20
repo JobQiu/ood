@@ -1,0 +1,47 @@
+package ls53_yh36.app.controller;
+
+import java.awt.EventQueue;
+
+import ls53_yh36.app.model.AppModel;
+import ls53_yh36.app.view.AppView;
+
+/**
+ * The app controller
+ * @author ls53@rice.edu
+ */
+public class AppController {
+    
+    /**
+     * The app View
+     */
+    private AppView view;
+    
+    /**
+     * The app model
+     */
+    private AppModel model;
+    
+    /**
+     * 
+     */
+    public AppController() {
+        
+    }
+    
+    public void start() {
+        view.start();
+        model.start();
+    }
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                AppController controller = new AppController();
+                controller.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+}

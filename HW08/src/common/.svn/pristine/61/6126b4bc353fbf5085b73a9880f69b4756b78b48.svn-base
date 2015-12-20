@@ -1,0 +1,81 @@
+package common.demo;
+
+import java.rmi.RemoteException;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+
+import common.IChatroom;
+import common.IUser;
+import provided.datapacket.ADataPacket;
+
+/**
+ * Reference implementation of a chatroom.
+ */
+public class Chatroom implements IChatroom {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3144118296649252280L;
+	
+	private int id;
+	private String displayName = "default";
+	private Set<IUser> users;
+	private static Random rand = new Random();
+
+	public Chatroom() {
+		id = rand.nextInt();
+		users = new HashSet<IUser>();
+	}
+
+	public Chatroom(int id) {
+		this.id = id;
+		users = new HashSet<IUser>();
+	}
+
+	@Override
+	public int id() {
+		return id;
+	}
+
+	@Override
+	public Set<IUser> getUsers() {
+		return users;
+	}
+
+	@Override
+	public boolean addUser(IUser user) {
+		return users.add(user);
+	}
+
+	@Override
+	public boolean removeUser(IUser user) {
+		return users.remove(user);
+	}
+
+	@Override
+	public void send(IUser me, ADataPacket message) {
+		users.iterator().forEachRemaining(
+					(user) ->{ 
+						try{
+							user.getConnect().sendReceive(me, message);
+						}
+						catch(RemoteException e)
+						{
+							e.printStackTrace();
+						}
+					});
+	}
+
+	@Override
+	public String getName() {
+		return displayName;
+	}
+
+	@Override
+	public void setName(String name) {
+		displayName = name;
+	}
+
+}

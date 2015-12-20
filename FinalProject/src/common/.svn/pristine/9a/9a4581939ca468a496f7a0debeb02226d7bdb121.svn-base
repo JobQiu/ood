@@ -1,0 +1,26 @@
+package common.message;
+
+import java.io.Serializable;
+import java.util.UUID;
+
+import provided.datapacket.ADataPacket;
+
+/**
+ * A message sent between remote users, which is 
+ * essentially a wrapper class of DataPacket. 
+ */
+public interface IMessage extends Serializable {
+
+	/**
+	 * Returns the ID of this message. 
+	 * @return the ID of this message
+	 */
+	public UUID getID();
+
+	/**
+	 * Returns the data-packet of this message. 
+	 * @return the data-packet of this message
+	 */
+	public ADataPacket getDataPacket();
+
+}

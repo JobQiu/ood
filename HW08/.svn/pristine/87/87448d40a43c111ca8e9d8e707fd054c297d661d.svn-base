@@ -1,0 +1,60 @@
+package chatapp.model;
+
+import java.util.ArrayList;
+
+import common.Bootstrap;
+import common.IChatroom;
+import common.IConnect;
+import common.IConnectToWorldAdapter;
+import common.IUser;
+import common.messages.RequestForAlgo;
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.datapacket.DataPacket;
+
+public class ChatAppModel {
+    
+    private String username;
+    
+    private IUser me;
+    
+    private IChatAppViewAdapter viewAdapter;
+    
+    private Bootstrap bootstrap = new Bootstrap();
+    
+    public ChatAppModel(IChatAppViewAdapter viewAdapter) {
+        this.viewAdapter = viewAdapter;
+    }
+    
+    public void start() {
+        me = bootstrap.init(username, new IConnectToWorldAdapter() {
+            
+            @Override
+            public <T> void receive(int roomID, IUser me, DataPacket<T> data) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public IUser getUser(IConnect stub) {
+                // TODO Auto-generated method stub
+                return null;
+            }
+            
+            @Override
+            public <T> ADataPacketAlgoCmd<?, T, ?> getCommand(RequestForAlgo<T> request) {
+                // TODO Auto-generated method stub
+                return null;
+            }
+            
+            @Override
+            public ArrayList<IChatroom> getChatrooms() {
+                // TODO Auto-generated method stub
+                return null;
+            }
+        });
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+}

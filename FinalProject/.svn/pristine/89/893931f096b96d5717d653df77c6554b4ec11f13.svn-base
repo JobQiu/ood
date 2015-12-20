@@ -1,0 +1,31 @@
+package ls53_yh36.chat.model;
+
+import java.util.UUID;
+
+import common.message.IChatMessage;
+import provided.datapacket.ADataPacket;
+
+public class ChatMessage implements IChatMessage {
+
+	private static final long serialVersionUID = 4994130538982440733L;
+
+	private UUID id;
+	
+	private ADataPacket dataPacket;
+	
+	public ChatMessage(UUID id, ADataPacket data) {
+		this.id = id;
+		dataPacket = data;
+	}
+	
+	@Override
+	public UUID getID() {
+		return id;
+	}
+
+	@Override
+	public ADataPacket getDataPacket() {
+		return dataPacket;
+	}
+
+}

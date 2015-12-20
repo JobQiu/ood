@@ -1,0 +1,2 @@
+eclipse.preferences.version=1
+prefWatchExpressions=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\n<watchExpressions>\n<expression enabled\="true" text\="userStub"/>\n<expression enabled\="true" text\="adpt"/>\n<expression enabled\="true" text\="entry.getValue().equals(user)"/>\n<expression enabled\="true" text\="entry.getKey()"/>\n<expression enabled\="true" text\="com.sun.proxy.$Proxy1"/>\n</watchExpressions>\n

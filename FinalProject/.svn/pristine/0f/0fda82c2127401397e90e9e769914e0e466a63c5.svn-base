@@ -1,0 +1,34 @@
+package ls53_yh36.server.game.smodel.message;
+
+import common.message.IChatMessage;
+import common.message.chat.ATextMessage;
+import provided.datapacket.DataPacket;
+
+public class GameOver extends ATextMessage {
+
+	private static final long serialVersionUID = -2540768500226733797L;
+
+	/**
+	 * Result about this player
+	 */
+	private String result;
+	
+	/**
+	 * Constructor
+	 * @param result Result of the finished game
+	 */
+	public GameOver(String result) {
+		this.result = result;
+	}
+	
+	@Override
+	public DataPacket<? extends IChatMessage> getDataPacket() {
+		return new DataPacket<ATextMessage>(ATextMessage.class, this);
+	}
+
+	@Override
+	public String getText() {
+		return result;
+	}
+
+}

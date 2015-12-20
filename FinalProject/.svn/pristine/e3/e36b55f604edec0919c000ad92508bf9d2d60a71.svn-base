@@ -1,0 +1,35 @@
+package ls53_yh36.server.game.gmodel.message;
+
+import java.util.UUID;
+
+import common.IChatUser;
+import common.message.IChatMessage;
+import provided.datapacket.DataPacket;
+
+public class ReportServer implements IChatMessage {
+
+	private static final long serialVersionUID = 2334838917682443956L;
+
+	public UUID gameID;
+	
+	public long time;
+	
+	public IChatUser player;
+	
+	public ReportServer(UUID id, long t, IChatUser pStub) {
+		gameID = id;
+		time = t;
+		player = pStub;
+	}
+	
+	@Override
+	public UUID getID() {
+		return gameID;
+	}
+
+	@Override
+	public DataPacket<? extends IChatMessage> getDataPacket() {
+		return new DataPacket<ReportServer>(ReportServer.class, this);
+	}
+
+}

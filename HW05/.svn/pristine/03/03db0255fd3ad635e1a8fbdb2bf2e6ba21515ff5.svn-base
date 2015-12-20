@@ -1,0 +1,35 @@
+package model.strategy;
+
+import model.Ball;
+import model.IBallCmd;
+import model.IInteractStrategy;
+import util.IDispatcher;
+
+/**
+ * A ball can swallow another ball
+ * @author ls53@rice.edu
+ */
+public class SwallowStrategy extends CollideStrategy {
+    
+    /**
+     * Initialization
+     * @param context The ball
+     */
+    @Override
+    public void init(Ball context) {
+        context.setInteractStrategy(new IInteractStrategy() {
+            
+            @Override
+            public void interact(Ball context, Ball target, IDispatcher<IBallCmd> disp) {
+                if (disp.hasObserver(context)) {
+                    double contextMass = Math.PI * context.getDimension().getX() * context.getDimension().getY();
+                    double targetMass = Math.PI * target.getDimension().getX() * target.getDimension().getY();                    
+                    double newMass = contextMass + targetMass;
+                    int radius = (int)Math.sqrt(newMass / Math.PI);
+                    context.setDimension(radius, radius);
+                    disp.deleteObserver(target);
+                }
+            }
+        });
+    }
+}

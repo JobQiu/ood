@@ -1,0 +1,36 @@
+package ls53_yh36.app.model;
+
+import java.util.UUID;
+
+import common.message.IInitMessage;
+import map.MapPanel;
+import provided.datapacket.ADataPacket;
+import provided.datapacket.DataPacket;
+
+public class Map implements IInitMessage {
+
+	private static final long serialVersionUID = -6199210564005217408L;
+
+	private MapPanel map;
+	
+	/**
+	 * ID of this message. 
+	 */
+	private final UUID msgID;
+	
+	public Map(MapPanel mapPanel) {
+		map = mapPanel;
+		msgID = UUID.randomUUID();
+	}
+
+	@Override
+	public UUID getID() {
+		return msgID;
+	}
+
+	@Override
+	public ADataPacket getDataPacket() {
+		return new DataPacket<MapPanel>(MapPanel.class, map);
+	}
+
+}

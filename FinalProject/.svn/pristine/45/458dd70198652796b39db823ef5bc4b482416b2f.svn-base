@@ -1,0 +1,78 @@
+package ls53_yh36.server.game.scontroller;
+
+import java.io.Serializable;
+import java.util.UUID;
+
+import common.IChatUser;
+import gov.nasa.worldwind.geom.Position;
+import gov.nasa.worldwind.layers.AbstractLayer;
+import ls53_yh36.server.game.smodel.GameModel;
+import ls53_yh36.server.game.smodel.GmModelAdpt;
+import ls53_yh36.server.game.sview.GameView;
+import ls53_yh36.server.game.sview.GmViewAdpt;
+
+public class GuessGame implements Serializable {
+
+	private static final long serialVersionUID = 421229736878755869L;
+
+	
+	private GameView gView;
+	
+	private GameModel gModel;
+	
+	public GuessGame(UUID id, IChatUser stub) {
+		gView = new GameView(new GmViewAdpt() {
+
+			private static final long serialVersionUID = 1975792449613549381L;
+
+			
+			@Override
+			public void startGame() {
+				gModel.launchGame();
+			}
+
+			@Override
+			public void close() {
+				System.exit(0);
+			}
+
+			@Override
+			public void backAns(String ans) {
+				gModel.nextPlace(ans);
+			}
+			
+		});
+		
+		gModel = new GameModel(new GmModelAdpt() {
+
+			private static final long serialVersionUID = -2131664188315979741L;
+
+			
+			@Override
+			public void addLayer(AbstractLayer layer) {
+				gView.showLayer(layer);
+			}
+
+			@Override
+			public void goPlace(Position pos) {
+				gView.goLongLat(pos);
+			}
+
+			@Override
+			public void showStat(String stat) {
+				gView.dispStat(stat);
+			}
+			
+			@Override
+			public void showQues(String qs) {
+				gView.dispQues(qs);
+			}
+			
+		}, id, stub);
+	}
+	
+	public void launch() {
+		gView.start();
+		gModel.start();
+	}
+}

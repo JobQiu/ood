@@ -1,0 +1,75 @@
+package common.message.chat;
+
+import java.util.UUID;
+
+import common.IChatUser;
+import common.message.IChatMessage;
+import provided.datapacket.ADataPacket;
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.datapacket.DataPacket;
+
+/**
+ * A message containing a command for an unknown data type. 
+ */
+public class CommandResponse implements IChatMessage {
+
+	/**
+	 * Auto-generated UID. 
+	 */
+	private static final long serialVersionUID = -5228915825734240633L;
+
+	/**
+	 * The class type of unknown data. 
+	 */
+	private final Class<?> type;
+
+	/**
+	 * ID of this message. 
+	 */
+	private final UUID msgID;
+
+	/**
+	 * The command to process the unknown data. 
+	 */
+	private final ADataPacketAlgoCmd<String, ?, IChatUser> cmd;
+
+	/**
+	 * Constructs a new message containing a command for an unknown data type. 
+	 * UUID for the message is auto-generated.
+	 * @param type - class type of unknown data
+	 * @param cmd - command to process the unknown data
+	 * @param msgID - the UUID of the CommandRequest.
+	 */
+	public CommandResponse(Class<?> type, UUID msgID, ADataPacketAlgoCmd<String, ?, IChatUser> cmd) {
+		this.msgID = msgID;
+		this.type = type;
+		this.cmd = cmd;
+	}
+
+	/**
+	 * Returns the class type of unknown data. 
+	 * @return the class type of unknown data
+	 */
+	public Class<?> getUnknownType() {
+		return type;
+	}
+
+	/**
+	 * Returns the command to process the unknown data. 
+	 * @return the command to process the unknown data
+	 */
+	public ADataPacketAlgoCmd<String, ?, IChatUser> getCommand() {
+		return cmd;
+	}
+
+	@Override
+	public UUID getID() {
+		return msgID;
+	}
+
+	@Override
+	public ADataPacket getDataPacket() {
+		return new DataPacket<CommandResponse>(CommandResponse.class, this);
+	}
+
+}

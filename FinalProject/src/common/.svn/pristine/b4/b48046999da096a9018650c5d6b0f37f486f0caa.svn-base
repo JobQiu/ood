@@ -1,0 +1,13 @@
+package common.message;
+
+/**
+ * A message only sent outside chatroom. 
+ * 
+ * Well-known "initial" messages are: 
+ * Invitation2Chatroom, 
+ * ChatroomListRequest, ChatroomListResponse, 
+ * InitUserInfoRequest, InitUserInfoResponse. 
+ */
+public interface IInitMessage extends IMessage {
+
+}

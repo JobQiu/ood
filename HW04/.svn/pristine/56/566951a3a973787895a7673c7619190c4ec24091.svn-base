@@ -1,0 +1,50 @@
+package model;
+
+import java.awt.Component;
+
+/**
+ * An interface that defines an adapter that the view uses to communicate with the model.
+ *
+ * @param <DropListItem> The type of items to put into the drop lists on the view.
+ */
+public interface IModelControlAdapter<DropListItem> {
+
+	/**
+	 * Make a ball that uses the selected Update Strategy.
+	 * @param selectedItem the selected item
+	 * @param canvas the canvas where the ball will be moving within
+	 */
+	void makeBall(DropListItem selectedItem, Component canvas);
+	
+	/**
+	 * Make a ball with the swithcable update strategy in the model.
+	 * @param canvas the canvas where the ball will be moving within
+	 */
+	void makeSwitcherBall(Component canvas);
+	
+	/**
+	 * Remove all balls in the model.
+	 */
+	void clearBalls();
+	
+	/**
+	 * Add a new strategy.
+	 * @param strategyName the strategy name
+	 * @return A concrete IUpdateStrategy instance of specified type.
+	 */
+	DropListItem addStrategy(String strategyName);
+
+	/**
+	 * Combine two given update strategies together.
+	 * @param selectedItem1 one of the two strategies to combine
+	 * @param selectedItem2 the other strategy to combine
+	 * @return a composite strategy instance that exhibits behaviors of both given strategies 
+	 */
+	DropListItem combineStrategies(DropListItem selectedItem1, DropListItem selectedItem2);
+	
+	/**
+	 * Switch the switchable strategy in the model to a new update strategy.
+	 * @param selectedItem the new update strategy
+	 */
+	void switchStrategy(DropListItem selectedItem);
+}

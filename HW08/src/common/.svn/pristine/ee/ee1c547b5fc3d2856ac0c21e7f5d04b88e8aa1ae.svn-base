@@ -1,0 +1,39 @@
+package common;
+
+import java.util.ArrayList;
+
+import common.messages.RequestForAlgo;
+import provided.datapacket.DataPacket;
+import provided.datapacket.ADataPacketAlgoCmd;
+
+public interface IConnectToWorldAdapter {
+	  /**
+	   *get a list of chatrooms from this IUser
+	   *@return a list of chatrooms
+	   */
+	  public ArrayList<IChatroom> getChatrooms();
+
+	  /**
+	   *Process the request for algorithm on the local machine
+	 * @param <T>
+	   *@param RequestForAlgo<T> the container for the class type being requested
+	   *@return ADataPacketAlgoCmd<?,T,?> the algorithm for processing hat type of data
+	   */
+	  public <T> ADataPacketAlgoCmd<?,T,?> getCommand(RequestForAlgo<T> request);
+
+	  /**
+	   *Process the data packet on the local machine
+	 * @param <T>
+	   *@param roomID the target chatroom to send message
+	   *@param me my IUser objec
+	   *@param data the datapacket to send
+	   */
+	  public <T> void receive(String roomID, IUser me, DataPacket<T> data);
+	  
+	  /**
+	   * Get the user object representing this application, and give it the IConnect stub
+	   * @param stub - the stub of the IConnect object
+	   * @return the IUser object
+	   */
+	  public IUser getUser(IConnect stub);
+}

@@ -1,0 +1,48 @@
+package model.strategy;
+
+import model.Ball;
+import util.Dispatcher;
+
+/**
+ * An IUpdateStrategy implementation that can change its underlying update strategy dynamically.
+ *
+ */
+public class SwitcherStrategy implements IUpdateStrategy {
+	/**
+	 * The underlying update strategy in use.
+	 */
+	private IUpdateStrategy updateStrategy;
+	
+	/**
+	 * Construct a SwitcherStrategy with the given update strategy as the initial one to use.
+	 * @param strategy the initial update strategy
+	 */
+	public SwitcherStrategy(IUpdateStrategy strategy) {
+		updateStrategy = strategy;
+	}
+
+	@Override
+	public void updateState(Ball context, Dispatcher dispatcher) {
+		updateStrategy.updateState(context, dispatcher);
+	}
+	
+	/**
+	 * Get the underlying update strategy in use.
+	 * @return the current update strategy in use.
+	 */
+	public IUpdateStrategy getUpdateStrategy() {
+		return updateStrategy;
+	}
+	
+	/**
+	 * Set the underlying strategy to a new strategy.
+	 * @param strategy the new udpate strategy to use
+	 */
+	public void setUpdateStrategy(IUpdateStrategy strategy) {
+		if(strategy == null) {
+			throw new IllegalArgumentException("Update Strategy cannot be null");
+		}
+		updateStrategy = strategy;
+	}
+
+}

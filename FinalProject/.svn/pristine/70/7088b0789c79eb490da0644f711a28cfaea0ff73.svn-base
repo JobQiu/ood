@@ -1,0 +1,14 @@
+package ls53_yh36.server.game.gview;
+
+import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
+import map.MapPanel;
+
+public class NewMap extends MapPanel {
+
+	private static final long serialVersionUID = -8693482370636503329L;
+
+	
+	public WorldWindowGLCanvas getWWD() {
+		return super.getWWD();
+	}
+}

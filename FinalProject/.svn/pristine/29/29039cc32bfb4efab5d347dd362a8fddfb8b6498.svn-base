@@ -1,0 +1,118 @@
+package ls53_yh36.app.view;
+
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+
+import ls53_yh36.game.view.GameView;
+import map.MapPanel;
+
+/**
+ * The app View
+ * @author ls53@rice.edu
+ */
+public class AppView extends JFrame {
+
+    /**
+     * The generated serial version UID
+     */
+    private static final long serialVersionUID = 6271408100072124087L;
+    
+    private List<GameView> gameViews = new ArrayList<>();
+    
+    /**
+     * The view to model adapter
+     */
+    private IAppModelAdapter modelAdapter;
+    
+    private JPanel contentPane;
+    private final JTextArea txtrInfo = new JTextArea();
+    private final JPanel panelCtrl = new JPanel();
+    private final JPanel panelUp = new JPanel();
+    private final JLabel lblNewTeammate = new JLabel("New Teammate:");
+    private final JTextField txtIp = new JTextField();
+    private final JButton btnConnect = new JButton("Connect");
+    private final JScrollPane scrollPaneInfo = new JScrollPane();
+    private final JPanel panelDown = new JPanel();
+    private final JButton btnStartGame = new JButton("Start Game!");
+
+    /**
+     * Create the frame.
+     */
+    public AppView(IAppModelAdapter modelAdapter) {
+        this.modelAdapter = modelAdapter;
+        initGUI();
+    }
+    
+    /**
+     * Initialize GUI
+     */
+    private void initGUI() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 600, 400);
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        contentPane.setLayout(new BorderLayout(0, 0));
+        setContentPane(contentPane);
+        
+        contentPane.add(panelCtrl, BorderLayout.NORTH);
+        panelCtrl.setLayout(new GridLayout(2, 1, 0, 0));
+        panelCtrl.add(panelUp);
+        
+        panelUp.add(lblNewTeammate);
+        
+        txtIp.setColumns(10);
+        panelUp.add(txtIp);
+        btnConnect.addActionListener(e -> {
+            String ip = txtIp.getText().trim();
+            if (!ip.isEmpty()) {
+                modelAdapter.connect(ip);
+            }
+        });
+        
+        panelUp.add(btnConnect);
+        
+        panelCtrl.add(panelDown);
+        btnStartGame.addActionListener(e -> {
+            modelAdapter.startGame();
+        });
+        
+        panelDown.add(btnStartGame);
+        
+        contentPane.add(scrollPaneInfo, BorderLayout.CENTER);
+        scrollPaneInfo.setViewportView(txtrInfo);
+    }
+    
+    /**
+     * Start GUI
+     */
+    public void start() {
+        String username = JOptionPane.showInputDialog(null, "Please input your username:", "Login", JOptionPane.INFORMATION_MESSAGE);
+        if (username == null) {
+            System.exit(0);
+        } else if (username.trim().isEmpty()) {
+            username = "COMP 504 user";
+        }
+        
+        setVisible(true);
+        modelAdapter.setUsername(username);
+    }
+    
+    public void setMapPanel(MapPanel mapPanel) {
+        GameView gameView = new GameView();
+        gameViews.add(gameView);
+        gameView.getPanel().add(mapPanel);
+        gameView.start();
+    }
+}

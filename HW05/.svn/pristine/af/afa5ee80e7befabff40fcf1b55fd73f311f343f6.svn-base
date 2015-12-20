@@ -1,0 +1,179 @@
+package controller;
+
+import java.awt.EventQueue;
+import java.awt.Graphics;
+
+import javax.swing.JPanel;
+
+import model.*;
+import view.*;
+/**
+ * The "Controller" in a Model-View-Controller architecture 
+ * Sets up the appropriate wiring between the model and the view. 
+ * Uses adapters to respond to user input and notifies the model and the view to update accordingly. 
+ * @author caojian
+ *
+ * @param <TDropListItem>
+ */
+public class BallWorldController<TDropListItem> {
+
+	
+	private BallWorldModel model;
+	private BallWorldGUI<TDropListItem> view;
+
+	/**
+	 * constructor
+	 * instantiate a model and a view
+	 */
+	public BallWorldController() {
+
+		
+		model = new BallWorldModel(new IViewCtrlAdapter(){
+			
+			@Override
+			/** return the painting panel */ 
+			public JPanel getPanel(){
+				return view.getCenterPanel();
+			}
+		},
+		    new IViewUpdateAdapter(){
+
+				@Override
+				/**update the state of balls the screen */
+				public void updateState() {
+					view.updateState();
+						
+				}
+				
+				/** repaint the screen */
+				public void updatePaint(){
+					view.updatePaint();
+				}
+
+				
+			
+		    }
+		);
+
+			
+		view = new BallWorldGUI<TDropListItem>(new IModelCtrlAdapter<TDropListItem>(){
+		
+			@SuppressWarnings("unchecked")
+			@Override
+				/**
+			    * Returns an IStrategyFac that can instantiate the strategy specified
+			    * by classname. Returns null if classname is null. The toString() of
+			    * the returned factory is the classname.
+			    * @param classname  Shortened name of desired strategy 
+			    * @return A factory to make that strategy
+			    */
+			public TDropListItem addUpdateStrategy(String classname) {
+				return (TDropListItem) model.makeStrategyFac(classname);
+			}
+			
+			@SuppressWarnings("unchecked")
+			@Override
+		       /**
+		        * Returns an IStrategyFac that can instantiate a MultiStrategy with the
+		        * two strategies made by the two given IStrategyFac objects. Returns
+		        * null if either supplied factory is null. The toString() of the
+		        * returned factory is the toString()'s of the two given factories,
+		        * concatenated with "-".             * 
+		        * @param selectedItem1 An IStrategyFac for a strategy
+		        * @param selectedItem2 An IStrategyFac for a strategy
+		        * @return An IStrategyFac for the composition of the two strategies
+		        */
+			public TDropListItem  combineUpdateStrategies(IUpdateStrategyFac<IBallCmd> stratFac1, IUpdateStrategyFac<IBallCmd> stratFac2) {
+				return (TDropListItem) model.combineStrategyFacs(stratFac1, stratFac2);
+				
+			}
+			
+			/**
+			 * switch the strategy of the switcher when clicking the button
+			 * @param 
+			 */
+			@Override
+			public void switchUpdateStrategy(IUpdateStrategyFac<IBallCmd> stratFac) {
+				model.switchStrategy(stratFac.make());
+				
+			}
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public TDropListItem addPaintStrategy(String classname) {
+				return (TDropListItem)model.makePaintStrategyFac(classname);
+			}
+			
+			@Override
+				/**
+			    * Add a ball to the system with a strategy as given by the given IStrategyFac
+			    * @param tDropListItem The fully qualified name of the desired strategy.
+			    */	    
+			public void makeBall(Object tDropListItem1, Object tDropListItem2) {
+				
+				model.makeSprite(tDropListItem1, tDropListItem2);
+				
+			}		
+			
+			@Override
+				/**
+			    * Add a swicher ball to the system with a strategy as given by the given IStrategyFac
+			    * @param selectedItem The fully qualified name of the desired strategy.
+			    */
+			public void makeSwitcher() {
+				
+				model.makeSwitcher();
+				
+			}
+						
+			@Override
+			/** remove all balls from screen */
+			public void clearAllBalls() {
+				model.deleteSprites();
+				
+			}
+
+			
+		},
+		    new IModelUpdateAdapter(){
+
+			   /**
+		       * Pass the update request to the model.
+		       * @param g The Graphics object the balls use to draw themselves.
+		       */
+				@Override
+				public void updatePaint(Graphics g){
+					
+					model.updatePaint(g);
+				}
+			
+				public void updateState(){
+					model.updateState();
+				}
+		    }
+		);
+	}
+	
+	/**
+	 * start the model and view instance
+	 */
+	public void start() {
+		model.start();
+		view.start();
+	}
+
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					BallWorldController<Object> controller = new BallWorldController<Object>();
+					controller.start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+	}
+
+}

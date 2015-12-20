@@ -1,0 +1,54 @@
+package common;
+
+import java.io.Serializable;
+import java.util.Collection;
+
+import provided.datapacket.ADataPacket;
+
+public interface IChatroom extends Serializable{
+	
+	/**
+	 * Get a unique ID of the the chatroom.
+	 * @return  integer ID unique to a chatroom session.
+	 */
+	int id();
+
+	/**
+	 * List of users in the chatroom. Does not have to be ordered, therefore any collection
+	 * can be used.
+	 * @return  A collection of all the users in this chatroom.
+	 */
+	Collection<IUser> getUsers();
+
+	/**
+	 * Add the specified user to this chatroom.
+	 * @param user  User to add.
+	 * @return  True if user was added to the chatroom. False if user was already in chatroom.
+	 */
+	boolean addUser(IUser user);
+
+	/**
+	 * Remove the specified user from this chatroom.
+	 * @param user  User to remove.
+	 * @return  True if user was removed from the chatroom. False if user was not present in chatroom.
+	 */
+	boolean removeUser(IUser user);
+
+	/**
+	 * Send a message to every user in the chatroom.
+	 * @param me	The sender's IUser object.
+	 * @param message   Message packet to send.
+	 */
+	void send(IUser me, ADataPacket message);
+	
+	/**
+	 * Getter and setter for the chatroom display name
+	 * This is not exactly needed for the chatroom to function, but it is convenient to have
+	 * @return the display name for this chatroom
+	 */
+	String getName();
+	
+	void setName(String name);
+
+
+}

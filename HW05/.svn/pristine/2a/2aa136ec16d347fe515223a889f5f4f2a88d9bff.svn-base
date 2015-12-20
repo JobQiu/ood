@@ -1,0 +1,22 @@
+package model.paint.shape;
+
+import java.awt.Shape;
+
+/**
+ * Abstract factory that creates a Shape for use as prototype shapes in IPaintStrategies. 
+ * The location of the center of the shape and the x and y scales can be specified.
+ * @author caojian
+ *
+ */
+public interface IShapeFactory {
+
+	/**
+	 * Returns a Shape object centered at (x, y) and with the specified x and y dimensions.
+	 * @param x x coordinate
+	 * @param y y coordinate
+	 * @param xScale length
+	 * @param yScale width
+	 * @return The shape
+	 */
+	public Shape makeShape(double x, double y, double xScale, double yScale);
+}

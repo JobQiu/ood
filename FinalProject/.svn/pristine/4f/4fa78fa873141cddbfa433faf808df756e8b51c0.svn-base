@@ -1,0 +1,10 @@
+package ls53_yh36.server.game.gmodel;
+
+public interface Cmd2RunGameAdpt {
+
+	/**
+	 * Post the information onto game view
+	 * @param msg
+	 */
+	public void post(String msg);
+}

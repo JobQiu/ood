@@ -1,0 +1,216 @@
+package view;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+
+/**
+ * The view class in ball world application that displays all controls and added balls.
+ */
+public class BallWorldView<TStrategyDropListItem, TPaintDropListItem> extends JFrame {
+	
+	/**
+	 * Serial Version ID automatically generated.
+	 */
+	private static final long serialVersionUID = 4665628271829011924L;
+
+
+	/**
+	 * The model adapter that this view communicates with.
+	 */
+	private final IModelControlAdapter<TStrategyDropListItem, TPaintDropListItem> modelCtrAdpt;
+
+	private final IModelUpdateAdapter modelUpdateAdpt;
+	
+	/**
+	 * Main content pane
+	 */
+	private JPanel contentPane;
+	
+	/**
+	 * Center panel
+	 */
+	private JPanel canvasPanel = new JPanel() {
+		/**
+		 * Serial Version ID automatically generated.
+		 */
+		private static final long serialVersionUID = -708326350965762632L;
+
+		/**
+		 * Overridden paintComponent method to paint a shape in the panel.
+		 * @param g The Graphics object to paint on.
+		 **/
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g); // Do everything normally done first, e.g. clear the screen.
+			modelUpdateAdpt.update(g);
+		}
+	};
+	/**
+	 *  North Panel
+	 */
+	private final JPanel controlPanel = new JPanel();
+	private final JComboBox<TStrategyDropListItem> comboxBall = new JComboBox<>();
+	private final JButton btnMakeBall = new JButton("Make Selected Ball");
+	private final JButton btnAddtoList = new JButton("Add to lists");
+	private final JTextField txtBallName = new JTextField();
+	private final JComboBox<TStrategyDropListItem> comboxCombine = new JComboBox<>();
+	private final JButton btnCombine = new JButton("Combine");
+	private final JButton btnMakeSwitherBall = new JButton("Make Swither Ball");
+	private final JButton btnSwitchStrat = new JButton("Switch");
+	private final JButton btnClearAll = new JButton("Clear All");
+	private final JPanel switcherPanel = new JPanel();
+	private final JPanel inputPanel = new JPanel();
+	private final JPanel comboPanel = new JPanel();
+	private final JPanel paintPanel = new JPanel();
+	private final JTextField txtPaintName = new JTextField();
+	private final JButton addPaintBtn = new JButton("Add");
+	private final JComboBox<TPaintDropListItem> paintComboBox = new JComboBox<>();
+
+	/**
+	 * Start view.
+	 */
+	public void start() {
+		setVisible(true);
+	}
+
+	/**
+	 * GUI initialization function
+	 */
+	public void initGUI() {
+		setTitle("Ball World");
+
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 900, 600);
+		contentPane = new JPanel();
+		contentPane.setToolTipText("Main ContentPane");
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new BorderLayout(0, 0));
+		setContentPane(contentPane);
+		canvasPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		canvasPanel.setPreferredSize(new Dimension(100, 100));
+		canvasPanel.setBackground(Color.WHITE);
+		canvasPanel.setToolTipText("The canvas panel which balls move within");
+		canvasPanel.setMinimumSize(new Dimension(50, 50));
+
+		contentPane.add(canvasPanel, BorderLayout.CENTER);
+		canvasPanel.setLayout(new GridLayout(1, 0, 1, 0));
+		controlPanel.setBackground(UIManager.getColor("Panel.background"));
+		contentPane.add(controlPanel, BorderLayout.NORTH);
+		controlPanel.setToolTipText("The control panel");
+		controlPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		
+		controlPanel.add(inputPanel);
+		inputPanel.setLayout(new GridLayout(0, 1, 0, 0));
+		inputPanel.add(txtBallName);
+		txtBallName.setToolTipText("type in the abbreviated name of the strategy to add without strategy suffix");
+		txtBallName.setColumns(10);
+		inputPanel.add(btnAddtoList);
+		btnAddtoList.setToolTipText("add a new type of strategy to the lists");
+		btnAddtoList.addActionListener(e -> {
+			if(txtBallName.getText() != null) {
+				TStrategyDropListItem strategyFac = modelCtrAdpt.addStrategy(txtBallName.getText());
+				comboxBall.addItem(strategyFac);
+				comboxCombine.addItem(strategyFac);
+			}
+		});
+		comboPanel.setBorder(null);
+		
+		controlPanel.add(comboPanel);
+		comboPanel.setLayout(new GridLayout(0, 1, 0, 0));
+		comboPanel.add(btnMakeBall);
+		btnMakeBall.setToolTipText("add a ball with the selected update strategy which cannot be changed thereafter");
+		btnMakeBall.addActionListener(e -> {
+		    TStrategyDropListItem updateStrategyFac = comboxBall.getItemAt(comboxBall.getSelectedIndex());
+		    TPaintDropListItem paintStrategyFac = paintComboBox.getItemAt(paintComboBox.getSelectedIndex());
+		    if (updateStrategyFac != null && paintStrategyFac != null) {
+		        modelCtrAdpt.makeBall(comboxBall.getItemAt(comboxBall.getSelectedIndex()), 
+		                paintComboBox.getItemAt(paintComboBox.getSelectedIndex()), 
+		                canvasPanel);		        
+		    }
+		});
+		comboPanel.add(comboxBall);
+		comboPanel.add(comboxCombine);
+		comboPanel.add(btnCombine);
+		btnCombine.setToolTipText("comine two selected strategies and add it to lists");
+		btnCombine.addActionListener(e -> {
+			TStrategyDropListItem item = modelCtrAdpt.combineStrategies(comboxBall.getItemAt(comboxBall.getSelectedIndex()), 
+			                                                            comboxCombine.getItemAt(comboxCombine.getSelectedIndex()));
+			comboxBall.addItem(item);
+			comboxCombine.addItem(item);
+		});
+		switcherPanel.setBorder(new TitledBorder(null, "Switcher Controls", TitledBorder.CENTER, TitledBorder.TOP, null, null));
+		
+		controlPanel.add(switcherPanel);
+		switcherPanel.setLayout(new GridLayout(0, 1, 0, 0));
+		switcherPanel.add(btnMakeSwitherBall);
+		btnMakeSwitherBall.setToolTipText("make a ball with current switcher strategy which can be changed thereafter");
+		switcherPanel.add(btnSwitchStrat);
+		btnSwitchStrat.setToolTipText("Swith update strategy of all switcher balls to the selected strategy");
+		btnClearAll.setToolTipText("Clear all balls");
+		btnClearAll.addActionListener(e -> modelCtrAdpt.clearBalls());
+		
+		controlPanel.add(btnClearAll);
+		paintPanel.setBorder(new TitledBorder(null, "Paint Strategies", TitledBorder.CENTER, TitledBorder.TOP, null, null));
+		
+		controlPanel.add(paintPanel);
+		paintPanel.setLayout(new GridLayout(0, 1, 0, 0));
+		txtPaintName.setToolTipText("paint strategy name");
+		txtPaintName.setColumns(10);
+		
+		paintPanel.add(txtPaintName);
+		addPaintBtn.addActionListener(e -> {
+		    if (txtPaintName.getText() != null) {
+		        TPaintDropListItem paintStrategyFac = modelCtrAdpt.addPaintStrategy(txtPaintName.getText());
+		        paintComboBox.addItem(paintStrategyFac);
+		        paintComboBox.setSelectedIndex(paintComboBox.getItemCount() - 1);
+		    }
+		});
+		addPaintBtn.setToolTipText("add paint strategy");
+		
+		paintPanel.add(addPaintBtn);
+		paintComboBox.setEditable(true);
+		
+		paintPanel.add(paintComboBox);
+		btnSwitchStrat.addActionListener(e -> {
+			int selectedIndex = comboxBall.getSelectedIndex();
+			if(selectedIndex >= 0) {
+				modelCtrAdpt.switchStrategy(comboxBall.getItemAt(selectedIndex));
+			}
+		});
+		btnMakeSwitherBall.addActionListener(e -> {
+		    TPaintDropListItem paintStrategyFac = paintComboBox.getItemAt(paintComboBox.getSelectedIndex());
+		    if (paintStrategyFac != null) {
+		        modelCtrAdpt.makeSwitcherBall(paintStrategyFac, canvasPanel);
+		    }
+		});
+		
+		setMinimumSize(new Dimension(100, 250));
+	}
+
+	/**
+	 * Update view.
+	 */
+	public void update() {
+		canvasPanel.repaint();
+	}
+	
+	public BallWorldView(IModelUpdateAdapter vupdateAdapter, 
+	                     IModelControlAdapter<TStrategyDropListItem, TPaintDropListItem> vcontrolAdapter) {
+		this.modelCtrAdpt = vcontrolAdapter;
+		this.modelUpdateAdpt = vupdateAdapter;
+		initGUI();
+	}
+}

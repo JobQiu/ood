@@ -1,0 +1,19 @@
+package strategy;
+
+import java.awt.Rectangle;
+
+import model.ABall;
+import util.Randomizer;
+
+/**
+ * An IUpdateStrategy implementation that set the velocity of a ball randomly.
+ *
+ */
+public class WanderStrategy implements IUpdateStrategy {
+
+	@Override
+	public void updateState(ABall context) {
+		context.setVelocity(Randomizer.Singleton.randomVel(new Rectangle(10,10)));
+	}
+
+}

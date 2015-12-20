@@ -1,0 +1,46 @@
+1442973857353	Delete elements
+1442973936644	Rename package 'strategy'
+1442974222599	Rename type 'ABall'
+1442974611964	Delete elements
+1442974866293	Rename type 'ABall'
+1442974880002	Rename package 'strategy'
+1442974982266	Rename field 'viewAdapter'
+1442975007695	Rename field 'viewUpdateAdapter'
+1442976293707	Delete elements
+1442976365274	Delete element
+1442976387346	Rename method 'normalizeStrategyName'
+1442976453192	Rename field 'timer'
+1442979252375	Rename type variable 'DropListItem'
+1442979858094	Rename type 'IStrategyFac'
+1442980830579	Rename field 'modelCtrAdapter'
+1442980861869	Rename field 'modelUpdateAdapter'
+1442981176299	Rename type 'IViewUpdateAdapter'
+1442981196662	Rename type 'IModelControlAdapter'
+1442981220031	Rename type 'IModelUpdateAdapter'
+1442981268134	Rename type 'IViewUpdateAdapter1'
+1442981326679	Rename type 'IModelUpdateAdapter'
+1442981352510	Rename type 'IViewControlAdapter'
+1442981365341	Rename type 'IViewUpdateAdapter'
+1442981381213	Rename type 'IModelUpdateAdapter1'
+1442981391154	Move compilation unit
+1442981398697	Move compilation units
+1442981463373	Rename type variable 'DropListItem'
+1443020413655	Move compilation unit
+1443020431854	Move compilation unit
+1443066239735	Rename method 'makeStrategyFac'
+1443066334606	Rename field '_errorStrategyFac'
+1443068202443	Rename local variable 'strategy'
+1443068279417	Rename local variable 'strategy'
+1443068344049	Rename field 'switcherBallStrategy'
+1443162614131	Rename type 'rectanglePaintStrategy'
+1443163043200	Rename type 'lambPaintStrategy'
+1443163092136	Move files
+1443163714213	Move compilation unit
+1443163880358	Move files
+1443163891184	Delete element
+1443163919569	Rename package 'model.paint.strategy.Images'
+1443164795570	Delete element
+1443168300983	Rename type 'Fish2PaintStrategy'
+1443171236895	Move compilation unit
+1443174195827	Delete elements
+1443174623851	Delete elements

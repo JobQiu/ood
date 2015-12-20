@@ -1,0 +1,67 @@
+package chatapp.view;
+
+import java.awt.BorderLayout;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JTextArea;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.JButton;
+
+public class ChatAppView extends JFrame {
+    
+    private IChatAppModelAdapter modelAdapter;
+
+    /**
+     * The generate serial version uid
+     */
+    private static final long serialVersionUID = -1259336758548704871L;
+    
+    private JPanel contentPane;
+    private final JPanel panel = new JPanel();
+    private final JTextArea textArea = new JTextArea();
+    private final JLabel lblConnectTo = new JLabel("connect to:");
+    private final JTextField txtIp = new JTextField();
+    private final JButton btnConnect = new JButton("connect");
+
+    /**
+     * Create the frame.
+     */
+    public ChatAppView(IChatAppModelAdapter modelAdapter) {
+        txtIp.setColumns(10);
+        initGui();
+        this.modelAdapter = modelAdapter;
+    }
+    
+    private void initGui() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 900, 600);
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        contentPane.setLayout(new BorderLayout(0, 0));
+        setContentPane(contentPane);
+        
+        contentPane.add(panel, BorderLayout.NORTH);
+        
+        panel.add(lblConnectTo);
+        
+        panel.add(txtIp);
+        
+        panel.add(btnConnect);
+        
+        contentPane.add(textArea, BorderLayout.CENTER);
+    }
+    
+    public void start() {
+        String username = JOptionPane.showInputDialog("Please input your username:");
+        if (username.trim().isEmpty()) {
+            username = "COMP 504 user";
+        }
+        
+        setVisible(true);
+        modelAdapter.initUsername(username);
+    }
+}

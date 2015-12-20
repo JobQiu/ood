@@ -1,0 +1,253 @@
+package model;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.util.Observable;
+import java.util.Observer;
+
+import model.strategy.IUpdateStrategy;
+import util.Dispatcher;
+
+/**
+ * A class that represents all balls that are filled with a certain color 
+ * and moves at a certain velocity on a canvas.
+ */
+public class Ball implements Observer {
+	
+	/**
+	 * The center location of the ball.
+	 */
+	private Point location;
+	
+	/**
+	 * The radius of the ball.
+	 */
+	private int radius;
+	/**
+	 * The velocity at which the ball moves.
+	 */
+	private Point velocity;
+	
+	/**
+	 * The color of the ball.
+	 */
+	private Color color;
+	
+	/**
+	 * The canvas within which the ball moves.
+	 */
+	private Component canvas;
+	
+	/**
+	 * The update strategy of the state of the ball.
+	 */
+	private IUpdateStrategy updateStrategy;
+	
+	/**
+	 * The strategy used to paint the ball.
+	 */
+	private IPaintStrategy paintStrategy;
+	
+	/**
+	 * Construct a ball.
+	 * @param location the center location of the ball
+	 * @param radius the radius (int) of the ball
+	 * @param velocity the velocity vector of the ball
+	 * @param color the RGB color of the ball
+	 * @param canvas the canvas within with the ball moves
+	 * @param updateStrategy the update strategy to use
+	 */
+	public Ball(Point location, int radius, Point velocity, Color color, Component canvas, IUpdateStrategy updateStrategy, IPaintStrategy paintStrategy) {
+		this.location = location;
+		this.radius = radius;
+		this.velocity = velocity;
+		this.color = color;
+		this.canvas = canvas;
+		this.updateStrategy = updateStrategy;
+		this.paintStrategy = paintStrategy;
+	}
+	
+	
+	/**
+	 * Get the center location of the ball.
+	 * @return the center location
+	 */
+	public Point getLocation() {
+		return this.location;
+	}
+
+	/**
+	 * Set the center location of the ball.
+	 * @param loc the new location of the ball
+	 */
+	public void setLocation(Point loc) {
+		this.location = loc;
+	}
+	
+	/**
+	 * Get the radius of the ball.
+	 * @return the radius
+	 */
+	public int getRadius() {
+		return this.radius;
+	}
+	
+	/**
+	 * Set the radius of the ball.
+	 * @param r the new radius
+	 */
+	public void setRadius(int r) {
+		if(r <= 0) {
+			throw new IllegalArgumentException("Radisu should be positive");
+		}
+		
+		this.radius = r;
+	}
+	
+	/**
+	 * Get the color of the ball.
+	 * @return the color of the ball
+	 */
+	public Color getColor() {
+		return this.color;
+	}
+	
+	/**
+	 * Set the color of a ball to a new ball.
+	 * @param color the new color of the ball
+	 */
+	public void setColor(Color color) {
+		this.color = color;
+	}
+	
+	/**
+	 * Get the velocity of the ball.
+	 * @return the velocity of the ball
+	 */
+	public Point getVelocity() {
+		return this.velocity;
+	}
+	
+	/**
+	 * Set the velocity of the ball.
+	 * @param v the new velocity of the ball
+	 */
+	public void setVelocity(Point v) {
+		this.velocity = v;
+	}
+	
+	/**
+	 * Returns the current strategy of this Ball.
+	 * @return The IUpdateStrategy currently in use.
+	 */
+	public IUpdateStrategy getUpdateStrategy() {
+        return updateStrategy;
+    }
+
+	/**
+	 * Sets the current strategy of this Ball to the given strategy.
+	 * @param updateStrategy The new IUpdateStrategy to use.
+	 */
+    public void setUpdateStrategy(IUpdateStrategy updateStrategy) {
+        this.updateStrategy = updateStrategy;
+    }
+
+    /**
+     * Returns the current paint strategy of this Ball.
+     * @return The IPaintStrategy currently in use.
+     */
+    public IPaintStrategy getPaintStrategy() {
+        return paintStrategy;
+    }
+
+    /**
+     * Sets the current strategy of this Ball to the given strategy.
+     * @param paintStrategy The new IPaintStrategy to use.
+     */
+    public void setPaintStrategy(IPaintStrategy paintStrategy) {
+        this.paintStrategy = paintStrategy;
+        this.paintStrategy.init(this);
+    }
+
+
+    /**
+	 * The update method called by the main ball Dispatcher to notify all the balls to perform the given command.
+	 * The given command is executed.
+	 * @param o The Dispatcher that sent the update request.
+	 * @param cmd The IBallCmd that will be run.
+	 */
+	public void update(Observable o, Object cmd) {
+		((IBallCmd)cmd).apply(this, (Dispatcher)o);
+	}
+	
+	/**
+	 * Move the ball to the new location determined by current velocity.
+	 */
+	public void move() {
+		location.x = location.x + velocity.x;
+		location.y = location.y + velocity.y;
+	}
+	
+	/**
+	 * Bounce the ball when it moves outside the boundary of the canvas.
+	 */
+	public void bounce() {
+	    /** get the bounds of the component in the form of a Rectangle object */
+        Rectangle bounds = canvas.getBounds();
+
+        /**
+         * the ball hits the top of the wall
+         */
+        if (location.y - radius + velocity.y <= 0) {
+            int diff = -(location.y - radius + velocity.y);
+            location.y = diff + radius;
+            velocity.y = -velocity.y;
+        }
+
+        /**
+         * the ball hits the bottom of the wall
+         */
+        if (location.y + radius + velocity.y >= bounds.height) {
+            int diff = location.y + radius + velocity.y - (int) Math.floor(bounds.height);
+            location.y = bounds.height - diff - radius;
+            velocity.y = -velocity.y;
+        }
+
+        /** 
+         * the ball hits the left of the wall 
+         */
+        if (location.x - radius + velocity.x <= 0) {
+            int diff = -(location.x - radius + velocity.x);
+            location.x = diff + radius;
+            velocity.x = -velocity.x;
+        }
+
+        /**
+         * the ball hits the right of the wall
+         */
+        if (location.x + radius + velocity.x >= bounds.width) {
+            int diff = location.x + radius + velocity.x - (int) Math.floor(bounds.width);
+            location.x = bounds.width - diff - radius;
+            velocity.x = -velocity.x;
+        }
+	}
+	
+	/**
+	 * Paint the ball on the canvas.
+	 * @param g the graphics object to paint on.
+	 */
+	public void paint(Graphics g) {
+		paintStrategy.paint(g, this);
+	}
+	
+	/**
+	 * Update the state of the ball. Delegates to the update strategy.
+	 * @param dispatcher The Dispatcher that sent the command that is calling this method.
+	 */
+	public void updateState(Dispatcher dispatcher) {
+        updateStrategy.updateState(this, dispatcher); // update this ball's state using the strategy.
+	}
+}

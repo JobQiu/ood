@@ -1,0 +1,258 @@
+package chatroom.view;
+
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.FileDialog;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+
+/**
+ * The chat room view
+ * @author ls53@rice.edu
+ * @param <TUser> The generic type for user
+ */
+public class ChatroomView<TUser> extends JFrame {
+
+    /**
+     * The view to model adapter
+     */
+    private IChatroomModelAdapter modelAdapter;
+    
+    /**
+     * The generated serial version UID
+     */
+    private static final long serialVersionUID = -5806443649707889704L;
+    
+    /**
+     * The main panel
+     */
+    private JPanel contentPane;
+    
+    /**
+     * The lower panel
+     */
+    private final JPanel panel = new JPanel();
+    
+    /**
+     * The button for sending message
+     */
+    private final JButton btnSend = new JButton("Send");
+    
+    /**
+     * The text area for inputing message
+     */
+    private final JTextArea txtrInput = new JTextArea();
+    
+    /**
+     * The button for sending image
+     */
+    private final JButton btnSendImage = new JButton("Send Image");
+    
+    /**
+     * The split panel
+     */
+    private final JSplitPane splitPane = new JSplitPane();
+    
+    /**
+     * The left scroll panel
+     */
+    private final JScrollPane scrollPaneLeft = new JScrollPane();
+    
+    /**
+     * The right scroll panel
+     */
+    private final JScrollPane scrollPaneRight = new JScrollPane();
+    
+    /**
+     * The text are for showing dialog
+     */
+    private final JTextArea txtrDialog = new JTextArea();
+    
+    /**
+     * The list model
+     */
+    private final DefaultListModel<TUser> listModel = new DefaultListModel<>();
+    
+    /**
+     * The list for showing users
+     */
+    private final JList<TUser> listUsers = new JList<>(listModel);
+
+    /**
+     * Create the frame.
+     */
+    public ChatroomView(IChatroomModelAdapter modelAdapter) {
+        this.modelAdapter = modelAdapter;
+        initGui();
+    }
+    
+    /**
+     * Initialize GuI
+     */
+    private void initGui() {
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setBounds(100, 100, 450, 300);
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        contentPane.setLayout(new BorderLayout(0, 0));
+        setContentPane(contentPane);
+        
+        contentPane.add(panel, BorderLayout.SOUTH);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        txtrInput.setToolTipText("Type message");
+        
+        panel.add(txtrInput);
+        btnSendImage.setToolTipText("Send image");
+        btnSendImage.addActionListener(e -> {
+            FileDialog fileDialog = new FileDialog(new JFrame(), "Select a image", FileDialog.LOAD);
+            fileDialog.setVisible(true);
+            String imagePath = fileDialog.getDirectory() + fileDialog.getFile();
+            
+            try {
+                ImageIcon image = new ImageIcon(ImageIO.read(new FileInputStream(imagePath)));
+                modelAdapter.sendImage(image);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+        btnSend.setToolTipText("Send message");
+        btnSend.addActionListener(e -> {
+            String input = txtrInput.getText();
+            if (!input.isEmpty()) {
+                modelAdapter.sendMessage(input);
+                txtrInput.setText("");
+            }
+        });
+        
+        panel.add(btnSend);
+        
+        panel.add(btnSendImage);
+        
+        contentPane.add(splitPane, BorderLayout.CENTER);
+        scrollPaneLeft.setViewportBorder(new TitledBorder(null, "Dialog:", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        
+        splitPane.setLeftComponent(scrollPaneLeft);
+        txtrDialog.setToolTipText("Show dialog");
+        txtrDialog.setEditable(false);
+        
+        scrollPaneLeft.setViewportView(txtrDialog);
+        
+        splitPane.setRightComponent(scrollPaneRight);
+        listUsers.setToolTipText("User list");
+        listUsers.setBorder(new TitledBorder(null, "Users:", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        
+        scrollPaneRight.setViewportView(listUsers);
+        
+        splitPane.setResizeWeight(0.7);
+        
+        addWindowListener(new WindowAdapter() {
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+                super.windowClosed(e);
+                modelAdapter.quiteChatroom();
+            }
+        });
+    }
+    
+    /**
+     * Start the view
+     */
+    public void start() {
+        setVisible(true);
+    }
+    
+    /**
+     * Append the message
+     * @param str The message to append
+     */
+    public void append(String str) {
+        txtrDialog.append(str);
+        txtrDialog.setCaretPosition(txtrDialog.getText().length());
+    }
+    
+    /**
+     * Add a user
+     * @param user The user to add
+     */
+    public void addUser(TUser user) {
+        listModel.addElement(user);
+    }
+    
+    /**
+     * Remove a user
+     * @param user The user to remove
+     */
+    public void removeUser(TUser user) {
+        listModel.removeElement(user);
+    }
+    
+    /**
+     * Send a waring message
+     * @param message The waring message to send
+     */
+    public void warn(String message) {
+        JOptionPane.showMessageDialog(this, message, "Warning", JOptionPane.WARNING_MESSAGE);
+    }
+    
+    /**
+     * Show an image
+     * @param container The container containing this image
+     * @param image The image to show
+     */
+    public void showImage(Container container, Image image) {
+        JPanel panel = new JPanel() {
+
+            /**
+             * The generated serial version UId
+             */
+            private static final long serialVersionUID = 9079775736504582319L;
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                int width = image.getWidth(null);
+                int height = image.getHeight(null);
+                if (width < container.getWidth() && height > container.getHeight()) {
+                    double scale = (container.getHeight() + 0.0) / height;
+                    height = container.getHeight();
+                    width = (int)(width * scale);
+                } else if (width > container.getWidth() && height < container.getHeight()) {
+                    double scale = (container.getWidth() + 0.0) / width;
+                    width = container.getWidth();
+                    height = (int)(height * scale);
+                } else if (width > container.getWidth() && height > container.getHeight()) {
+                    double wScale = (container.getWidth() + 0.0) / width;
+                    double hScale = (container.getHeight() + 0.0) / height;
+                    double scale = wScale < hScale ? wScale : hScale;
+                    width = (int)(width * scale);
+                    height = (int)(height * scale);
+                }
+                
+                g.drawImage(image, 0, 0, width, height, null);
+            }
+            
+        };
+        
+        container.add(panel);
+    }
+}

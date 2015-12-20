@@ -1,0 +1,61 @@
+package ls53_yh36.server.game.scontroller;
+
+import javax.swing.SwingUtilities;
+
+import ls53_yh36.server.game.smodel.ServerModel;
+import ls53_yh36.server.game.smodel.ServerModelAdpt;
+import ls53_yh36.server.game.sview.ServerView;
+import ls53_yh36.server.game.sview.ServerViewAdpt;
+
+public class ServerController {
+
+	private ServerView<String> sView;
+	
+	private ServerModel sModel;
+	
+	
+	public ServerController() {
+		sView = new ServerView<String>(new ServerViewAdpt() {
+
+			@Override
+			public void shutDown() {
+				sModel.close();
+			}
+			
+		});
+		
+		
+		sModel = new ServerModel(new ServerModelAdpt() {
+
+			@Override
+			public void updateScore(String sco) {
+				sView.addEntry(sco);
+			}
+			
+		});
+	}
+	
+	
+	public static void main(String[] args) {
+		final ServerController[] c = new ServerController[1];
+		
+		
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				c[0] = new ServerController();
+				c[0].start();
+//				new RunGameFac(null, null).makeGame();
+			}
+			
+		});
+		
+//		while (true);
+	}
+	
+	public void start() {
+		sView.start();
+		sModel.start();
+	}
+}

@@ -1,8 +1,0 @@
-package view;
-
-public interface IModelCtrlAdapter {
-    
-    public void loadBall(String className);
-    
-    public void clearBalls();
-}

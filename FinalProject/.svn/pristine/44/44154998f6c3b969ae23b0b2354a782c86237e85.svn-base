@@ -1,0 +1,37 @@
+package ls53_yh36.server.game.smodel.command;
+
+import java.util.UUID;
+
+import common.IChatUser;
+import common.ICmd2ModelAdapter;
+import ls53_yh36.server.game.gmodel.Cmd2RunGameAdpt;
+import ls53_yh36.server.game.smodel.message.StartGame;
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.datapacket.DataPacket;
+import provided.mixedData.MixedDataKey;
+
+public class StartGameCmd extends ADataPacketAlgoCmd<String, StartGame, IChatUser> {
+
+	private static final long serialVersionUID = -2177811586536199119L;
+
+	transient private ICmd2ModelAdapter adpt;
+	
+	private UUID id;
+	
+	public StartGameCmd(UUID id) {
+		this.id = id;
+	}
+	
+	@Override
+	public String apply(Class<?> index, DataPacket<StartGame> host, IChatUser... params) {
+		adpt.setMixedDataDictEntry(new MixedDataKey<Cmd2RunGameAdpt>(id, "Cmd2RunGameAdpt", Cmd2RunGameAdpt.class), host.getData().getGameFac().makeGame());
+		return "Game has been launched.\n";
+	}
+
+	@Override
+	public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {
+		adpt = cmd2ModelAdpt;
+	}
+
+
+}

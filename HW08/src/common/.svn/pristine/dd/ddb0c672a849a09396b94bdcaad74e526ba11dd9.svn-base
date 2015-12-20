@@ -1,0 +1,24 @@
+package common.messages;
+
+import java.io.Serializable;
+
+import common.IChatroom;
+
+public class InviteToChatroom implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9149863039861372087L;
+	
+	public InviteToChatroom(IChatroom chatroom)
+	{
+		this.chatroom = chatroom;
+	}
+	
+	/**
+	 * Chatroom you want to invite the recipient to
+	 */
+	public IChatroom chatroom;
+
+}

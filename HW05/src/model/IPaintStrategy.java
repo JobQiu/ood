@@ -1,0 +1,39 @@
+/**
+ * 
+ */
+package model;
+
+import java.awt.Graphics;
+
+/**
+ * @author caojian
+ * Top-level interface that represents a strategy used by a Ball 
+ * when asked to perform variant paint operations. A Ball has only one IPaintStrategy
+ */
+public interface IPaintStrategy {
+
+    /**
+     * Initializes the given ball.
+     * @param host The ball
+     */
+	public void init(Ball host);
+	
+	/**
+	 * Paints the host onto the given Graphics context.
+	 * @param g The Graphics object
+	 * @param host The ball
+	 */
+	public void paint(Graphics g, Ball host);
+	
+	/**
+     * The singleton null object instance for this interface, which does nothing.
+     */
+    public static final IPaintStrategy NULL_OBJECT = new IPaintStrategy() {
+        
+        @Override
+        public void paint(Graphics g, Ball host) {}
+        
+        @Override
+        public void init(Ball host) {}
+    };
+}

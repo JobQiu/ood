@@ -1,0 +1,54 @@
+package ls53_yh36.client.chat.model;
+
+import java.awt.Component;
+
+import ls53_yh36.user.ChatUser;
+
+/**
+ * The chat model to view adapter
+ * @author ls53@rice.edu
+ */
+public interface IChatViewAdapter {
+    
+    /**
+     * Start the chat room view
+     */
+    public void start();
+    
+    /**
+     * Append a message to the view
+     * @param user The user who send this message
+     * @param message The message
+     */
+    public void append(ChatUser user, String message);
+    
+    /**
+     * Add a user
+     * @param user The user to add
+     */
+    public void addUser(ChatUser user);
+    
+    /**
+     * Remove a user
+     * @param user The user to remove
+     */
+    public void removeUser(ChatUser user);
+    
+    /**
+     * Send a warning message
+     * @param message The warning message
+     */
+    public void warn(String message);
+    
+    /**
+     * Set chat view's title
+     * @param title The title to set
+     */
+    public void setTitle(String title);
+    
+    /**
+     * Add to pane
+     * @param component The component to add
+     */
+    public void addToPane(Component component);
+}

@@ -1,0 +1,17 @@
+package model.strategy;
+
+import java.awt.Point;
+
+import model.Ball;
+import util.Randomizer;
+
+public class WanderStrategy implements IUpdateStrategy {
+
+    @Override
+    public void updateState(Ball _ball) {
+        /** current velocity */
+        Point velocity = _ball.getVelocity();
+        velocity.x += Randomizer.Singleton.randomInt(-5, 5);
+        velocity.y += Randomizer.Singleton.randomInt(-5, 5);
+    }
+}

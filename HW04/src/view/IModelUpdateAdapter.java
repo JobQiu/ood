@@ -1,0 +1,15 @@
+package view;
+
+import java.awt.Graphics;
+
+/**
+ * An interface that defines an adapter that the view uses to update the model.
+ *
+ */
+public interface IModelUpdateAdapter {
+	/**
+	 * Update the model.
+	 * @param g the graphics object used to paint all balls.
+	 */
+	void update(Graphics g);
+}

@@ -1,0 +1,7 @@
+package ls53_yh36.server.game.smodel;
+
+import java.rmi.Remote;
+
+public interface RmtAdpt extends Remote {
+
+}

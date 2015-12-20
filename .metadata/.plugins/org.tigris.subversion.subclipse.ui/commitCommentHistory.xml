@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CommitComments>	<CommitComment>added javadoc</CommitComment>
-	<CommitComment>completed uml</CommitComment>
-	<CommitComment>added three classes in uml</CommitComment>
-	<CommitComment>added comment</CommitComment>
-	<CommitComment>added three balls</CommitComment>
-	<CommitComment>added uml file</CommitComment>
-	<CommitComment>added lambda expression</CommitComment>
-	<CommitComment>added the provided code</CommitComment>
-	<CommitComment>completed mvc</CommitComment>
-	<CommitComment>built basic framework of MVC</CommitComment>
+	<CommitComment>deleted javadoc</CommitComment>
+	<CommitComment>added javadoc and uml diagram</CommitComment>
+	<CommitComment>added user manual</CommitComment>
+	<CommitComment>added some comment</CommitComment>
+	<CommitComment>fixed bugs of could not send AddMe</CommitComment>
+	<CommitComment>fixed some bugs</CommitComment>
+	<CommitComment>another new version that is removed some lib</CommitComment>
+	<CommitComment>a new version</CommitComment>
+	<CommitComment>deleted unnecessary files</CommitComment>
 </CommitComments>

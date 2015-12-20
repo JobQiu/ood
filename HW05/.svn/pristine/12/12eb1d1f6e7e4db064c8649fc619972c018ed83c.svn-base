@@ -1,0 +1,34 @@
+package model.paint.shape;
+
+import java.awt.Point;
+import java.awt.geom.AffineTransform;
+
+/**
+ * Concrete PolygonFactory that creates fish-shaped Polygons
+ * @author caojian
+ *
+ */
+public class Fish1PolygonFactory extends PolygonFactory{
+    
+    /**
+     * The affine transform object
+     */
+	private static AffineTransform at = new AffineTransform();
+	
+	/**
+	 * The scale factor
+	 */
+	private static double scaleFactor = 0.04;
+	
+	/**
+	 * Constructor that calls the PolygonFactory superclass constructor with the scale factor 
+	 * and polygon points that define the fish shape.
+	 */
+	public Fish1PolygonFactory() {
+		super(at, scaleFactor, new Point(0,5), new Point(30,15), new Point(40,10), new Point(50,7),
+				new Point(60,0), new Point(70,7), new Point(90,12), new Point(100,15), new Point(115,22),
+				new Point(100,35), new Point(90,40), new Point(70,43), new Point(60,50), new Point(50,43),
+				new Point(40,40), new Point(30,35), new Point(0,45), new Point(15,25));		
+		
+	}
+}

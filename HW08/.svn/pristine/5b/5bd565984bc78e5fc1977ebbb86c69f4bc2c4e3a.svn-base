@@ -1,0 +1,247 @@
+package chatroom.model;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.rmi.RemoteException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.swing.ImageIcon;
+
+import chatapp.model.User;
+import common.IChatroom;
+import common.ICmd2ModelAdapter;
+import common.IConnect;
+import common.IUser;
+import common.messages.AddMe;
+import common.messages.InviteToChatroom;
+import common.messages.RequestForAlgo;
+import provided.datapacket.ADataPacket;
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.datapacket.DataPacket;
+import provided.datapacket.DataPacketAlgo;
+
+public class ChatroomModel implements IChatroom {
+    
+    /**
+     * The generated serial version UID
+     */
+    private static final long serialVersionUID = 959411122322091727L;
+    
+    /**
+     * The chat room UUID
+     */
+    private UUID id;
+    
+    /**
+     * The chat room name
+     */
+    private String name;
+    
+    private IUser meHolder;
+    
+    private HashSet<IUser> users = new HashSet<>();
+    
+    private transient IChatroomViewAdapter viewAdapter;
+    
+    private DataPacketAlgo<String, IUser> dataPacketAlgo = new DataPacketAlgo<>(null);
+    
+    public ChatroomModel(UUID id, String name, String username, Set<ChatroomModel> chatrooms) {
+        this.id = id;
+        this.name = name;
+        InetAddress ip = null;
+        try {
+            ip = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        
+        dataPacketAlgo.setDefaultCmd(new ADataPacketAlgoCmd<String, Object, IUser>() {
+
+            /**
+             * The generated serial version UID
+             */
+            private static final long serialVersionUID = -6066750783627231641L;
+
+            @Override
+            public String apply(Class<?> index, DataPacket<Object> host, IUser... params) {
+                viewAdapter.append(params[0], host.getData().toString());
+                return null;
+            }
+
+            @Override
+            public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {}
+        });
+        
+        dataPacketAlgo.setCmd(InviteToChatroom.class, new ADataPacketAlgoCmd<String, Object, IUser>() {
+
+            /**
+             * The generated serial version UID
+             */
+            private static final long serialVersionUID = 6120064986717684675L;
+
+            @Override
+            public String apply(Class<?> index, DataPacket<Object> host, IUser... params) {
+                if (params[0].equals(meHolder)) {
+                    return null;
+                }
+                
+                viewAdapter.append(params[0], "Send an InviteToChatroom DataPacket");
+                viewAdapter.warn("Please send the InviteToChatroom DataPacket via the main IConnect!");
+                return null;
+            }
+
+            @Override
+            public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {}
+        });
+        
+        dataPacketAlgo.setCmd(AddMe.class, new ADataPacketAlgoCmd<String, Object, IUser>() {
+            
+            /**
+             * The generated serial version UID
+             */
+            private static final long serialVersionUID = 6120064986717684675L;
+
+            @Override
+            public String apply(Class<?> index, DataPacket<Object> host, IUser... params) {
+                AddMe packetContent = (AddMe)(host.getData());
+                users.add(packetContent.me);
+                viewAdapter.addUser(packetContent.me);
+                return null;
+            }
+
+            @Override
+            public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {}
+        });
+        
+        meHolder = new User(new IConnect() {
+            
+            @Override
+            public void sendReceive(IUser me, ADataPacket data) throws RemoteException {
+                data.execute(dataPacketAlgo, me);
+            }
+            
+            @Override
+            public IUser getUser(IConnect stub) throws RemoteException {
+                return meHolder;
+            }
+            
+            @Override
+            public ADataPacketAlgoCmd<String, ?, IUser> getNewCommand(RequestForAlgo request) throws RemoteException {
+                return null;
+            }
+            
+            @Override
+            public HashSet<IChatroom> getChatrooms() throws RemoteException {
+                HashSet<IChatroom> result = new HashSet<>();
+                for (IChatroom chatroom : chatrooms) {
+                    result.add(chatroom);
+                }
+                
+                return result;
+            }
+        }, username, ip);
+        
+        users.add(meHolder);
+    }
+    
+    public void start() {
+        viewAdapter.setTitle(name);
+        viewAdapter.addUser(meHolder);
+        viewAdapter.start();
+    }
+    
+    public void sendMessage(String message) {
+        send(new DataPacket<String>(String.class, message));
+    }
+    
+    public void sendImage(ImageIcon image) {
+        
+    }
+
+    public void setViewAdapter(IChatroomViewAdapter viewAdapter) {
+        this.viewAdapter = viewAdapter;
+    }
+    
+    public void send(ADataPacket message) {
+        send(meHolder, message);
+    }
+    
+    public IUser getMe() {
+        return meHolder;
+    }
+
+    @Override
+    public UUID id() {
+        return id;
+    }
+
+    @Override
+    public HashSet<IUser> getUsers() {
+        return users;
+    }
+
+    @Override
+    public boolean addUser(IUser user) {
+        users.add(user);
+        return true;
+    }
+
+    @Override
+    public boolean removeUser(IUser user) {
+        users.remove(user);
+        return true;
+    }
+
+    @Override
+    public void send(IUser me, ADataPacket message) {
+        users.iterator().forEachRemaining(
+                (user) ->{ 
+                    try{
+                        user.getConnect().sendReceive(me, message);
+                    }
+                    catch(RemoteException e)
+                    {
+                        e.printStackTrace();
+                    }
+                });
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = hash * 23 + id.hashCode();
+        hash = hash * 11 + name.hashCode();
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        
+        if (obj instanceof IChatroom) {
+            IChatroom chatroom = (IChatroom)obj;
+            return id == chatroom.id();
+        }
+        
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+}

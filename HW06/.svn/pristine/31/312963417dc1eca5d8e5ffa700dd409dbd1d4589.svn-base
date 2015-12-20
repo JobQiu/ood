@@ -1,0 +1,30 @@
+package model;
+
+import java.awt.Component;
+
+public interface IView2ModelAdapter {
+	/**
+	 * Gets canvas of the view
+	 * @return the canvas of the view
+	 */
+	public Component getCanvas();
+
+	/**
+	 * Pass the update request to the view
+	 */
+	public void update();  //need both getCanvas() and update()?
+
+
+	/**
+	 * No-op singleton implementation of IViewControlAdapter.
+	 */
+	public static final IView2ModelAdapter NULL_OBJECT = new IView2ModelAdapter() {
+		public Component getCanvas() {
+			return null;
+		};
+
+		public void update() {
+		};
+
+	};
+}

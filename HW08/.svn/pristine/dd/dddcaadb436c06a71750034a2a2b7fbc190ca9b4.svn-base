@@ -1,0 +1,170 @@
+package chatroom.view;
+
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.FileDialog;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.border.EmptyBorder;
+
+public class ChatroomView<TUser> extends JFrame {
+
+    private IChatroomModelAdapter modelAdapter;
+    
+    /**
+     * The generated serial version UID
+     */
+    private static final long serialVersionUID = -5806443649707889704L;
+    
+    private JPanel contentPane;
+    private final JPanel panel = new JPanel();
+    private final JButton btnSend = new JButton("Send");
+    private final JTextArea txtrInput = new JTextArea();
+    private final JButton btnSendImage = new JButton("Send Image");
+    private final JSplitPane splitPane = new JSplitPane();
+    private final JScrollPane scrollPaneLeft = new JScrollPane();
+    private final JScrollPane scrollPaneRight = new JScrollPane();
+    private final JTextArea txtrDialog = new JTextArea();
+    private final DefaultListModel<TUser> listModel = new DefaultListModel<>();
+    private final JList<TUser> listUsers = new JList<>(listModel);
+
+    /**
+     * Create the frame.
+     */
+    public ChatroomView(IChatroomModelAdapter modelAdapter) {
+        this.modelAdapter = modelAdapter;
+        initGui();
+    }
+    
+    private void initGui() {
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setBounds(100, 100, 450, 300);
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        contentPane.setLayout(new BorderLayout(0, 0));
+        setContentPane(contentPane);
+        
+        contentPane.add(panel, BorderLayout.SOUTH);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        
+        panel.add(txtrInput);
+        btnSendImage.addActionListener(e -> {
+            FileDialog fileDialog = new FileDialog(new JFrame(), "Select a image", FileDialog.LOAD);
+            fileDialog.setVisible(true);
+            String imagePath = fileDialog.getDirectory() + fileDialog.getFile();
+            
+            try {
+                Image image = ImageIO.read(new FileInputStream(imagePath));
+                modelAdapter.sendImage(image);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+        btnSend.addActionListener(e -> {
+            String input = txtrInput.getText();
+            if (!input.isEmpty()) {
+                modelAdapter.sendMessage(input);
+                txtrInput.setText("");
+            }
+        });
+        
+        panel.add(btnSend);
+        
+        panel.add(btnSendImage);
+        
+        contentPane.add(splitPane, BorderLayout.CENTER);
+        
+        splitPane.setLeftComponent(scrollPaneLeft);
+        
+        scrollPaneLeft.setViewportView(txtrDialog);
+        
+        splitPane.setRightComponent(scrollPaneRight);
+        
+        scrollPaneRight.setViewportView(listUsers);
+        
+        splitPane.setResizeWeight(0.7);
+        
+        addWindowListener(new WindowAdapter() {
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+                super.windowClosed(e);
+                modelAdapter.quiteChatroom();
+            }
+        });
+    }
+    
+    public void start() {
+        setVisible(true);
+    }
+    
+    public void append(String str) {
+        txtrDialog.append(str);
+        txtrDialog.setCaretPosition(txtrDialog.getText().length());
+    }
+    
+    public void addUser(TUser user) {
+        listModel.addElement(user);
+    }
+    
+    public void removeUser(TUser user) {
+        listModel.removeElement(user);
+    }
+    
+    public void warn(String message) {
+        JOptionPane.showMessageDialog(this, message, "Warning", JOptionPane.WARNING_MESSAGE);
+    }
+    
+    public void showImage(Container container, Image image) {
+        JPanel panel = new JPanel() {
+
+            /**
+             * The generated serial version UId
+             */
+            private static final long serialVersionUID = 9079775736504582319L;
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                int width = image.getWidth(null);
+                int height = image.getHeight(null);
+                if (width < container.getWidth() && height > container.getHeight()) {
+                    double scale = (container.getHeight() + 0.0) / height;
+                    height = container.getHeight();
+                    width = (int)(width * scale);
+                } else if (width > container.getWidth() && height < container.getHeight()) {
+                    double scale = (container.getWidth() + 0.0) / width;
+                    width = container.getWidth();
+                    height = (int)(height * scale);
+                } else if (width > container.getWidth() && height > container.getHeight()) {
+                    double wScale = (container.getWidth() + 0.0) / width;
+                    double hScale = (container.getHeight() + 0.0) / height;
+                    double scale = wScale < hScale ? wScale : hScale;
+                    width = (int)(width * scale);
+                    height = (int)(height * scale);
+                }
+                
+                g.drawImage(image, 0, 0, width, height, null);
+            }
+            
+        };
+        
+        container.add(panel);
+    }
+}

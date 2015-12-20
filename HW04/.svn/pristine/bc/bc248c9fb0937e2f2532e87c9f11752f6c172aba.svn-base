@@ -1,0 +1,21 @@
+package model.paint.strategy;
+
+import java.security.PublicKey;
+
+import model.paint.UprightImagePaintStratergy;
+
+public class lambPaintStrategy extends UprightImagePaintStratergy {
+
+	
+	public lambPaintStrategy()
+	{
+		this("Images/lamb.gif", 0.33);
+	}
+	public lambPaintStrategy(String filename, double fillFactor) {
+		super("Images/lamb.gif", 0.33);
+	
+	}
+	
+	
+
+}

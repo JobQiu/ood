@@ -1,0 +1,85 @@
+package model;
+
+import java.util.Arrays;
+
+import javax.swing.Timer;
+
+import provided.abcParser.ABCParser;
+import provided.music.IPhrase;
+import provided.music.NESeqList;
+import provided.music.Note;
+import provided.player.ISequencePlayerStatus;
+import provided.player.SequencePlayer;
+import provided.player.SequencePlayer2;
+import provided.player.SequencePlayer2.IPlayable;
+import provided.util.ABCUtil;
+import visitor.PlayMusicAlgo;
+import visitor.ToStringAlgo;
+
+/**
+ * Construct a player model which contains business logic
+ * 
+ * @author Li Shen, Ning Zhu
+ *
+ */
+public class PlayerModel {
+	/**
+	 * Adapter for controlling the view (print to the view)
+	 */
+	private IView2ModelAdapter view2ModelAdapter = IView2ModelAdapter.NULL_OBJECT;
+
+	private SequencePlayer sp = new SequencePlayer(16, 0); // 16 = ticks per QUARTER note, dynamic, set
+	private Note g = new Note('G', 0, 0, 1.0, false);// ??dynamic, set
+	private ABCParser parser; // = new ABCParser("/songs/twinkle.abc"); dynamic,
+								// set
+	private IPhrase phrase; // = parser.parse();
+	private SequencePlayer2 player;// dynamic, set
+	private IPlayable music = player.makePlayable(ISequencePlayerStatus.NULL); //dynamic, set
+	
+	/*
+	 * not necessary??? sp.setTicksPerDefaultNote(16); // 16 = ticks per DEFAULT note
+	 * sp.setTempo(140); // 140 quarter notes (beats) per minute sp.addNote(g,
+	 * 10); // 10 = start tick of note. Tick of next note is returned.
+	 * sp.play(ISequencePlayerStatus.NULL); // No-op end-of-song cmd supplied.
+	 * System
+	 * .out.println(ABCUtil.Singleton.getFileContents("/songs/scale.abc"));
+	 * NESeqList.setToStringAlgo(new ToStringAlgo());
+	 * System.out.println(phrase);
+	 * System.out.println(Arrays.toString(ABCUtil.Singleton.getInstruments()));
+	 * phrase.execute(new PlayMusicAlgo(), player, 0);
+	 * 
+	 * 
+	 * music.start();
+	 */
+	// music.stop();
+
+	/**
+	 * Constructor for BallModel class
+	 * 
+	 * @param viewCtrlAdpt
+	 *            model to view adapter communication instance
+	 * @param viewUpdateAdpt
+	 *            model to view adapter updater instance
+	 */
+	public PlayerModel(IView2ModelAdapter _view2ModelAdapter, String fileName) {
+		this.view2ModelAdapter = _view2ModelAdapter;
+		this.parser = new ABCParser(fileName);
+		this.sp.setTempo(140);
+	}
+
+	/**
+	 * Start the timer
+	 * the model can be fully constructed before it starts doing anything. 
+	 * the controller will call this method once everything is fully constructed.
+	 */
+	public void start() {
+		music.start();
+	}
+
+	/**
+	 * This is the method that is called by IView2ModelAdapter.paint().
+	 * This method will update the sprites's painted locations by 
+	 * painting all the sprites onto the given Graphics object.
+	 * @param g The Graphics object from the view's paintComponent() call.
+	 */
+}

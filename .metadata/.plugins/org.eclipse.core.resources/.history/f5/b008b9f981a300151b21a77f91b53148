@@ -1,0 +1,54 @@
+package ls53_yh36.server.game.scontroller;
+
+import java.io.Serializable;
+import java.util.UUID;
+
+import common.IChatUser;
+import ls53_yh36.server.game.gcontroller.RunController;
+import ls53_yh36.server.game.gmodel.Cmd2RunGameAdpt;
+
+/**
+ * The run game factory
+ * @author ls53@rice.edu
+ */
+public class RunGameFac implements Serializable {
+
+	private static final long serialVersionUID = 2679156251583164401L;
+	
+	/**
+	 * Stub connected to server
+	 */
+	private IChatUser sStub;
+	
+	/**
+	 * Team's UUID
+	 */
+	private UUID id;
+	
+	/**
+	 * Player's IChatUser stub
+	 */
+	private IChatUser pStub;
+	
+	/**
+	 * Constructor
+	 * @param sStub Server's IChatUser stub
+	 * @param id Game's UUID
+	 * @param pStub Player's IChatUser stub
+	 */
+	public RunGameFac(IChatUser sStub, UUID id, IChatUser pStub) {
+		this.sStub = sStub;
+		this.id = id;
+		this.pStub = pStub;
+	}
+	
+	/**
+	 * Adapter to the game model
+	 * @return Return an adapter to the current running game
+	 */
+	public Cmd2RunGameAdpt makeGame() {
+		RunController ctrl = new RunController();
+		ctrl.start(sStub, id, pStub);
+		return ctrl.getCGAdpt();
+	}
+}

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy 5 packages to &apos;FinalProject/src/temp&apos;&#x0A;- Original project: &apos;HW08&apos;&#x0A;- Destination element: &apos;FinalProject/src/temp&apos;&#x0A;- Original elements:&#x0A;     HW08/src/chatapp.controller&#x0A;     HW08/src/chatroom.view&#x0A;     HW08/src/chatapp.view&#x0A;     HW08/src/chatroom.model&#x0A;     HW08/src/chatapp.model" description="Copy packages" destination="=FinalProject/src&lt;temp" element1="/src&lt;chatapp.controller" element2="/src&lt;chatroom.view" element3="/src&lt;chatapp.view" element4="/src&lt;chatroom.model" element5="/src&lt;chatapp.model" flags="589830" fragments="5" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyPackages" stamp="1448411941694" version="1.0"/>
+</session>

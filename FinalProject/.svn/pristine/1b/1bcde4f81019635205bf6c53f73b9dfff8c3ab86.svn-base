@@ -1,0 +1,34 @@
+package ls53_yh36.server.game.scontroller;
+
+import java.io.Serializable;
+import java.util.UUID;
+
+import common.IChatUser;
+import ls53_yh36.server.game.gcontroller.RunController;
+
+public class RunGameFac implements Serializable {
+
+	private static final long serialVersionUID = 2679156251583164401L;
+	
+	/**
+	 * Stub connected to server
+	 */
+	private IChatUser sStub;
+	
+	/**
+	 * Team's UUID
+	 */
+	private UUID id;
+	
+	private IChatUser pStub;
+	
+	public RunGameFac(IChatUser sStub, UUID id, IChatUser pStub) {
+		this.sStub = sStub;
+		this.id = id;
+		this.pStub = pStub;
+	}
+	
+	public void makeGame() {
+		new RunController().start(sStub, id, pStub);
+	}
+}

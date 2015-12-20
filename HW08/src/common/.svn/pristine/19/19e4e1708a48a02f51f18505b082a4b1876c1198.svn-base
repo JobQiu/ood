@@ -1,0 +1,27 @@
+package common;
+
+/**
+ * This interface defines the properties assocaited with the user.
+ *
+ * @author xc7, bb26
+ */
+import java.net.InetAddress;
+
+public interface IUser {
+	/* private transient IConnect connection */
+
+	/* set AConnect associated with this user */
+	public void setConnect(IConnect stub);
+	  
+	/* get IConnect associated with this user */
+	public IConnect getConnect();
+	
+	/* get user name */
+	public String getName();
+
+	/* get IP address from this user */
+	public InetAddress getIP();
+
+	/* set IP address for this user */
+	public void setIP(InetAddress address);
+}

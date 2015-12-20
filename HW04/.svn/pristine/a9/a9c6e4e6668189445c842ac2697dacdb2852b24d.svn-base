@@ -1,0 +1,12 @@
+package strategy;
+
+/**
+ * Defines an interface that create concrete instances of IUpdateStrategy.
+ */
+public interface IStrategyFac {
+	/**
+	 * Create an concrete IUpdateStrategy instance.
+	 * @return an instance of a concrete IUpdateStrategy
+	 */
+	IUpdateStrategy make();
+}

@@ -1,0 +1,25 @@
+package ls53_yh36.client.app.view;
+
+/**
+ * The App view to model adapter
+ * @author ls53@rice.edu
+ */
+public interface IAppModelAdapter {
+    
+    /**
+     * Set the username
+     * @param username The username
+     */
+    public void setUsername(String username);
+    
+    /**
+     * Connect IP
+     * @param ip The IP address
+     */
+    public void connect(String ip);
+    
+    /**
+     * Start the game
+     */
+    public void startGame();
+}

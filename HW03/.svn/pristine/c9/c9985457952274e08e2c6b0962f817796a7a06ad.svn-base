@@ -1,0 +1,34 @@
+package strategies;
+
+import java.awt.Point;
+
+import model.Ball;
+
+/**
+ * @author JacobChen
+ *
+ */
+public class CurveStrategy implements IUpdateStrategy {
+
+	/** the clockwise angle of rotation per timer tick */
+	double theta = Math.PI * 0.05;
+
+	/* (non-Javadoc)
+	 * @see strategies.IUpdateStrategy#updateState(model.Ball)
+	 * this updateState strategy is used to turn the ball all the time
+	 * @param the ball to update state
+	 */
+	public void updateState(Ball _ball) {
+
+		/** current velocity */
+		Point velocity = _ball.getVelocity();
+
+		/**
+		 * turn a ball
+		 */
+		double vx = velocity.x;
+		double vy = velocity.y;
+		velocity.x = (int) Math.round(vx * Math.cos(theta) - vy * Math.sin(theta));
+		velocity.y = (int) Math.round(vy * Math.cos(theta) + vx * Math.sin(theta));
+	}
+}

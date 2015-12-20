@@ -1,0 +1,20 @@
+package view;
+
+import java.awt.Graphics;
+
+public interface IModelUpdateAdapter<TDropListItem> {
+	
+	/**
+	 * Pass the update request to the model
+	 * @param g The Graphics object the balls use to draw themselves.
+	 */
+	public void update(Graphics g);
+	
+	/**
+	 * No-op singleton implementation of IModelUpdateAdapter.
+	 */
+	@SuppressWarnings("rawtypes")
+	public static final IModelUpdateAdapter NULL_OBJECT = new IModelUpdateAdapter() {
+		public void update(Graphics g){}
+	};
+}

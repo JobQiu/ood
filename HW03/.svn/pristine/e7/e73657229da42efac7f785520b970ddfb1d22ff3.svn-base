@@ -1,0 +1,250 @@
+package view;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+
+/**
+ * The frame view of the program.
+ * @author JacobChen, Li Shen
+ *
+ */
+public class View<TDropListItem> extends JFrame {
+
+	private static final long serialVersionUID = 4688870386598408654L;
+
+	/**
+	 * Adapter back to the model for control tasks.
+	 */
+	private IModelControlAdapter<TDropListItem> modelControlAdpt;
+
+	/**
+	 * Adapter back to the model for updating event
+	 */
+	@SuppressWarnings("rawtypes")
+	private IModelUpdateAdapter modelUpdateAdpt = IModelUpdateAdapter.NULL_OBJECT;
+
+	/**
+	 * content panel
+	 */
+	private JPanel contentPane;
+
+	/**
+	 * Create a special panel with an overridden paintComponent method.
+	 */
+	private final JPanel panel_center = new JPanel() {
+
+		private static final long serialVersionUID = -708326350965762632L;
+
+		public void paintComponent(Graphics g) {
+			/** Do everything normally done first, e.g. clear the screen.*/
+			super.paintComponent(g);
+			/** call back to the model to paint the sprites */
+			modelUpdateAdpt.update(g);
+		}
+	};
+
+	/** the panel which draw required GUI components on */
+	private final JPanel GUIpanel = new JPanel();
+
+	/**
+	 * textfield and button on the east Jsplitpane
+	 */
+	private final JSplitPane splitPaneEast = new JSplitPane();
+	private final JTextField textField = new JTextField();
+	private final JButton btnAddToList = new JButton("Add to lists");
+
+	/**
+	 * buttons and droplists on the middle Jsplitpane
+	 */
+	private final JSplitPane splitPaneMiddle = new JSplitPane();
+	private final JSplitPane splitPaneMidUp = new JSplitPane();
+	private final JButton btnMakeSelBall = new JButton("Make Selected Ball");
+	private final JComboBox<TDropListItem> comboBoxUp = new JComboBox<TDropListItem>();
+	private final JSplitPane splitPaneMidDown = new JSplitPane();
+	private final JComboBox<TDropListItem> comboBoxDown = new JComboBox<TDropListItem>();
+	private final JButton btnCombine = new JButton("Combine!");
+
+	/**
+	 * buttons on the west Jsplitpane
+	 */
+	private final JSplitPane splitPaneWest = new JSplitPane();
+	private final JButton btnMakeSwitcher = new JButton("Make Switchers");
+	private final JButton btnSwitch = new JButton("Switch!");
+
+	/** 'ClearAll' button on the rightmost */
+	private final JButton btnClear = new JButton("ClearAll");
+
+	public View(IModelControlAdapter<TDropListItem> modelCtrlAdpt,
+			@SuppressWarnings("rawtypes") IModelUpdateAdapter modelUpdateAdpt) {
+		this.modelControlAdpt = modelCtrlAdpt;
+		this.modelUpdateAdpt = modelUpdateAdpt;
+		initGUI();
+	}
+
+	/**
+	 * Start the frame
+	 */
+	public void start() {
+		setVisible(true);
+	}
+
+	/**
+	 * WindowBuider InitGUI method 
+	 */
+	private void initGUI() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(200, 200, 900, 700);
+
+		/** the content panel */
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new BorderLayout(0, 0));
+		setContentPane(contentPane);
+
+		/** the panel at the center */
+		contentPane.add(panel_center, BorderLayout.CENTER);
+		panel_center.setBackground(new Color(240, 255, 255));
+
+		/** the panel which draw GUI components on */
+		contentPane.add(GUIpanel, BorderLayout.NORTH);
+		GUIpanel.setBackground(new Color(102, 205, 170));
+
+		/**
+		 * JsplitPane east
+		 */
+		GUIpanel.add(splitPaneEast);
+		splitPaneEast.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		splitPaneEast.setLeftComponent(textField); // textfield
+		textField.setColumns(10);
+		textField.setToolTipText("Type the name of strategy");
+		splitPaneEast.setRightComponent(btnAddToList); // 'Add to lists' button
+		btnAddToList
+				.setToolTipText("add strategy to both droplists, the rest of the classname is added automatically ");
+		/**
+		 * Add the strategy typed in the textfield to both droplists
+		 * by clicking the 'Add to lists' button.
+		 */
+		btnAddToList.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				TDropListItem o = modelControlAdpt.addStrategy(textField.getText());
+				if (null == o)
+					return; // just in case
+
+				comboBoxUp.insertItemAt(o, 0);
+				comboBoxDown.insertItemAt(o, 0);
+			}
+		});
+
+		/**
+		 * JsplitPane middle
+		 */
+		GUIpanel.add(splitPaneMiddle);
+		splitPaneMiddle.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		splitPaneMiddle.setLeftComponent(splitPaneMidUp);
+		splitPaneMidUp.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		splitPaneMidUp.setLeftComponent(btnMakeSelBall); // 'Make selected balls' button
+		btnMakeSelBall.setToolTipText("instantiate the ball with the strategy selected in the upper droplist");
+		/**
+		 * Make the ball of the selected strategy in the upper droplist
+		 * by clicking the 'make selected ball' button.
+		 */
+		btnMakeSelBall.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				TDropListItem ballItem = comboBoxUp.getItemAt(comboBoxUp.getSelectedIndex());
+				if (null == ballItem)
+					return; // just in case
+
+				modelControlAdpt.makeBall(ballItem);
+			}
+		});
+		splitPaneMidUp.setRightComponent(comboBoxUp); // upper droplist
+		comboBoxUp.setBackground(Color.WHITE);
+		splitPaneMiddle.setRightComponent(splitPaneMidDown);
+		splitPaneMidDown.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		splitPaneMidDown.setLeftComponent(comboBoxDown); // bottom droplist
+		comboBoxDown.setBackground(Color.WHITE);
+		splitPaneMidDown.setRightComponent(btnCombine); // 'Combine' button
+		btnCombine.setToolTipText(
+				"combine the strategy in both droplist to a single strategy that will appear in the upper droplist");
+
+		/**
+		 * Combine strategies in both droplist to a new strategy which will be 
+		 * added to the upper droplist by clicking the 'combine' button.
+		 */
+		btnCombine.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TDropListItem ballItem1 = comboBoxUp.getItemAt(comboBoxUp.getSelectedIndex());
+				TDropListItem ballItem2 = comboBoxDown.getItemAt(comboBoxDown.getSelectedIndex());
+				if (ballItem1 == null || ballItem2 == null)
+					return; // just in case
+
+				TDropListItem o = modelControlAdpt.combineStrategies(ballItem1, ballItem2);
+				comboBoxUp.insertItemAt(o, 0);
+				comboBoxDown.insertItemAt(o, 0);
+			}
+		});
+
+		/**
+		 * jsplitpane west
+		 */
+		GUIpanel.add(splitPaneWest);
+		splitPaneWest.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		btnMakeSwitcher.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				modelControlAdpt.makeSwitcherBall();
+			}
+		});
+		splitPaneWest.setLeftComponent(btnMakeSwitcher); // 'Make switcher' button
+		btnMakeSwitcher.setToolTipText("instantiate a ball that can switch strategies");
+		btnSwitch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				modelControlAdpt.switchStrategy(comboBoxUp.getItemAt(comboBoxUp.getSelectedIndex()));
+			}
+		});
+		splitPaneWest.setRightComponent(btnSwitch); // 'switch' button
+		btnSwitch.setToolTipText(
+				"switch the strategy of all switchers balls to the one currently selected in the upper droplist");
+
+		/** 'ClearAll' button */
+		GUIpanel.add(btnClear); // 'ClearAll' button
+		btnClear.setToolTipText("clear all the balls from the screen");
+		/**
+		 * Clear all balls from the screen by clicking the 'clearAll' button
+		 */
+		btnClear.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				modelControlAdpt.clearBalls();
+			}
+		});
+	}
+
+	/**
+	 * Gets the canvas to paint on
+	 * @return the panel_center
+	 */
+	public Component getCanvas() {
+		return panel_center;
+	}
+
+	/**
+	 * repaint the view
+	 */
+	public void update() {
+		panel_center.repaint();
+	}
+
+}

@@ -1,0 +1,7 @@
+package chatroom.model;
+
+public class ChatroomModel {
+    public ChatroomModel(String me, IChatroomViewAdapter viewAdapter) {
+        
+    }
+}

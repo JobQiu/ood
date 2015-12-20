@@ -1,0 +1,310 @@
+package ls53_yh36.client.app.view;
+
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+
+import ls53_yh36.client.chat.view.ChatView;
+import ls53_yh36.client.chat.view.IChatModelAdapter;
+
+/**
+ * The app View
+ * @author ls53@rice.edu
+ */
+public class AppView<TInitUser, TChatUser, TChatroom> extends JFrame {
+
+    /**
+     * The generated serial version UID
+     */
+    private static final long serialVersionUID = 6271408100072124087L;
+    
+    /**
+     * The view to model adapter
+     */
+    private IAppModelAdapter<TInitUser, TChatroom> modelAdapter;
+    
+    /**
+     * The main panel
+     */
+    private JPanel contentPane;
+    
+    /**
+     * The text area for showing infomation
+     */
+    private final JTextArea txtrInfo = new JTextArea();
+    
+    /**
+     * The panel containing panelUP and panelDown
+     */
+    private final JPanel panelCtrl = new JPanel();
+    
+    /**
+     * The upper panel
+     */
+    private final JPanel panelUp = new JPanel();
+    
+    /**
+     * The new teammate label
+     */
+    private final JLabel lblNewUser = new JLabel("New User:");
+    
+    /**
+     * The text field for inputing IP address
+     */
+    private final JTextField txtIp = new JTextField();
+    
+    /**
+     * The connect button
+     */
+    private final JButton btnConnect = new JButton("Connect");
+    
+    /**
+     * The scroll panel
+     */
+    private final JScrollPane scrollPaneInfo = new JScrollPane();
+    
+    /**
+     * The lower panel
+     */
+    private final JPanel panelDown = new JPanel();
+    
+    /**
+     * The invite button
+     */
+    private final JButton btnInvite = new JButton("Invite");
+    
+    /**
+     * The teammate label
+     */
+    private final JLabel lblUser = new JLabel("User:");
+    
+    /**
+     * The combo box for selecing user
+     */
+    private final JComboBox<TInitUser> cbxUsers = new JComboBox<>();
+    
+    /**
+     * The chatroom label
+     */
+    private final JLabel lblChatroom = new JLabel("Chatroom:");
+    
+    /**
+     * The combo box for selecting a chatroom
+     */
+    private final JComboBox<TChatroom> cbxChatrooms = new JComboBox<>();
+    
+    /**
+     * The button for creating a new chat room
+     */
+    private final JButton btnNewChatroom = new JButton("New Chatroom");
+    private final JButton btnGetChatroomList = new JButton("Get Chatroom List");
+
+    /**
+     * Create the frame.
+     */
+    public AppView(IAppModelAdapter<TInitUser, TChatroom> modelAdapter) {
+        this.modelAdapter = modelAdapter;
+        initGUI();
+    }
+    
+    /**
+     * Initialize GUI
+     */
+    private void initGUI() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 600, 400);
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        contentPane.setLayout(new BorderLayout(0, 0));
+        setContentPane(contentPane);
+        
+        contentPane.add(panelCtrl, BorderLayout.NORTH);
+        panelCtrl.setLayout(new GridLayout(2, 1, 0, 0));
+        panelCtrl.add(panelUp);
+        
+        panelUp.add(lblNewUser);
+        
+        txtIp.setColumns(10);
+        panelUp.add(txtIp);
+        btnConnect.addActionListener(e -> {
+            String ip = txtIp.getText().trim();
+            if (!ip.isEmpty()) {
+                modelAdapter.connectTo(ip);
+            }
+        });
+        
+        panelUp.add(btnConnect);
+        btnNewChatroom.addActionListener(e -> {
+            modelAdapter.createNewChatroom();
+        });
+        
+        panelUp.add(btnNewChatroom);
+        
+        panelCtrl.add(panelDown);
+        btnInvite.addActionListener(e -> {
+            if (cbxUsers.getSelectedIndex() == -1 || cbxChatrooms.getSelectedIndex() == -1) {
+                return;
+            }
+            
+            TInitUser user = cbxUsers.getItemAt(cbxUsers.getSelectedIndex());
+            TChatroom chatroom = cbxChatrooms.getItemAt(cbxChatrooms.getSelectedIndex());
+            modelAdapter.inviteUserToChatroom(user, chatroom);
+        });
+        
+        panelDown.add(lblUser);
+        
+        panelDown.add(cbxUsers);
+        btnGetChatroomList.addActionListener(e -> {
+            if (cbxUsers.getSelectedIndex() == -1) {
+                return;
+            }
+            
+            modelAdapter.join(cbxUsers.getItemAt(cbxUsers.getSelectedIndex()));
+        });
+        
+        panelDown.add(btnGetChatroomList);
+        
+        panelDown.add(lblChatroom);
+        
+        panelDown.add(cbxChatrooms);
+        
+        panelDown.add(btnInvite);
+        
+        contentPane.add(scrollPaneInfo, BorderLayout.CENTER);
+        scrollPaneInfo.setViewportView(txtrInfo);
+        
+        addWindowListener(new WindowAdapter() {
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                modelAdapter.quitAllChatrooms();
+            }
+        });
+    }
+    
+    /**
+     * Start GUI
+     */
+    public void start() {
+        String username = JOptionPane.showInputDialog(null, "Please input your username:", "Login", JOptionPane.INFORMATION_MESSAGE);
+        if (username == null) {
+            System.exit(0);
+        } else if (username.trim().isEmpty()) {
+            username = "COMP 504 user";
+        }
+        
+        setVisible(true);
+        modelAdapter.setUsername(username);
+    }
+    
+    /**
+     * Append a message
+     * @param str The message
+     */
+    public void append(String str) {
+        txtrInfo.append(str);
+        txtrInfo.setCaretPosition(txtrInfo.getText().length());
+    }
+    
+    /**
+     * Get a new chat room name
+     * @return The new chat room name
+     */
+    public String getNewChatroomName() {
+        String chatroomName = null;
+        do {
+            chatroomName = JOptionPane.showInputDialog(null, "Please input new chatroom's name:", "Chatroom Name", JOptionPane.INFORMATION_MESSAGE);
+            if (chatroomName == null) {
+                return null;
+            }
+            
+            chatroomName = chatroomName.trim();                
+        } while (chatroomName.isEmpty());
+        
+        return chatroomName;
+    }
+    
+    public ChatView<TChatUser> makeChatView(IChatModelAdapter chatModelAdapter) {
+        return new ChatView<TChatUser>(chatModelAdapter);
+    }
+    
+    /**
+     * Ask a user if he will join this chat room
+     * @param username The user name of the user who sends the invitation
+     * @param chatroom The chat room
+     * @return True if accepting invitation, false otherwise
+     */
+    public boolean willJoinChatroom(String username, String chatroom) {
+        String message = String.format("Will you join the chatroom %s invited by %s", chatroom, username);
+        int result = JOptionPane.showConfirmDialog(null, message, "Invitation", JOptionPane.OK_CANCEL_OPTION);
+        
+        return result == JOptionPane.OK_OPTION;
+    }
+    
+    /**
+     * Add a user
+     * @param user The user to add
+     */
+    public void addUser(TInitUser user) {
+        cbxUsers.insertItemAt(user, 0);
+        cbxUsers.setSelectedIndex(0);
+    }
+    
+    /**
+     * Add a chat room
+     * @param chatroom The chat room to add
+     */
+    public void addChatroom(TChatroom chatroom) {
+        cbxChatrooms.insertItemAt(chatroom, 0);
+        cbxChatrooms.setSelectedIndex(0);
+    }
+    
+    /**
+     * Choose a chat room
+     * @param user The user who owns the chat room list
+     * @param chatroomList The chat room list
+     */
+    public String chooseChatroom(String username, String[] chatroomNames) {
+        if (chatroomNames.length == 0) {
+            append("Chatroom List is empty\n");
+            return null;
+        }
+        
+        return (String)JOptionPane.showInputDialog(null, 
+                                                   "Which chatroom to join?",
+                                                   String.format("%s Chatroom List", username),
+                                                   JOptionPane.QUESTION_MESSAGE,
+                                                   null,
+                                                   chatroomNames,
+                                                   chatroomNames[0]);
+    }
+    
+    /**
+     * Remove a chat room
+     * @param chatroom The chat room to remove
+     */
+    public void removeChatroom(TChatroom chatroom) {
+        cbxChatrooms.removeItem(chatroom);
+    }
+    
+    /**
+     * Send a warning message
+     * @param message The warning message
+     */
+    public void warn(String message) {
+        JOptionPane.showMessageDialog(this, message, "Warning", JOptionPane.WARNING_MESSAGE);
+    }
+}

@@ -1,0 +1,9 @@
+package chatroom.model;
+
+import common.IUser;
+
+public interface IChatroomViewAdapter {
+    public void start();
+    
+    public void append(IUser user, String message);
+}

@@ -1,0 +1,84 @@
+package ls53_yh36.user;
+
+import java.io.Serializable;
+import java.rmi.RemoteException;
+
+import common.IInitUser;
+import common.message.IInitMessage;
+import provided.datapacket.DataPacket;
+import provided.datapacket.DataPacketAlgo;
+
+/**
+ * The init user implementation
+ * @author ls53@rice.edu
+ */
+public class InitUser implements IInitUser, Serializable {
+    
+    /**
+     * The generated serial version UID
+     */
+    private static final long serialVersionUID = 1232781283115377674L;
+
+    /**
+     * The name
+     */
+    private String name;
+    
+    /**
+     * The ip
+     */
+    private String ip;
+    
+    /**
+     * The data packet alogrithm
+     */
+    private DataPacketAlgo<String, IInitUser> dataPacketAlgo;
+    
+    /**
+     * Constructor
+     * @param name The name
+     * @param ip The IP
+     * @param dataPacketAlgo The data packet algorithm
+     */
+    public InitUser(String name, String ip, DataPacketAlgo<String, IInitUser> dataPacketAlgo) {
+        this.name = name;
+        this.ip = ip;
+        this.dataPacketAlgo = dataPacketAlgo;
+    }
+
+    /**
+     * Get the name
+     * @return The name
+     */
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    /**
+     * Receive a message
+     * @param sender The sender
+     * @param dp The data packet
+     * @exception The remote exception
+     */
+    @Override
+    public void receive(IInitUser sender, DataPacket<? extends IInitMessage> dp) throws RemoteException {
+        dp.execute(dataPacketAlgo, sender);
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+}

@@ -1,0 +1,441 @@
+package ls53_yh36.client.chat.model;
+
+import java.awt.Component;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Supplier;
+
+import javax.swing.JFrame;
+
+import common.IChatUser;
+import common.IChatroom;
+import common.ICmd2ModelAdapter;
+import common.IInitUser;
+import common.demo.message.chat.ChatUserInfoRequest;
+import common.demo.message.chat.ChatUserInfoResponse;
+import common.demo.message.chat.CommandRequest;
+import common.demo.message.chat.InitUserResponse;
+import common.demo.message.chat.TextMessage;
+import common.message.IChatMessage;
+import common.message.chat.AAddMe;
+import common.message.chat.AChatUserInfoRequest;
+import common.message.chat.AChatUserInfoResponse;
+import common.message.chat.ACommandResponse;
+import common.message.chat.AInitUserRequest;
+import common.message.chat.ARemoveMe;
+import common.message.chat.ATextMessage;
+import ls53_yh36.user.ChatUser;
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.datapacket.DataPacket;
+import provided.datapacket.DataPacketAlgo;
+import provided.mixedData.MixedDataKey;
+
+public class ChatModel implements IChatroom {
+    
+    /**
+     * The generated serial version UID
+     */
+    private static final long serialVersionUID = 3642862362618211070L;
+    
+    private UUID id;
+    
+    private String name;
+    
+    private String username;
+    
+    private String ip;
+    
+    private IChatUser me;
+    
+    private IChatUser meStub;
+    
+    private Map<IChatUser, ChatUser> users = new HashMap<>();
+    
+    private IInitUser initUser;
+    
+    private Map<Class<?>, Object[]> UnknownMessages = new HashMap<>();
+    
+    /**
+     * The model to view adapter
+     */
+    private transient IChatViewAdapter viewAdapter;
+    
+    private transient ICmd2ModelAdapter adapter = new ICmd2ModelAdapter() {
+        
+        @Override
+        public void updateUpdatable(Supplier<Component> componentFac) {
+            // TODO Auto-generated method stub
+            
+        }
+        
+        @Override
+        public <T> void setMixedDataDictEntry(MixedDataKey<T> key, T value) {
+            // TODO Auto-generated method stub
+            
+        }
+        
+        @Override
+        public void sendToChatroom(IChatMessage message) {
+            // TODO Auto-generated method stub
+            
+        }
+        
+        @Override
+        public String getUserName() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+        @Override
+        public <T> T getMixedDataDictEntry(MixedDataKey<T> key) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+        @Override
+        public void createNewWindow(Supplier<JFrame> frameFac) {
+            // TODO Auto-generated method stub
+            
+        }
+        
+        @Override
+        public void addToScrollable(Supplier<Component> componentFac) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void sendMsgTo(IChatMessage msg, IChatUser chatUser) {
+            // TODO Auto-generated method stub
+            
+        }
+    };
+    
+    /**
+     * The data packet algorithm
+     */
+    private DataPacketAlgo<String, IChatUser> dataPacketAlgo = new DataPacketAlgo<>(null);
+
+    public ChatModel(UUID id, String name, String username, String ip, IInitUser initUser) {
+        this.id = id;
+        this.name = name;
+        this.username = username;
+        this.ip = ip;
+        this.initUser = initUser;
+        initDataPacketAlgo();
+        
+        me = new ChatUser(username, ip, dataPacketAlgo);
+        try {
+            meStub = (IChatUser)UnicastRemoteObject.exportObject(me, IChatUser.BOUND_PORT_CLIENT);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void initDataPacketAlgo() {
+        dataPacketAlgo.setDefaultCmd(new ADataPacketAlgoCmd<String, Object, IChatUser>() {
+
+            /**
+             * The generated serial version UID
+             */
+            private static final long serialVersionUID = 7036336565109666871L;
+
+            @Override
+            public String apply(Class<?> index, DataPacket<Object> host, IChatUser... params) {
+                try {
+                    UnknownMessages.put(index, new Object[]{host, params[0]});
+                    params[0].receive(meStub, new CommandRequest(index).getDataPacket());
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                
+                return null;
+            }
+
+            @Override
+            public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {} 
+        });
+        
+        dataPacketAlgo.setCmd(ACommandResponse.class, new ADataPacketAlgoCmd<String, ACommandResponse, IChatUser>() {
+
+            /**
+             * The generated serial version UID
+             */
+            private static final long serialVersionUID = 8874613789621670600L;
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public String apply(Class<?> index, DataPacket<ACommandResponse> host, IChatUser... params) {
+                ACommandResponse response = host.getData();
+                ADataPacketAlgoCmd<String, ?, IChatUser> cmd = response.getCommand();
+                dataPacketAlgo.setCmd(response.getUnknownType(), cmd);
+                cmd.setCmd2ModelAdpt(adapter);
+                Object[] unknown = UnknownMessages.get(index);
+                DataPacket<Object> oldhost = (DataPacket<Object>)unknown[0];
+                IChatUser sender = (IChatUser)unknown[1];
+                
+                return oldhost.execute(dataPacketAlgo, sender);
+            }
+
+            @Override
+            public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {}
+        });
+        
+        dataPacketAlgo.setCmd(ATextMessage.class, new ADataPacketAlgoCmd<String, ATextMessage, IChatUser>() {
+
+            /**
+             * The generated serial version UID
+             */
+            private static final long serialVersionUID = 8874613789621670600L;
+
+            @Override
+            public String apply(Class<?> index, DataPacket<ATextMessage> host, IChatUser... params) {
+                viewAdapter.append(users.get(params[0]), host.getData().getText());
+                return null;
+            }
+
+            @Override
+            public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {}
+        });
+        
+        dataPacketAlgo.setCmd(AChatUserInfoRequest.class, new ADataPacketAlgoCmd<String, AChatUserInfoRequest, IChatUser>() {
+
+            /**
+             * The generated serial version UID
+             */
+            private static final long serialVersionUID = 8874613789621670600L;
+
+            @Override
+            public String apply(Class<?> index, DataPacket<AChatUserInfoRequest> host, IChatUser... params) {
+                try {
+                    params[0].receive(meStub, new ChatUserInfoResponse(host.getData(), username, ip).getDataPacket());
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                
+                return null;
+            }
+
+            @Override
+            public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {}
+        });
+        
+        dataPacketAlgo.setCmd(AChatUserInfoResponse.class, new ADataPacketAlgoCmd<String, AChatUserInfoResponse, IChatUser>() {
+
+            /**
+             * The generated serial version UID
+             */
+            private static final long serialVersionUID = 283333508165590487L;
+
+            @Override
+            public String apply(Class<?> index, DataPacket<AChatUserInfoResponse> host, IChatUser... params) {
+                AChatUserInfoResponse response = host.getData();
+                ChatUser chatUser = new ChatUser(response.getName(), response.getIP(), null);
+                users.put(params[0], chatUser);
+                viewAdapter.addUser(chatUser);
+                return null;
+            }
+
+            @Override
+            public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {}
+        });
+        
+        dataPacketAlgo.setCmd(AInitUserRequest.class, new ADataPacketAlgoCmd<String, AInitUserRequest, IChatUser>() {
+
+            /**
+             * The generated serial version UID
+             */
+            private static final long serialVersionUID = 5732580926874597021L;
+
+            @Override
+            public String apply(Class<?> index, DataPacket<AInitUserRequest> host, IChatUser... params) {
+                try {
+                    params[0].receive(meStub, new InitUserResponse(host.getData(), initUser).getDataPacket());
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                
+                return null;
+            }
+
+            @Override
+            public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {}
+        });
+        
+        dataPacketAlgo.setCmd(AAddMe.class, new ADataPacketAlgoCmd<String, AAddMe, IChatUser>() {
+
+            /**
+             * The generated serial version UID
+             */
+            private static final long serialVersionUID = 6637848777092124975L;
+
+            @Override
+            public String apply(Class<?> index, DataPacket<AAddMe> host, IChatUser... params) {
+                addUser(host.getData().getUser());
+                return null;
+            }
+
+            @Override
+            public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {}
+        });
+        
+        dataPacketAlgo.setCmd(ARemoveMe.class, new ADataPacketAlgoCmd<String, ARemoveMe, IChatUser>() {
+
+            /**
+             * The generated serial version UID
+             */
+            private static final long serialVersionUID = 5715553416060420852L;
+
+            @Override
+            public String apply(Class<?> index, DataPacket<ARemoveMe> host, IChatUser... params) {
+                viewAdapter.append(users.get(params[0]), "Send a RemoveMe data packet");
+                removeUser(host.getData().getUser());
+                return null;
+            }
+
+            @Override
+            public void setCmd2ModelAdpt(ICmd2ModelAdapter cmd2ModelAdpt) {}
+        });
+    }
+    
+    /**
+     * Start the chat room model
+     */
+    public void start() {
+        viewAdapter.setTitle(name);
+        viewAdapter.start();
+    }
+    
+    public void sendMessage(String message) {
+        send(meStub, new TextMessage(message));
+    }
+    
+    public IChatUser getMe() {
+        return meStub;
+    }
+    
+    /**
+     * Set the model to view adapter
+     * @param viewAdapter The model to view adatper
+     */
+    public void setViewAdapter(IChatViewAdapter viewAdapter) {
+        this.viewAdapter = viewAdapter;
+    }
+
+    @Override
+    public UUID getID() {
+        return id;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public Set<IChatUser> getUsers() {
+        return users.keySet();
+    }
+    
+    /**
+     * Add a user to this chat room
+     * @param user The user to add
+     */
+    @Override
+    public boolean addUser(IChatUser user) {
+        if (!users.containsKey(user)) {
+            try {
+                user.receive(meStub, new ChatUserInfoRequest().getDataPacket());
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+            
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Remove a user from this chat room
+     * @param user The user to remove
+     */
+    @Override
+    public boolean removeUser(IChatUser user) {
+        if (users.containsKey(user)) {
+            ChatUser chatUser = users.get(user);
+            viewAdapter.removeUser(chatUser);
+            users.remove(user);
+        }
+        
+        return false;
+    }
+
+    @Override
+    public void send(IChatUser sender, IChatMessage message) {
+        (new Thread() {
+
+            @Override
+            public void run() {
+                super.run();
+                for (Entry<IChatUser, ChatUser> entry : users.entrySet()) {
+                    IChatUser user = entry.getKey();
+                    try {
+                        user.receive(sender, message.getDataPacket());
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                    
+                }
+            }
+            
+        }).start();
+    }
+    
+    /**
+     * Get the hash code method
+     */
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = hash * 23 + id.hashCode();
+        hash = hash * 11 + name.hashCode();
+        return hash;
+    }
+
+    /**
+     * Check if this chat room equals to other object
+     * @param obj The other obj to check
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        
+        if (obj instanceof IChatroom) {
+            IChatroom chatroom = (IChatroom)obj;
+            return id.equals(chatroom.getID());
+        }
+        
+        return false;
+    }
+
+    /**
+     * Override the toString method
+     */
+    @Override
+    public String toString() {
+        return name;
+    }
+}

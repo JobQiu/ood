@@ -1,0 +1,11 @@
+package chatapp.view;
+
+public interface IChatAppModelAdapter<TUser, TChatroom> {
+    public void initUsername(String username);
+    
+    public void connectTo(String ip);
+    
+    public void createNewChatroom();
+    
+    public void inviteUserToChatroom(TUser user, TChatroom chatroom);
+}

@@ -1,0 +1,17 @@
+package model.paint.strategy;
+
+import java.awt.geom.AffineTransform;
+
+import model.paint.ShapePaintStrategy;
+import model.paint.shape.EllipseShapeFactory;
+
+public class EllipsePaintStrategy extends ShapePaintStrategy {
+    
+    public EllipsePaintStrategy() {
+        this(new AffineTransform(), 0, 0, 5, 2);
+    }
+    
+    public EllipsePaintStrategy(AffineTransform at, double x, double y, double xScale, double yScale) {
+        super(at, EllipseShapeFactory.Singleton.makeShape(x, y, xScale, yScale));
+    }
+}

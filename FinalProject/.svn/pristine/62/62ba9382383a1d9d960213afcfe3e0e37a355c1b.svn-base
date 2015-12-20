@@ -1,0 +1,22 @@
+package ls53_yh36.client.chat.model;
+
+import java.rmi.RemoteException;
+
+import common.IChatUser;
+import common.message.IChatMessage;
+import provided.datapacket.DataPacket;
+
+public class ChatUser implements IChatUser {
+    
+    String name;
+
+    @Override
+    public void receive(IChatUser sender, DataPacket<? extends IChatMessage> dp) throws RemoteException {
+        // TODO Auto-generated method stub
+
+    }
+    
+    public String getName() {
+        return name;
+    }
+}

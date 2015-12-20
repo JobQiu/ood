@@ -1,0 +1,181 @@
+package ls53_yh36.server.game.smodel;
+
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.Stack;
+import java.io.Serializable;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.UUID;
+
+import common.IChatUser;
+import map.MapLayer;
+import gov.nasa.worldwind.geom.Position;
+import ls53_yh36.server.game.smodel.message.GameOver;
+
+public class GameModel implements Serializable {
+	
+	private static final long serialVersionUID = -8867336209553551079L;
+
+	
+	/**
+	 * GameID assigned for a team
+	 */
+	UUID gID;
+
+	/**
+	 * Adapter to the view
+	 */
+	private GmModelAdpt gView;
+	
+	/**
+	 * Annotation layer
+	 */
+	private MapLayer annoLayer = new MapLayer();	
+	
+	/**
+	 * Position lib to store the candidate positions
+	 */
+	private List<Station> places = new ArrayList<>();
+	
+	/**
+	 * Container for places to be used in the game
+	 */
+	private Stack<Station> selPlc = new Stack<>();
+	
+	/**
+	 * Accumulate the scores got
+	 */	
+	private int score;
+	
+	/**
+	 * Make sure the game be only played one time
+	 */
+	private boolean played;
+	
+	/**
+	 * Game to server adpater stub
+	 */
+	private IChatUser svrStub;
+	
+	
+	public GameModel(GmModelAdpt view, UUID id, IChatUser stub) {
+		gID = id;
+		gView = view;
+		played = false;
+		svrStub = stub;
+	}
+	
+	public void start() {
+		gView.addLayer(annoLayer);
+		
+		loadStations();
+	}
+	
+	
+	public void launchGame() {
+		if (played) {
+			gView.showStat("You have finished the game!\n");
+			return;
+		}
+		
+		played = true;
+		
+		// Generate random places and put them into the game container
+		Set<Station> plc = new HashSet<>();
+		Random rd = new Random();
+		for (int i = 0; i < 2;) {
+			Station sta = places.get(rd.nextInt(places.size()));
+			if (!plc.contains(sta)) {
+				plc.add(sta);
+				i++;
+			}
+		}
+		score = 0;
+		selPlc.clear();
+		selPlc.addAll(plc);
+		gView.showStat("Game is starting...\n" +
+				   "Please input your answer from the given choices.\n"
+				   + "Right answer will get 3 points.\n"
+				   + "No answer or wrong answer will deduct 1 point.\n"
+				   + "To confirm your answer, please click the \" Confirm\" button.\n");
+		gView.goPlace(selPlc.peek().pos);
+		gView.showQues(selPlc.peek().ques);
+	}
+	
+	public void nextPlace(String ans) {
+		if (!played) {
+			gView.showStat("The game hasn't started. Please click \"Play\" button to start the game.\n");
+			return;
+		}
+		
+		Station pre = selPlc.pop();
+		if (pre.ans.equalsIgnoreCase(ans)) {
+			gView.showStat("Great :-) +3 points.\n");
+			score += 3;
+		}
+		else {
+			gView.showStat("Pity :-( -1 point.\n" + "Ans: " + pre.ans + "\n");
+			score -= 1;
+		}
+		
+		if (!selPlc.isEmpty()) {
+			gView.goPlace(selPlc.peek().pos);
+			gView.showQues(selPlc.peek().ques);
+		}
+		else {
+			gView.showStat("Game Over!\nYour final score is "
+							+ score + "\n"
+							+ "Wait for your teammates to finish and get your team's ranking.\n");
+			try {
+				svrStub.receive(svrStub, new GameOver("" + score).getDataPacket());
+			} catch (RemoteException e) {
+				System.err.println("Exception happens when sending back the result to the server.\n");
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
+	
+	private class Station implements Serializable {
+		
+		private static final long serialVersionUID = 6681596621067643097L;
+
+		/**
+		 * Position of the place
+		 */
+		public Position pos;
+		
+		/**
+		 * Question?
+		 */
+		public String ques;
+		
+		/**
+		 * Answer to the question
+		 */
+		public String ans;
+
+		
+		public Station (Position ps, String qs, String as) {
+			pos = ps;
+			ques = qs;
+			ans = as;
+		}
+	}
+	
+	public void loadStations() {
+		places.add(new Station(Position.fromDegrees(30.187870, 118.144226, 2000),
+								"What's the name of the mountain?\nTarzan\nHouston\nHuangshan\nHengshan\n",
+								"Huangshan"));
+		places.add(new Station(Position.fromDegrees(29.721321, -95.393896, 500),
+								"Who lives here?\n Steve Wong\nLeebron\nRice Marsh\n",
+								"Leebron"));
+		places.add(new Station(Position.fromDegrees(46.191401, -122.195551, 1500),
+								"What's the name of this famouse volcano?\nSt. Helens\nMount Vesuvius\nMount Fuji\nYellowstone Caldera\n",
+								"St. Helens"));
+	}
+}

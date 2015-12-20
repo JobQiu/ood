@@ -1,0 +1,58 @@
+package common.demo;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+
+import common.Bootstrap;
+import common.Chatroom;
+import common.IChatroom;
+import common.IConnect;
+import common.IConnectToWorldAdapter;
+import common.IUser;
+import common.User;
+import common.messages.RequestForAlgo;
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.datapacket.DataPacket;
+
+public class ConsoleChatApp {
+
+	public static void main(String[] args)
+	{
+		
+		Bootstrap bootstrap = new Bootstrap();
+		
+		User me = bootstrap.init("b",new IConnectToWorldAdapter(){
+
+			@Override
+			public <T> void receive(String roomID, IUser me, DataPacket<T> data) {
+				System.out.println(data.getData().toString());
+			}
+
+			@Override
+			public ArrayList<IChatroom> getChatrooms() { return null;}
+
+			@Override
+			public <T> ADataPacketAlgoCmd<?, T, ?> getCommand(RequestForAlgo<T> request) {return null;}
+
+			@Override
+			public IUser getUser(IConnect stub) {
+			    try {
+					return new User(stub, "a", InetAddress.getLocalHost() );
+				} catch (UnknownHostException e) {
+					e.printStackTrace();
+					return new User(stub, "a", null );
+				}
+			}
+		});
+		
+		User friend = bootstrap.connectToUser("127.0.0.1");
+		
+		Chatroom room = new Chatroom();
+		room.addUser(friend);
+		
+		room.send(me, new DataPacket<String>(String.class,"Hello world"));
+	
+	}
+
+}

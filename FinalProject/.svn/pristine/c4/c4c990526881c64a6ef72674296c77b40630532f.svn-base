@@ -1,0 +1,122 @@
+package ls53_yh36.app.controller;
+
+import java.awt.EventQueue;
+
+import common.IInitUser;
+import ls53_yh36.app.model.AppModel;
+import ls53_yh36.app.model.IAppViewAdapter;
+import ls53_yh36.app.view.AppView;
+import ls53_yh36.app.view.IAppModelAdapter;
+import map.MapPanel;
+
+/**
+ * The app controller
+ * @author ls53@rice.edu
+ */
+public class AppController {
+    
+    /**
+     * The app View
+     */
+    private AppView view;
+    
+    /**
+     * The app model
+     */
+    private AppModel model;
+    
+    /**
+     * The constructor for App Controller
+     */
+    public AppController() {
+        view = new AppView(new IAppModelAdapter() {
+            
+            @Override
+            public void startGame() {
+                model.startGame();
+            }
+            
+            @Override
+            public void setUsername(String username) {
+                model.setUsername(username);
+            }
+            
+            @Override
+            public void connect(String ip) {
+                model.connectTo(ip);
+            }
+        });
+        
+        model = new AppModel(new IAppViewAdapter() {
+            
+            @Override
+            public boolean willJoinChatroom(String username, String chatroom) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+            
+            @Override
+            public void warn(String message) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public void setTitle(String title) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public void setMapPanel(MapPanel map) {
+                view.setMapPanel(map);
+            }
+            
+            @Override
+            public String getNewChatroomName() {
+                // TODO Auto-generated method stub
+                return null;
+            }
+            
+            @Override
+            public MapPanel getMapPanel() {
+                return view.getMapPanel();
+            }
+            
+            @Override
+            public void append(String message) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public void addUser(IInitUser user) {
+                // TODO Auto-generated method stub
+                
+            }
+        });
+    }
+    
+    /**
+     * Start the App
+     */
+    public void start() {
+        view.start();
+        model.start();
+    }
+    
+    /**
+     * Launch the whole application
+     * @param args
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                AppController controller = new AppController();
+                controller.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+}

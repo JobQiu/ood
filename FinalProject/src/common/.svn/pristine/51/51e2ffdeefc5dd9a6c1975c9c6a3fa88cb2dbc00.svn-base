@@ -1,0 +1,60 @@
+package common.message.init;
+
+import common.message.AResponse;
+import common.message.IInitMessage;
+import provided.datapacket.DataPacket;
+
+/**
+ * A message containing initial user's information. 
+ */
+public class InitUserInfoResponse extends AResponse implements IInitMessage {
+
+	/**
+	 * Auto-generated UID. 
+	 */
+	private static final long serialVersionUID = -6439203006024872836L;
+
+	/**
+	 * User's name. 
+	 */
+	private final String userName;
+
+	/**
+	 * User's IP address. 
+	 */
+	private final String userIP;
+
+	/**
+	 * Constructs a new message containing user's information. 
+	 * @param request - the corresponding request of this response. 
+	 * @param userName - user's name. 
+	 * @param userIP - user's IP address. 
+	 */
+	public InitUserInfoResponse(InitUserInfoRequest request, String userName, String userIP) {
+		super(request);
+		this.userName = userName;
+		this.userIP = userIP;
+	}
+
+	/**
+	 * Returns user's name. 
+	 * @return user's name. 
+	 */
+	public String getName() {
+		return userName;
+	}
+
+	/**
+	 * Returns user's IP address. 
+	 * @return user's IP address. 
+	 */
+	public String getIP() {
+		return userIP;
+	}
+
+	@Override
+	public DataPacket<? extends IInitMessage> getDataPacket() {
+		return new DataPacket<InitUserInfoResponse>(InitUserInfoResponse.class, this);
+	}
+
+}

@@ -1,0 +1,16 @@
+package chatapp.model;
+
+import chatroom.model.ChatroomModel;
+import chatroom.model.IChatroomViewAdapter;
+import common.User;
+
+public interface IChatAppViewAdapter {
+    
+    public void appendMessage(String message);
+    
+    public void addUser(User user);
+    
+    public String getNewChatroomName();
+    
+    public IChatroomViewAdapter makeChatroomViewAdapter(ChatroomModel model);
+}

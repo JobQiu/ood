@@ -1,0 +1,38 @@
+package ls53_yh36.server.game.smodel.message;
+
+import common.IChatUser;
+import common.message.IChatMessage;
+import common.message.chat.ACommandRequest;
+import common.message.chat.ACommandResponse;
+import ls53_yh36.server.game.smodel.command.StartGameCmd;
+import provided.datapacket.ADataPacketAlgoCmd;
+import provided.datapacket.DataPacket;
+
+public class StartGameResponse extends ACommandResponse {
+
+	private static final long serialVersionUID = -7590328689960737986L;
+
+	private Class<?> unknownType;
+	
+	public StartGameResponse(ACommandRequest request, Class<?> unknown) {
+		super(request);
+		unknownType = unknown;
+//		unknownType = request.getClass();
+	}
+
+	@Override
+	public DataPacket<? extends IChatMessage> getDataPacket() {
+		return new DataPacket<ACommandResponse>(ACommandResponse.class, this);
+	}
+
+	@Override
+	public Class<?> getUnknownType() {
+		return unknownType;
+	}
+
+	@Override
+	public ADataPacketAlgoCmd<String, ?, IChatUser> getCommand() {
+		return new StartGameCmd();
+	}
+
+}

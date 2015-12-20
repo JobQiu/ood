@@ -1,0 +1,43 @@
+package chatroom.model;
+
+import javax.swing.ImageIcon;
+
+import common.IChatroom;
+import common.IUser;
+import provided.datapacket.ADataPacket;
+import provided.datapacket.DataPacket;
+import provided.datapacket.DataPacketAlgo;
+
+public class ChatroomModel {
+    
+    private IUser me;
+    
+    private IChatroom chatroom;
+    
+    private IChatroomViewAdapter viewAdapter;
+    
+    private DataPacketAlgo<ADataPacket, Void> dataPacketAlgo;
+    
+    public ChatroomModel(IUser me, IChatroom chatroom) {
+        this.me = me;
+        this.chatroom = chatroom;
+    }
+    
+    public void start() {
+        viewAdapter.start();
+        // send AddMe packet
+    }
+    
+    public void sendMessage(String message) {
+        chatroom.send(me, new DataPacket<String>(String.class, message));
+        viewAdapter.append(me, message);
+    }
+    
+    public void sendImage(ImageIcon image) {
+        
+    }
+
+    public void setViewAdapter(IChatroomViewAdapter viewAdapter) {
+        this.viewAdapter = viewAdapter;
+    }
+}

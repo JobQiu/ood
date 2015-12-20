@@ -1,0 +1,57 @@
+package common.message.chat;
+
+import java.util.UUID;
+
+import common.message.IChatMessage;
+import provided.datapacket.ADataPacket;
+import provided.datapacket.DataPacket;
+
+/**
+ * A message asking for a command for an unknown data type. 
+ */
+public class CommandRequest implements IChatMessage {
+
+	/**
+	 * Auto-generated UID. 
+	 */
+	private static final long serialVersionUID = -5554873966239814836L;
+
+	/**
+	 * The class type of unknown data. 
+	 */
+	private final Class<?> type;
+
+	/**
+	 * ID of this message. 
+	 */
+	private final UUID msgID;
+
+	/**
+	 * Constructs a new message to request a command for an unknown data type. 
+	 * @param msgID - ID of the message with the unknown data 
+	 * @param type - class type of unknown data
+	 */
+	public CommandRequest(Class<?> type, UUID msgID) {
+		this.msgID = msgID;
+		this.type = type;
+	}
+
+	/**
+	 * Returns the class type of unknown data. 
+	 * @return the class type of unknown data
+	 */
+	public Class<?> getUnknownType() {
+		return type;
+	}
+
+	@Override
+	public UUID getID() {
+		return msgID;
+	}
+
+	@Override
+	public ADataPacket getDataPacket() {
+		return new DataPacket<CommandRequest>(CommandRequest.class, this);
+	}
+
+}

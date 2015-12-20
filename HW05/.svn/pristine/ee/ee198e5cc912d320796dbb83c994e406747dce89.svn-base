@@ -1,0 +1,53 @@
+package model.strategy;
+
+
+import model.Ball;
+import model.IUpdateStrategy;
+import util.IDispatcher;
+
+/**
+ * strategy that creates a ball which can change its behavior upon button clicking
+ *
+ */
+public class SwitcherStrategy<TDispMsg> extends AUpdateStrategy<TDispMsg>{
+
+	/** create a straight strategy */
+	private IUpdateStrategy<TDispMsg> _strategy = new StraightStrategy<TDispMsg>();
+	
+	private boolean hasInitialized = false;
+	
+	@Override
+	/**
+	 * Initializes the strategy.   Should be called every time the Ball sets a new strategy.
+	 * @param context  The ball using this strategy.
+	 */
+	public void init(Ball context){
+	    _strategy.init(context);
+	    hasInitialized = true;
+	}
+	
+	
+	@Override
+	/**
+	 * change the diameter of the ball by 1 each time
+	 * if it reaches the threshold, reverse the change direction
+	 * @param <IDispMsg>
+	 */
+	public void updateState(Ball context, IDispatcher<TDispMsg> dispatcher) {
+	    if (!hasInitialized) {
+	        _strategy.init(context);
+	        hasInitialized = true;
+	    }
+	    
+		_strategy.updateState(context, dispatcher); 
+	}
+	
+	/**
+	 * set to a new strategy
+	 * @param newStrategy The new strategy
+	 */
+	public void setStrategy(IUpdateStrategy<TDispMsg> newStrategy) { 
+		_strategy = newStrategy;
+		hasInitialized = false;
+	}
+}

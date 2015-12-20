@@ -1,0 +1,26 @@
+package model.strategy;
+
+import model.Ball;
+
+public class BreathingStrategy implements IUpdateStrategy {
+
+	/** the size a ball expands or shrinks each tick*/
+	private int sizeChanged = 1;
+	
+	/* (non-Javadoc)
+	 * @see strategies.IUpdateStrategy#updateState(model.Ball)
+	 * this updateState strategy is used to change
+	 * the ball's size all the time
+	 * @param the ball to update state
+	 */
+	@Override
+	public void updateState(Ball _ball) {
+		int radius = _ball.getRadius();
+		_ball.setRadius(radius + sizeChanged);
+		if (radius + sizeChanged == 60) {
+			sizeChanged = -1;
+		} else if (radius + sizeChanged == 5) {
+			sizeChanged = 1;
+		}
+	}
+}

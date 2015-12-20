@@ -1,0 +1,57 @@
+package controller;
+
+import java.awt.EventQueue;
+
+import model.PlayerModel;
+import provided.abcParser.ABCParser;
+import provided.music.IPhrase;
+import provided.music.Note;
+import provided.player.ISequencePlayerStatus;
+import provided.player.SequencePlayer;
+import provided.util.ABCUtil;
+import view.PlayerGui;
+
+public class PlayerApp {
+    
+    private PlayerModel model;
+    
+    private PlayerGui view;
+    
+    public PlayerApp() {
+        model = new PlayerModel();
+        
+        view = new PlayerGui();
+    }
+    
+    /**
+     * Launch the player app.
+     */
+    public void start() {
+        view.start();
+    }
+    
+    /**
+     * The main method of the player app.
+     * @param args Useless arguments.
+     */
+    public static void main(String[] args) {
+//        SequencePlayer sp = new SequencePlayer(16, 0);  // 16 = ticks per QUARTER note
+//        sp.setTicksPerDefaultNote(16);  // 16 = ticks per DEFAULT note
+//        sp.setTempo(140);   // 140 quarter notes (beats) per minute
+//        Note g = new Note('G', 0, 0, 1.0, false);
+//        sp.addNote(g, 10);   // 10 = start tick of note.  Tick of next note is returned.
+//        sp.play(ISequencePlayerStatus.NULL);   // No-op end-of-song cmd supplied.
+//        System.out.println(ABCUtil.Singleton.getFileContents("/songs/twinkle.abc"));
+//        ABCParser parser = new ABCParser("/songs/twinkle.abc");
+        //IPhrase phrase = parser.parse();
+        
+        EventQueue.invokeLater(() -> {
+            try {
+                PlayerApp app = new PlayerApp();
+                app.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+}

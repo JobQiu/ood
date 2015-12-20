@@ -1,0 +1,11 @@
+package strategies;
+
+import model.Ball;
+
+public interface IUpdateStrategy {
+	/**
+	 * Update the state of the ball with the desired strategy
+	 * @param _ball the ball to update its state
+	 */
+	public void updateState(Ball _ball);
+}

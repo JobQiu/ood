@@ -1,0 +1,33 @@
+package ls53_yh36.server.game.smodel;
+
+import java.io.Serializable;
+
+import gov.nasa.worldwind.geom.Position;
+import gov.nasa.worldwind.layers.AbstractLayer;
+
+public interface GmModelAdpt extends Serializable {
+
+	/**
+	 * Show the layer on the mapPanel
+	 * @param layer Layer to be shown
+	 */
+	public void addLayer(AbstractLayer layer);
+	
+	/**
+	 * Navigate to the given position
+	 * @param pos Position contains latitude, longitude and altitude
+	 */
+	public void goPlace(Position pos);
+	
+	/**
+	 * Show the status
+	 * @param stat Status to be post
+	 */
+	public void showStat(String stat);
+	
+	/**
+	 * Post the question
+	 * @param qs
+	 */
+	public void showQues(String qs);
+}

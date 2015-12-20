@@ -1,0 +1,10 @@
+package ls53_yh36.app.view;
+
+public interface IModelAdapter {
+    
+    public void setUsername(String username);
+    
+    public void connect(String ip);
+    
+    public void startGame();
+}

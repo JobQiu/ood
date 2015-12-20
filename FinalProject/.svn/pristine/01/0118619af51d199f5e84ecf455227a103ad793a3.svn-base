@@ -1,0 +1,191 @@
+package ls53_yh36.server.game.sview;
+
+import java.awt.BorderLayout;
+import java.awt.Container;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.BevelBorder;
+import java.awt.GridLayout;
+import javax.swing.JTextArea;
+import javax.swing.border.TitledBorder;
+
+import gov.nasa.worldwind.geom.Position;
+import gov.nasa.worldwind.globes.Earth;
+import gov.nasa.worldwind.layers.AbstractLayer;
+import map.MapPanel;
+
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JScrollPane;
+import java.awt.Insets;
+import net.miginfocom.swing.MigLayout;
+
+/**
+ * The game view
+ * @author ls53@rice.edu
+ *
+ */
+public class GameView extends JFrame {
+	
+    private static final long serialVersionUID = 3680227716314230436L;
+    
+    private GmViewAdpt gModel;
+    private MapPanel map;
+    
+    private JPanel contentPane;
+    private final JPanel panelCtrl = new JPanel();
+    private final JPanel panelMap = new JPanel();
+    private final JTextField txtAns = new JTextField();
+    private final JButton btnConfirm = new JButton("Confirm");
+    private final JButton btnStart = new JButton("PLAY");
+    private final JButton btnEnd = new JButton("CLOSE");
+    private final JPanel panelOp = new JPanel();
+    private final JPanel panelResult = new JPanel();
+    private final JScrollPane scrollPane = new JScrollPane();
+    private final JTextArea textArea = new JTextArea();
+    private final JPanel panelAns = new JPanel();
+    private final JScrollPane scrollPaneQues = new JScrollPane();
+    private final JTextArea textQArea = new JTextArea();
+
+
+    /**
+     * Create the frame.
+     */
+    public GameView(GmViewAdpt model) {
+        initGUI();
+        
+        gModel = model;
+    }
+    
+    /**
+     * Initialize GUI
+     */
+    private void initGUI() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 738, 434);
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        contentPane.setLayout(new BorderLayout(0, 0));
+        setContentPane(contentPane);
+        
+        contentPane.add(panelCtrl, BorderLayout.SOUTH);
+        btnStart.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		gModel.startGame();
+        	}
+        });
+        
+        panelCtrl.add(btnStart);
+        btnEnd.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		gModel.close();
+        	}
+        });
+        
+        panelCtrl.add(btnEnd);
+        panelMap.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+        
+        contentPane.add(panelMap, BorderLayout.CENTER);
+    	
+    	contentPane.add(panelOp, BorderLayout.EAST);
+    	panelResult.setBorder(new TitledBorder(null, "Results", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+    	
+    	contentPane.add(panelResult, BorderLayout.WEST);
+    	GridBagLayout gbl_panelResult = new GridBagLayout();
+    	gbl_panelResult.columnWidths = new int[] {150, 0};
+    	gbl_panelResult.rowHeights = new int[]{315, 0, 0};
+    	gbl_panelResult.columnWeights = new double[]{0.0, Double.MIN_VALUE};
+    	gbl_panelResult.rowWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
+    	panelResult.setLayout(gbl_panelResult);
+    	
+    	GridBagConstraints gbc_scrollPane = new GridBagConstraints();
+    	gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
+    	gbc_scrollPane.fill = GridBagConstraints.BOTH;
+    	gbc_scrollPane.gridx = 0;
+    	gbc_scrollPane.gridy = 0;
+    	panelResult.add(scrollPane, gbc_scrollPane);
+    	
+    	panelOp.setLayout(new MigLayout("", "[150px,grow,fill]", "[180.00px,grow,fill][120.00,fill]"));
+        scrollPaneQues.setViewportBorder(new TitledBorder(null, "Question", TitledBorder.CENTER, TitledBorder.TOP, null, null));
+        
+        panelOp.add(scrollPaneQues, "cell 0 0,grow");
+        textQArea.setLineWrap(true);
+        
+        scrollPaneQues.setViewportView(textQArea);
+        panelAns.setBorder(new TitledBorder(null, "Your Answer", TitledBorder.CENTER, TitledBorder.TOP, null, null));
+        
+        panelOp.add(panelAns, "cell 0 1,grow");
+        panelAns.add(txtAns);
+        txtAns.setColumns(10);
+        panelAns.add(btnConfirm);
+        btnConfirm.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		gModel.backAns(txtAns.getText());
+        		txtAns.setText("");
+        	}
+        });
+    	
+    	
+    	scrollPane.setViewportView(textArea);
+    	panelMap.setLayout(new GridLayout(0, 1, 0, 0));
+    	textArea.setLineWrap(true);
+    	
+    	map = new MapPanel(Earth.class);
+    	panelMap.add(map);
+//    	map.setPreferredSize(new java.awt.Dimension(600, 400));
+    }
+    
+    /**
+     * Start the GUI
+     */
+    public void start() {
+        setVisible(true);
+        map.start();
+    }
+    
+    /**
+     * Get the container
+     * @return
+     */
+    public Container getPanel() {
+        return panelMap;
+    }
+    
+    /**
+     * Add the layer to the mapPanel, like annotation, icon
+     * @param layer Layer to be added
+     */
+    public void showLayer(AbstractLayer layer) {
+    	map.addLayer(layer);
+    }
+    
+    /**
+     * Remove the layer from the map
+     * @param layer Layer to be removed
+     */
+    public void removeLayer(AbstractLayer layer) {
+    	map.removeLayer(layer);
+    }
+    
+    /**
+     * Navigate to the given position
+     * @param pos Position decided by the longitude and the latitude
+     */
+    public void goLongLat(Position pos) {
+    	map.setPosition(pos, false);
+    }
+    
+    public void dispStat(String txt) {
+    	textArea.append(txt);
+    }
+    
+    public void dispQues(String txt) {
+    	textQArea.setText(txt);
+    }
+}

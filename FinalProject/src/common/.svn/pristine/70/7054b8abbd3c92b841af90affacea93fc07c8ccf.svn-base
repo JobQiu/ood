@@ -1,0 +1,60 @@
+package common.message.chat;
+
+import common.message.AResponse;
+import common.message.IChatMessage;
+import provided.datapacket.DataPacket;
+
+/**
+ * A message containing a chat user's information. 
+ */
+public class ChatUserInfoResponse extends AResponse implements IChatMessage {
+
+	/**
+	 * Auto-generated UID. 
+	 */
+	private static final long serialVersionUID = -2781673188894508467L;
+
+	/**
+	 * User's name. 
+	 */
+	private final String userName;
+
+	/**
+	 * User's IP address. 
+	 */
+	private final String userIP;
+
+	/**
+	 * Constructs a new message containing user's information. 
+	 * @param request - the corresponding request of this response. 
+	 * @param userName - user's name. 
+	 * @param userIP - user's IP address. 
+	 */
+	public ChatUserInfoResponse(ChatUserInfoRequest request, String userName, String userIP) {
+		super(request);
+		this.userName = userName;
+		this.userIP = userIP;
+	}
+
+	/**
+	 * Returns user's name. 
+	 * @return user's name. 
+	 */
+	public String getName() {
+		return userName;
+	}
+
+	/**
+	 * Returns user's IP address. 
+	 * @return user's IP address. 
+	 */
+	public String getIP() {
+		return userIP;
+	}
+
+	@Override
+	public DataPacket<? extends IChatMessage> getDataPacket() {
+		return new DataPacket<ChatUserInfoResponse>(ChatUserInfoResponse.class, this);
+	}
+
+}

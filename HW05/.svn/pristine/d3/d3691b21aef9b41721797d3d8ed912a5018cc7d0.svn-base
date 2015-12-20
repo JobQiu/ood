@@ -1,0 +1,175 @@
+package model;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+
+import javax.swing.JPanel;
+
+
+import util.IDispatcher;
+import util.IObserver;
+;
+/**
+ * Ball class to generate balls with different strategies
+ * @author: Jian Cao
+ */
+public class Ball implements IObserver<IBallCmd> {
+
+	/** color of the ball */
+	private Color color;
+	/** dimension of the ball */
+	private Point dimension;
+	/** velocity of ball */
+	private Point velocity;	
+	/**coordinate of ball */
+	private Point location;
+	/** panel to paint on */
+	private JPanel centerPanel;
+	/** strategy of ball movement */
+	private IUpdateStrategy<IBallCmd> updateStrategy;
+	
+	private IPaintStrategy paintStrategy;
+	
+	/** 
+	 * constructor of ball
+	 * @param color 
+	 * @param diameter
+	 * @param incrementX
+	 * @param incrementY
+	 * @param centerPanel
+	 * @param strategy
+	 */
+	public Ball(Color color, Point dimension, Point location, Point velocity, JPanel centerPanel, IUpdateStrategy<IBallCmd> updateStrategy, IPaintStrategy paintStrategy) {
+		this.color = color;
+		this.dimension = dimension;
+		this.velocity = velocity;
+		this.location = location;
+		this.centerPanel = centerPanel;
+		setUpdateStrategy(updateStrategy);
+		setPaintStrategy(paintStrategy);
+	}
+	
+	/** get the color of ball */
+	public Color getColor(){
+		return this.color;
+	}
+	
+	/** set the color of ball */
+	public void setColor(Color color){
+		this.color = color;		
+	}
+	
+	/** get the dimension of ball */
+	public Point getDimension(){
+		return dimension; 
+	}
+	
+	/** set the dimension of ball */
+	public void setDimension(int length, int width){
+		this.dimension.y = length;
+		this.dimension.x = width;
+	}
+
+	/** get the coordinate of ball */
+	public Point getLocation(){
+		return this.location;
+	}
+	
+	/** set the x, y coordinate of ball */
+	public void setLocation(int x, int y){
+		this.location.x = x;
+		this.location.y = y;
+	}
+	
+	/** get the x,y velocity of ball */
+	public Point getVelocity(){
+		return velocity;
+	}
+	
+	/** set the x, y velocity of ball */
+	public void setVelocity(int incrementX, int incrementY){
+		this.velocity.x = incrementX;
+		this.velocity.y = incrementY;
+	}
+	
+	/** get the paint strategy of ball */
+	public IUpdateStrategy<IBallCmd> getUpdateStrategy(){
+		return this.updateStrategy;
+	}
+	
+	/** set the update strategy of ball */
+	public void setUpdateStrategy(IUpdateStrategy<IBallCmd> strategy){
+		updateStrategy = strategy;
+		updateStrategy.init(this);
+	}
+	
+	/** get the paint strategy of ball */
+	public IPaintStrategy getPaintStrategy(){
+		return this.paintStrategy;
+	}
+	
+	/** set the paint strategy of ball */
+	public void setPaintStrategy(IPaintStrategy strategy){
+		paintStrategy = strategy;
+		paintStrategy.init(this);
+	}
+	
+	/** get the panel to paint on */
+	public JPanel getCanvas(){
+		return this.centerPanel;
+	}
+	
+	/** update the state of ball based on different strategy 
+	 * @param <TDispMsg>*/
+	public void changeState(IDispatcher<IBallCmd> dispatcher){
+		updateStrategy.updateState(this, dispatcher);
+	}
+	
+	/** paint the ball on panel for given paint strategy */
+	public void updatePaint(Graphics g, Ball ball){
+		paintStrategy.paint(g, ball);
+	}
+	
+	/** bounce the ball of the wall */
+	public void bounce(){
+		if (location.x - dimension.x < 0) {
+			velocity.x = -velocity.x;
+			location.x = dimension.x;
+		} else if (location.x + dimension.x > centerPanel.getWidth()) {
+			velocity.x = -velocity.x;
+			location.x = centerPanel.getWidth() - dimension.x;
+		}
+
+		if (location.y - dimension.y < 0) {
+			velocity.y = -velocity.y;
+			location.y = dimension.y;
+		} else if (location.y + dimension.y > centerPanel.getHeight()) {
+			velocity.y = -velocity.y;
+			location.y = centerPanel.getHeight() - dimension.y;
+		}
+		
+	}
+	
+	/** move the ball depending on velocity */
+	public void move(){
+		location.x += velocity.x;
+		location.y += velocity.y;
+	}
+	
+	public void interactWith(Ball target, IDispatcher<IBallCmd> dispatcher) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+	 * Update things such as changing the position, creating animated motion or other 
+	 * characteristics of the sprite by calling abstract updateBall() method.
+	 * @param o observable
+	 * @param g the Graphics object to paint the ball onto
+	 */
+	public void update(IDispatcher<IBallCmd> dispatcher, IBallCmd msg){
+		msg.apply(this, dispatcher);
+	}
+}
